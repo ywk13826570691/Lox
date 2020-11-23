@@ -13,5 +13,6 @@ long lox_handle_jmp(struct lox_cmd *cmd);
 
 long lox_handle_function_param_end(struct lox_cmd *cmd);
 long lox_handle_return(struct lox_cmd *cmd);
+long lox_handle_function_end(struct lox_cmd *cmd);
 
 #endif // LOX_HANDLE_H

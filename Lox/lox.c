@@ -470,13 +470,16 @@ int lox_machine_run(void)
             {
                 lox_handle_function_param_end(cmd);
             }
-
             break;
-            case LOX_RETURN:
-                lox_info("--------------------pppppppppppppppppp\n");
-                cmd_add = 0;
-                lox_handle_return(cmd);
-                break;
+
+        case LOX_RETURN:
+            cmd_add = 0;
+            lox_handle_return(cmd);
+            break;
+        case LOX_END_FUNCTION:
+            cmd_add = 0;
+            lox_handle_function_end(cmd);
+            break;
         default:
             break;
         }

@@ -315,3 +315,14 @@ long lox_handle_return(struct lox_cmd *cmd)
     return LOX_OK;
 }
 
+
+long lox_handle_function_end(struct lox_cmd *cmd)
+{
+    lox_stack_clear_and_return();
+
+    //lox_stack_print();
+    lox_info("---------return sp------------------:%ld \n", SP);
+
+    return LOX_OK;
+}
+
