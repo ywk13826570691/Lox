@@ -1,0 +1,62 @@
++
+-
+*
+/
+%
+<<
+>>
+
++=
+-=
+*=
+/=
+%=
+<<=
+>>=
+
+!=
+==
+>=
+<=
+>
+<
+and
+or
+
+false
+true
+nil
+
+
+
+while(bool) { }
+
+do {} while(bool)
+
+for(bool) {}
+
+break
+continue
+
+
+if(bool)
+{
+}
+else
+{
+}
+函数
+function name(param....)
+{
+	return
+}
+
+
+
+@ 注释
+
+global 全局变量
+
+
+
+

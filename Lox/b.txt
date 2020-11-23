@@ -1,0 +1,28 @@
+function sum(a, b)
+    f = 1000;
+    f = 100
+	return a + b
+end
+
+function add(a, b)
+	return a+ b
+end
+
+--function rrrr()
+	--return;
+--end
+
+--a = 1000
+--c = a + 10
+--print(1)
+--print("hello vkang")
+--print(11.2);
+--print(type(a))
+
+print("hello", "vkang", "world")
+--print(a)
+--print(c)
+gg = sum(1,8)
+ff = sum(3,5)
+print(gg)
+print(sum(55,25))
