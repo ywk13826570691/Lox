@@ -6,11 +6,18 @@
 struct lox_object* lox_object_new_number(float f);
 struct lox_object* lox_object_new_string(char *str);
 struct lox_object* lox_object_new_temp(void);
+struct lox_object* lox_object_new_array(void);
 
 struct lox_object* lox_object_new_func(void);
 
 
 int lox_object_copy(struct lox_object *dst, struct lox_object *src);
+int lox_object_copy_to_number(struct lox_object *dst, struct lox_object *src);
+int lox_object_copy_to_string(struct lox_object *dst, struct lox_object *src);
+int lox_object_copy_to_nil(struct lox_object *dst, struct lox_object *src);
+int lox_object_copy_to_array(struct lox_object *dst, struct lox_object *src);
+int lox_object_destroy_array(struct lox_object *obj);
+
 long lox_object_add(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst);
 
 long lox_object_destroy(struct lox_object *obj);

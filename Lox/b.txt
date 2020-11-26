@@ -1,11 +1,16 @@
 function sum(a, b)
     f = 1000;
     f = 100
+    print("---------------------------------------------------------------------------------vkang hello\n")
 	return a + b
 end
 
 function add(a, b)
 	return a+ b
+end
+
+function sss()
+    print("mm")
 end
 
 --function rrrr()
@@ -26,3 +31,7 @@ gg = sum(1,8)
 ff = sum(3,5)
 print(gg)
 print(sum(55,25))
+
+sss()
+print("llllllllllllllllllllllllllllllllllllllllllllllllllllllllll\n");
+s = [1,2,3,7, 8, 9, "hello"]

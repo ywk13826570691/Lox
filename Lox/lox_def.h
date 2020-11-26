@@ -22,7 +22,7 @@ enum lox_tag_type
     LOX_TYPE_INVALID,
     LOX_NUMBER,
     LOX_STRING,
-    LOX_VECTOR,
+    LOX_ARRAY,
     LOX_NIL,
     LOX_TRUE,
     LOX_FALSE,
@@ -37,8 +37,9 @@ struct lox_vector_value
 
 struct lox_vector
 {
+    int counter;
     int len;
-    struct lox_vector_value *vec_head;
+    struct lox_vector_value vec_head;
 };
 
 
@@ -61,13 +62,15 @@ struct lox_object_value
 {
     float v_f;
     char *v_str;
-    struct lox_vector v_vec;
+    struct lox_vector *v_vec;
     struct lox_function *v_func;
 };
 
 struct lox_object
 {
     int o_tag;
+    int o_is_array_object;
+    int o_array_object_counter;
     struct lox_object_value o_value;
 };
 

@@ -14,13 +14,14 @@ long lox_stack_push_number_var(float f, long label);
 long lox_stack_push_string_var(char *str, long label);
 long lox_stack_push_var(char *name, long label);
 long lox_stack_push_temp_var(long label);
+long lox_stack_push_array_var(long label, long *labels, long label_cnt);
 
 long lox_find_symbol_by_name(char *s_name);
 long lox_find_symbol_by_label(unsigned long label);
 
 long lox_stack_push_value(long v);
 
-void lox_stack_print();
+void lox_stack_print(void);
 
 void lox_stack_clear_and_return(void);
 

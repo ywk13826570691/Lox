@@ -65,6 +65,11 @@ long lox_handle_push_cmd(struct lox_cmd *cmd)
     {
         ret = lox_stack_push_temp_var(push_type->f_label_index);
     }
+    else if (push_type->p_type == PUSH_ARRARY)
+    {
+        lox_info("---------------------handle push array:%d\n", cmd->cmd_args[0]);
+        ret = lox_stack_push_array_var(cmd->cmd_push.f_label_index, &cmd->cmd_args[1], cmd->cmd_args[0]);
+    }
     else
     {
         lox_error("finding an invalid push cmd:%d\n", push_type->p_type);

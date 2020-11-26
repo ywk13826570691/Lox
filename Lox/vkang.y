@@ -4,6 +4,7 @@
     #include "lox_function.h"
     #include "lox_opcode.h"
     #include "lox_register.h"
+    #include "lox_array.h"
     extern int lox_linenumber;
     extern unsigned int lox_var_label_index;
     extern int lox_function_parsing;
@@ -54,7 +55,7 @@
 
 //%type <pChar> parlist1
 
-%type <vLong> expr var varlist1 varlist functionvalue  functioncall retlist
+%type <vLong> expr var varlist1 varlist functionvalue  functioncall retlist expr1
 
 %left AND OR
 %left EQ NE '>' '<' LE GE
@@ -62,6 +63,11 @@
 %left '+' '-'
 %left '*' '/'
 %left NOT
+%left '['
+%left ']'
+
+%nonassoc LEFT_BRACKETS
+%nonassoc RIGHT_BRACKETS
 
 %nonassoc UMINUS
 
@@ -183,6 +189,15 @@ varlist1  :	NAME {
 
 varlist  : expr { $$ = $1; }
           /*| val_list ',' expr*/
+     | array {
+                    extern long  lox_array_index;
+                    extern long  lox_array_label[1000];
+printf("---------------------------------------------------------1111111---------------------:%d\n", lox_array_index);
+                    $$ = lox_var_label_index;
+                    lox_opcode_push_array_var(lox_var_label_index, lox_array_label, lox_array_index);
+                    lox_var_label_index++;
+                    lox_array_parsing_end();
+                }
 		  ;
 /*
 exprlist  :
@@ -241,6 +256,18 @@ dimension    :
 	     | expr
 	     ;
          */
+
+array: '[' arraylist ']'
+        ;
+
+arraylist:
+        | arraylist1
+        ;
+
+//[1,2,3,[4,5,6],7, 8, 9]
+arraylist1: expr {   lox_array_push_label($1);   printf("---------------------------------------------------------1111111222---------------------:\n");}
+          | arraylist1  ','  expr { lox_array_push_label($3); printf("---------------------------------------------------------111111133333---------------------:\n");}
+          ;
 	     
 functioncall : functionvalue  '(' function_parlistlist ')' { 
 									$$ = $1; 
@@ -282,7 +309,7 @@ var	  :	NAME  {
 				}
 				$$ = ret;
 			  }
-	  /*|	var '[' expr1 ']'*/ 
+	  |	var '[' expr ']' {}
 	  ;
 
 %%

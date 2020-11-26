@@ -1,6 +1,7 @@
 #include "lox_stack.h"
 #include "lox_register.h"
 #include "lox_object.h"
+#include "lox_array.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -89,6 +90,36 @@ long lox_stack_push_temp_var(long label)
     return lox_stack_push(s);
 }
 
+long lox_stack_push_array_var(long label, long *labels, long label_cnt)
+{
+    struct lox_symbol *s = (struct lox_symbol *)malloc(sizeof (struct lox_symbol));
+    struct lox_object *obj = lox_object_new_array();
+    memset(s, 0, sizeof (struct lox_symbol));
+    s->sym_obj = obj;
+    s->sym_label_value = label;
+
+    for(int i = 0; i < label_cnt; i++)
+    {
+        long label_index = labels[i];
+        struct lox_symbol *sym = lox_find_symbol_by_label(label_index);
+        if (!sym)
+        {
+            lox_error("stack push array can not find var\n");
+            exit(0);
+        }
+        else
+        {
+            if (sym->sym_obj->o_tag == LOX_NUMBER)
+                lox_info("stack push array can find var %f\n", sym->sym_obj->o_value.v_f);
+            if (sym->sym_obj->o_tag == LOX_STRING)
+                lox_info("stack push array can find var %s\n", sym->sym_obj->o_value.v_str);
+
+            lox_array_insert_obj(obj, sym->sym_obj);
+        }
+    }
+    return  lox_stack_push(s);
+}
+
 long lox_find_symbol_by_name(char *s_name)
 {
     if (!s_name)
@@ -169,7 +200,18 @@ void lox_stack_clear_and_return(void)
         lox_stack[FP + LOX_STACK_TOP + i] = 0;
     }
 #endif
+#if 0
     for (int i = FP + LOX_STACK_TOP + argc ; i < SP ; i++ )
+    {
+        struct lox_symbol *s = lox_stack[i];
+        if (s && s->sym_obj)
+            free(s->sym_obj);
+        if (s)
+            free(s);
+        lox_stack[i] = 0;
+    }
+#endif
+    for (long i = SP; i >= FP + LOX_STACK_TOP + argc; i--)
     {
         struct lox_symbol *s = lox_stack[i];
         if (s && s->sym_obj)

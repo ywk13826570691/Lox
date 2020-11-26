@@ -11,7 +11,9 @@ SOURCES += \
         lox_stack.c \
         main.c \
     lox_handle.c \
-    lox_object.c
+    lox_object.c \
+    lox_keywords.c \
+    lox_array.c
 
 HEADERS += \
     lox.h \
@@ -22,7 +24,9 @@ HEADERS += \
     lox_register.h \
     lox_stack.h \
     lox_handle.h \
-    lox_object.h
+    lox_object.h \
+    lox_keywords.h \
+    lox_array.h
 
 OTHER_FILES += \
     vkang.l \

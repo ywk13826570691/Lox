@@ -78,6 +78,7 @@ enum lox_push_type
     PUSH_STRING_VAR,
     PUSH_VAR,
     PUSH_TEMP_VAR,
+    PUSH_ARRARY,
 };
 
 struct lox_cmd_push
@@ -100,7 +101,7 @@ struct lox_cmd
 {
     int  cmd_opcode;
     char cmd_jmp_label[LOX_VAR_MAX_NAME_LEN];
-    long cmd_args[LOX_REGISTER_CNT*10];
+    long cmd_args[LOX_REGISTER_CNT*20];
 
     struct lox_cmd_push cmd_push;
     struct lox_cmd_jmp cmd_jmp;
@@ -119,6 +120,7 @@ int lox_opcode_push_number_var(float f, int label);
 int lox_opcode_push_string_var(char *str, int label);
 int lox_opcode_push_var(char *var_name, int label);
 int lox_opcode_push_temp_var(int label);
+int lox_opcode_push_array_var(int label, long *labels, long label_cnt);
 
 
 //int lox_opcode_get_var(char *var_name, int label);
