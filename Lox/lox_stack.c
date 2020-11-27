@@ -90,6 +90,13 @@ long lox_stack_push_temp_var(long label)
     return lox_stack_push(s);
 }
 
+long lox_stack_push_temp_ptr_var(long label_temp)
+{
+    struct lox_symbol *s = (struct lox_symbol *)malloc(sizeof (struct lox_symbol));
+    s->sym_label_value = label_temp;
+    return lox_stack_push(s);
+}
+
 long lox_stack_push_array_var(long label, long *labels, long label_cnt)
 {
     struct lox_symbol *s = (struct lox_symbol *)malloc(sizeof (struct lox_symbol));
@@ -213,11 +220,30 @@ void lox_stack_clear_and_return(void)
 #endif
     for (long i = SP; i >= FP + LOX_STACK_TOP + argc; i--)
     {
-        struct lox_symbol *s = lox_stack[i];
-        if (s && s->sym_obj)
-            free(s->sym_obj);
-        if (s)
-            free(s);
+        struct lox_symbol *sym = lox_stack[i];
+        if (sym && sym->sym_obj)
+        {
+            if (sym->sym_obj->o_is_array_object)
+            {
+                if (sym->sym_obj->o_tag == LOX_ARRAY)
+                {
+                    lox_object_destroy_array(sym->sym_obj);
+                }
+                else
+                {
+                    if (!sym->sym_obj->o_array_object_counter)
+                    {
+                        free(sym->sym_obj);
+                    }
+                }
+            }
+            else
+            {
+                free(sym->sym_obj);
+            }
+        }
+        if (sym)
+            free(sym);
         lox_stack[i] = 0;
     }
 

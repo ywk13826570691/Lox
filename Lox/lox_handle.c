@@ -4,6 +4,8 @@
 #include "lox_register.h"
 #include "lox_stack.h"
 #include "lox_object.h"
+#include "lox_lib.h"
+#include "lox_array.h"
 
 
 /*
@@ -59,16 +61,21 @@ long lox_handle_push_cmd(struct lox_cmd *cmd)
     }
     else if (push_type->p_type == PUSH_VAR)
     {
+        lox_info("handle push var----------------:%s %d\n", push_type->f_var_name, push_type->f_label_index);
         ret = lox_stack_push_var(push_type->f_var_name, push_type->f_label_index);
     }
     else if (push_type->p_type == PUSH_TEMP_VAR)
     {
         ret = lox_stack_push_temp_var(push_type->f_label_index);
     }
+    else if (push_type->p_type == PUSH_TEMP_PTR_VAR)
+    {
+        ret = lox_stack_push_temp_ptr_var(push_type->f_label_index);
+    }
     else if (push_type->p_type == PUSH_ARRARY)
     {
         lox_info("---------------------handle push array:%d\n", cmd->cmd_args[0]);
-        ret = lox_stack_push_array_var(cmd->cmd_push.f_label_index, &cmd->cmd_args[1], cmd->cmd_args[0]);
+        ret = lox_stack_push_array_var(push_type->f_label_index, &cmd->cmd_args[1], cmd->cmd_args[0]);
     }
     else
     {
@@ -329,5 +336,62 @@ long lox_handle_function_end(struct lox_cmd *cmd)
     lox_info("---------return sp------------------:%ld \n", SP);
 
     return LOX_OK;
+}
+
+long lox_handle_get_array_value(struct lox_cmd *cmd)
+{
+    lox_info("lox_handle_get_array_value \n");
+    struct lox_symbol *sym = lox_find_symbol_by_label(cmd->cmd_label_index);
+    struct lox_symbol *sym_temp = lox_find_symbol_by_label(cmd->cmd_args[0]);
+    if (sym)
+    {
+        lox_info("lox_handle_get_array_value array:%s\n", sym->sym_name);
+        if (sym->sym_obj->o_tag != LOX_ARRAY)
+        {
+            lox_error("lox_handle_get_array_value %s is not an array\n", sym->sym_name);
+            exit(0);
+        }
+        int index_cnt = cmd->cmd_args[1];
+        int flag = cmd->cmd_args[2];
+        long index_array[100] = { 0 };
+        for(int i = 0; i < index_cnt; i++)
+        {
+            long index_label = cmd->cmd_args[3 + i];
+            struct lox_symbol *res = lox_find_symbol_by_label(index_label);
+            if (!res || !res->sym_obj)
+            {
+                lox_error("lox_handle_get_array_value nil index\n");
+                exit(0);
+            }
+            if (res->sym_obj->o_tag != LOX_NUMBER)
+            {
+                lox_error("lox_handle_get_array_value  index must number\n");
+                exit(0);
+            }
+            if (!lox_is_int_number(res->sym_obj->o_value.v_f))
+            {
+                lox_error("lox_handle_get_array_value  index must int number\n");
+                exit(0);
+            }
+            lox_info("lox_handle_get_array_value handle index:%f\n", res->sym_obj->o_value.v_f);
+            index_array[i] = (int)res->sym_obj->o_value.v_f;
+
+        }
+        struct lox_object *get_res = lox_array_get_object(sym->sym_obj, index_array, index_cnt);
+        if (get_res->o_tag == LOX_NUMBER)
+            lox_info("lox_handle_get_array_value find element:%f\n", get_res->o_value.v_f);
+
+        if (sym_temp && get_res)
+        {
+            if (!flag)
+            {
+                lox_object_copy(sym_temp->sym_obj, get_res);
+            }
+            else
+            {
+                sym_temp->sym_obj = get_res;
+            }
+        }
+    }
 }
 

@@ -71,6 +71,7 @@ struct lox_object
     int o_tag;
     int o_is_array_object;
     int o_array_object_counter;
+    int o_counter;
     struct lox_object_value o_value;
 };
 

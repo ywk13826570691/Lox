@@ -72,7 +72,9 @@ extern int yydebug;
     STRING = 282,
     NUMBER = 283,
     NAME = 284,
-    UMINUS = 285
+    LEFT_BRACKETS = 285,
+    RIGHT_BRACKETS = 286,
+    UMINUS = 287
   };
 #endif
 /* Tokens.  */
@@ -103,20 +105,22 @@ extern int yydebug;
 #define STRING 282
 #define NUMBER 283
 #define NAME 284
-#define UMINUS 285
+#define LEFT_BRACKETS 285
+#define RIGHT_BRACKETS 286
+#define UMINUS 287
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 
 union YYSTYPE
 {
-#line 13 "vkang.y" /* yacc.c:1909  */
+#line 16 "vkang.y" /* yacc.c:1909  */
 
  long   vLong;
  float vFloat;
  char *vChar;
 
-#line 120 "y.tab.h" /* yacc.c:1909  */
+#line 124 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

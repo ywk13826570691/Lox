@@ -480,6 +480,10 @@ int lox_machine_run(void)
             cmd_add = 0;
             lox_handle_function_end(cmd);
             break;
+
+        case LOX_GET_ARRAY_VALUE:
+            lox_handle_get_array_value(cmd);
+            break;
         default:
             break;
         }

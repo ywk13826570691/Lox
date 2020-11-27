@@ -305,7 +305,7 @@ int lox_find_local_symbol(char *name)
 
 void lox_local_symbol_destory(void)
 {
-    memset(local_lable_table, 0, 1000);
+    memset(local_lable_table, 0, 1000*sizeof (struct lox_local_symbol));
 }
 
 

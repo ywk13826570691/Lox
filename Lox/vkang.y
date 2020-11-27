@@ -8,6 +8,8 @@
     extern int lox_linenumber;
     extern unsigned int lox_var_label_index;
     extern int lox_function_parsing;
+    
+    char lox_var_name[50];
 %}
 
 %union 
@@ -55,7 +57,7 @@
 
 //%type <pChar> parlist1
 
-%type <vLong> expr var varlist1 varlist functionvalue  functioncall retlist expr1
+%type <vLong> expr var  var_create varlist functionvalue  functioncall retlist expr1
 
 %left AND OR
 %left EQ NE '>' '<' LE GE
@@ -138,7 +140,7 @@ sc	 : /* empty */ | ';' ;
 stat1 : IF expr THEN PrepJump block PrepJump elsepart END
 	| WHILE  expr DO PrepJump block PrepJump END
 	| REPEAT  block UNTIL expr PrepJump
-    | varlist1 '=' varlist { lox_opcode_move($1, $3); }
+    | var_create '=' varlist { lox_opcode_move($1, $3);} 
     | functioncall {
                        struct lox_symbol *sym = lox_get_cur_calling_function();
                        lox_opcode_jmp($1, -100);
@@ -169,22 +171,49 @@ retlist: /* empty */ { lox_opcode_return(0, 0);}
        ;
 var_decalre: NAME sc
 		   ;
-varlist1  :	NAME { 
-				
-				int ret = lox_add_local_symbol($1, lox_var_label_index);
-				if (ret > 0)
+var_create: varlist1 
+			{
+				if (lox_get_is_array_element())
 				{
-                    printf("find same var:%s\n", $1);
-					$$ = ret;
+					int ret = lox_find_local_symbol(lox_var_name);
+					if (ret < 0)
+					{
+						lox_error("Using an invalid array:%s\n", lox_var_name);
+						exit(0);
+					}
+					else
+					{
+						lox_info("Using array elememt:%s\n", lox_var_name);
+					}
+					extern long lox_array_ele_index;
+					extern long lox_arrary_ele_labels[50];
+					$$ = lox_var_label_index;
+					lox_opcode_push_temp_ptr_var(lox_var_label_index);
+					lox_opcode_get_array_object(ret, lox_var_label_index, lox_arrary_ele_labels, lox_array_ele_index, 1);
+					lox_var_label_index++;
+					lox_array_element_end();
 				}
 				else
 				{
-					lox_opcode_push_var($1, lox_var_label_index);
-					$$ = lox_var_label_index;
-					lox_var_label_index++;
+					int ret = lox_add_local_symbol(lox_var_name, lox_var_label_index);
+					if (ret > 0)
+					{
+		                printf("find same var:%s\n", lox_var_name);
+						$$ = ret;
+					}
+					else
+					{
+						lox_opcode_push_var(lox_var_name, lox_var_label_index);
+						$$ = lox_var_label_index;
+						lox_var_label_index++;
+					}
 				}
 			}
-          /*| varlist1 ',' var	*/
+			;
+varlist1  :	NAME { 
+					strcpy(lox_var_name, $1);
+				 }
+          | varlist1 '[' expr ']' { lox_set_is_array_element(); lox_array_element_index_push_label($3); }
 	      ;
 
 varlist  : expr { $$ = $1; }
@@ -192,7 +221,6 @@ varlist  : expr { $$ = $1; }
      | array {
                     extern long  lox_array_index;
                     extern long  lox_array_label[1000];
-printf("---------------------------------------------------------1111111---------------------:%d\n", lox_array_index);
                     $$ = lox_var_label_index;
                     lox_opcode_push_array_var(lox_var_label_index, lox_array_label, lox_array_index);
                     lox_var_label_index++;
@@ -264,9 +292,9 @@ arraylist:
         | arraylist1
         ;
 
-//[1,2,3,[4,5,6],7, 8, 9]
-arraylist1: expr {   lox_array_push_label($1);   printf("---------------------------------------------------------1111111222---------------------:\n");}
-          | arraylist1  ','  expr { lox_array_push_label($3); printf("---------------------------------------------------------111111133333---------------------:\n");}
+//
+arraylist1: expr {   lox_array_push_label($1); }
+          | arraylist1  ','  expr { lox_array_push_label($3);}
           ;
 	     
 functioncall : functionvalue  '(' function_parlistlist ')' { 
@@ -298,6 +326,7 @@ functionvalue : NAME {
             }
           }
 	      ;
+/*
 var	  :	NAME  { 
 				struct lox_symbol *sym = lox_get_cur_parsing_function();
 				int ret = lox_find_local_symbol($1);
@@ -309,8 +338,36 @@ var	  :	NAME  {
 				}
 				$$ = ret;
 			  }
-	  |	var '[' expr ']' {}
 	  ;
+*/
+
+var: varlist1
+			{
+				int ret = lox_find_local_symbol(lox_var_name);
+				
+				if (ret <= 0)
+				{
+					lox_error("Using an invalid var:%s\n", lox_var_name);
+					exit(0);
+				}
+				
+				if (lox_get_is_array_element())
+				{
+					extern long lox_array_ele_index;
+					extern long lox_arrary_ele_labels[50];
+					$$ = lox_var_label_index;
+					lox_opcode_push_temp_var(lox_var_label_index);
+					lox_opcode_get_array_object(ret, lox_var_label_index, lox_arrary_ele_labels, lox_array_ele_index, 0);
+					lox_var_label_index++;
+					lox_array_element_end();
+				}
+				else
+				{
+					$$ = ret;
+				}
+			}
+	;
+
 
 %%
 

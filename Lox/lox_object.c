@@ -144,7 +144,6 @@ int lox_object_copy_to_nil(struct lox_object *dst, struct lox_object *src)
     }
     else if(src->o_tag == LOX_ARRAY)
     {
-        dst->o_tag = LOX_ARRAY;
         dst->o_value.v_vec = src->o_value.v_vec;
         src->o_value.v_vec->counter++;
     }
@@ -174,7 +173,6 @@ int lox_object_copy_to_array(struct lox_object *dst, struct lox_object *src)
     }
     else if(src->o_tag == LOX_ARRAY)
     {
-        dst->o_value.v_vec = malloc(sizeof (struct lox_vector));
         dst->o_value.v_vec = src->o_value.v_vec;
         src->o_value.v_vec->counter++;
     }
@@ -197,15 +195,11 @@ int lox_object_destroy_array(struct lox_object *obj)
             while(v)
             {
                 struct lox_vector_value *v_next = v->next;
-                if (v->vec_v && v->vec_v->o_tag != LOX_ARRAY)
-                {
-                    free(v->vec_v);
-                }
-                else
-                {
-                    lox_object_destroy_array(v->vec_v);
-                }
 
+                if (v->vec_v->o_is_array_object)
+                {
+                    v->vec_v->o_array_object_counter--;
+                }
                 free(v);
                 v = v_next;
             }

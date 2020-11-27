@@ -6,6 +6,7 @@ CONFIG -= qt
 SOURCES += \
         lox.c \
         lox_function.c \
+    lox_lib.c \
         lox_opcode.c \
         lox_register.c \
         lox_stack.c \
@@ -20,6 +21,7 @@ HEADERS += \
     lox_config.h \
     lox_def.h \
     lox_function.h \
+    lox_lib.h \
     lox_opcode.h \
     lox_register.h \
     lox_stack.h \
