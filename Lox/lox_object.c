@@ -7,9 +7,7 @@ struct lox_object* lox_object_new_number(float f)
 {
     struct lox_object *obj = (struct lox_object *)malloc(sizeof (struct lox_object));
     obj->o_tag = LOX_NUMBER;
-    obj->o_is_array_object = 0;
     obj->o_value.v_f = f;
-
     return obj;
 }
 
@@ -17,10 +15,8 @@ struct lox_object* lox_object_new_string(char *str)
 {
     struct lox_object *obj = (struct lox_object *)malloc(sizeof (struct lox_object));
     obj->o_tag = LOX_STRING;
-    obj->o_is_array_object = 0;
     obj->o_value.v_str = (char *)malloc(strlen(str)+1);
     strcpy(obj->o_value.v_str, str);
-    obj->o_value.v_str = str;
     return obj;
 }
 
@@ -28,7 +24,6 @@ struct lox_object* lox_object_new_temp(void)
 {
     struct lox_object *obj = (struct lox_object *)malloc(sizeof (struct lox_object));
     obj->o_tag = LOX_NIL;
-    obj->o_is_array_object = 0;
     return obj;
 }
 
@@ -37,7 +32,6 @@ struct lox_object* lox_object_new_array(void)
     struct lox_object *obj = (struct lox_object *)malloc(sizeof (struct lox_object));
     obj->o_value.v_vec = malloc(sizeof(struct lox_vector));
     obj->o_tag = LOX_ARRAY;
-    obj->o_is_array_object = 0;
     obj->o_value.v_vec->len = 0;
     return obj;
 }
@@ -46,7 +40,6 @@ struct lox_object* lox_object_new_func(void)
 {
     struct lox_object *obj = (struct lox_object *)malloc(sizeof (struct lox_object));
     obj->o_tag = LOX_FUNCTION;
-    obj->o_is_array_object = 0;
     return obj;
 }
 
@@ -111,7 +104,6 @@ int lox_object_copy_to_string(struct lox_object *dst, struct lox_object *src)
     else if(src->o_tag == LOX_NIL)
     {
         dst->o_tag = LOX_NIL;
-        dst->o_value.v_str = NULL;
     }
     else if(src->o_tag == LOX_ARRAY)
     {
@@ -183,9 +175,25 @@ int lox_object_copy_to_array(struct lox_object *dst, struct lox_object *src)
     return LOX_OK;
 }
 
+long lox_object_destroy(struct lox_object *obj1)
+{
+    struct lox_object *obj = obj1;
+    if (obj)
+    {
+        if(obj->o_tag == LOX_STRING)
+        {
+            free(obj->o_value.v_str);
+        }
+    }
+    return LOX_OK;
+}
+
+// counter is zero of arr
 int lox_object_destroy_array(struct lox_object *obj)
 {
+
     int ret = LOX_OK;
+
     if (obj && obj->o_value.v_vec)
     {
         obj->o_value.v_vec->counter--;
@@ -195,19 +203,41 @@ int lox_object_destroy_array(struct lox_object *obj)
             while(v)
             {
                 struct lox_vector_value *v_next = v->next;
-
-                if (v->vec_v->o_is_array_object)
+                struct lox_object *o = v->vec_v;
+                if (o->o_tag == LOX_ARRAY)
                 {
-                    v->vec_v->o_array_object_counter--;
+                    lox_object_destroy_array(o);
+                }
+                else
+                {
+                    lox_object_destroy(o);
+                    free(o);
                 }
                 free(v);
                 v = v_next;
             }
             free(obj->o_value.v_vec);
-            obj->o_value.v_vec = NULL;
         }
     }
     return ret;
+}
+
+int lox_object_increase(struct lox_object *obj)
+{
+    if (obj && obj->o_counter > 0)
+    {
+        obj->o_counter--;
+    }
+    return LOX_OK;
+}
+
+int lox_object_decrease(struct lox_object *obj)
+{
+    if (obj)
+    {
+        obj->o_counter++;
+    }
+    return LOX_OK;
 }
 
 int lox_object_copy(struct lox_object *dst, struct lox_object *src)
@@ -217,26 +247,23 @@ int lox_object_copy(struct lox_object *dst, struct lox_object *src)
         lox_info("lox_object_copy null value!!!\n");
         return LOX_ERROR(LOX_INVALID);
     }
-    else if ( dst->o_tag == LOX_NUMBER)
-    {
+
+    switch (dst->o_tag) {
+    case LOX_NUMBER:
         lox_object_copy_to_number(dst, src);
-    }
-    else if (dst->o_tag == LOX_STRING)
-    {
+        break;
+    case LOX_STRING:
         lox_object_copy_to_string(dst, src);
-    }
-    else if (dst->o_tag == LOX_NIL)
-    {
+        break;
+    case LOX_NIL:
         lox_object_copy_to_nil(dst, src);
-    }
-    else if (dst->o_tag == LOX_ARRAY)
-    {
+        break;
+    case LOX_ARRAY:
         lox_object_copy_to_array(dst, src);
-    }
-    else
-    {
-        lox_debug("copy invalid\n");
-        return LOX_ERROR(LOX_INVALID);
+        break;
+    default:
+        lox_error("lox_object_copy dst invalid type");
+        break;
     }
     return LOX_OK;
 }
@@ -247,18 +274,6 @@ long lox_object_add(struct lox_object *obj1, struct lox_object *obj2, struct lox
     {
         dst->o_tag = LOX_NUMBER;
         dst->o_value.v_f = obj1->o_value.v_f + obj2->o_value.v_f;
-    }
-    return LOX_OK;
-}
-
-long lox_object_destroy(struct lox_object *obj)
-{
-    if (obj)
-    {
-        if(obj->o_tag == LOX_STRING)
-        {
-            free(obj->o_value.v_str);
-        }
     }
     return LOX_OK;
 }

@@ -106,7 +106,7 @@ int lox_opcode_push_var(char *var_name, int label)
     cmd.cmd_opcode = LOX_PUSH;
     cmd.cmd_push.p_type =  PUSH_VAR;
 
-    cmd.cmd_push.f_var_name = var_name;
+    strcpy(cmd.cmd_push.f_var_name, var_name);
     cmd.cmd_push.f_label_index = label;
 
     lox_info("----push var:%s %d\n",var_name, label);
@@ -182,7 +182,7 @@ int lox_opcode_push_array_var(int label, long *labels, long label_cnt)
     return lox_func_push_cmd(&cmd);
 }
 
-int lox_opcode_get_array_object(int array_label, int temp_label, long *label_indexs, long index_cnt, int flag)
+int lox_opcode_get_array_object(int array_label, int temp_label, long *label_indexs, long index_cnt)
 {
     int ret = LOX_ERROR(LOX_INVALID);
     struct lox_symbol *sym = lox_get_cur_parsing_function();
@@ -199,12 +199,38 @@ int lox_opcode_get_array_object(int array_label, int temp_label, long *label_ind
     cmd.cmd_label_index = array_label;
     cmd.cmd_args[0] = temp_label;
     cmd.cmd_args[1] = index_cnt;
-    cmd.cmd_args[2] = flag;
 
 
     for(int i = 0; i < index_cnt; i++)
     {
-        cmd.cmd_args[3 + i] = label_indexs[i];
+        cmd.cmd_args[2 + i] = label_indexs[i];
+    }
+
+    return lox_func_push_cmd(&cmd);
+}
+
+int lox_opcode_set_array_object(int array_label, int temp_label, long *label_indexs, long index_cnt)
+{
+    int ret = LOX_ERROR(LOX_INVALID);
+    struct lox_symbol *sym = lox_get_cur_parsing_function();
+
+    if (!sym)
+    {
+        lox_error("cur parse funcion is nil %s %d\n", __func__, __LINE__);
+        return  ret;
+    }
+
+    struct lox_cmd cmd;
+
+    cmd.cmd_opcode = LOX_SET_ARRAY_VALUE;
+    cmd.cmd_label_index = array_label;
+    cmd.cmd_args[0] = temp_label;
+    cmd.cmd_args[1] = index_cnt;
+
+
+    for(int i = 0; i < index_cnt; i++)
+    {
+        cmd.cmd_args[2 + i] = label_indexs[i];
     }
 
     return lox_func_push_cmd(&cmd);

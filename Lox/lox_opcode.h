@@ -66,6 +66,7 @@ enum lox_opcode
     LOX_FUNCTION_PARAM_END, // param end
 
     LOX_GET_ARRAY_VALUE,
+    LOX_SET_ARRAY_VALUE,
 
     LOX_GET_VAR,
     LOX_NULL,
@@ -89,7 +90,7 @@ struct lox_cmd_push
     long f_number;
     float f_f;
     char *f_str;
-    char *f_var_name;
+    char f_var_name[100];
     int  f_label_index;
 };
 
@@ -124,7 +125,8 @@ int lox_opcode_push_var(char *var_name, int label);
 int lox_opcode_push_temp_var(int label);
 int lox_opcode_push_temp_ptr_var(int label_temp);
 int lox_opcode_push_array_var(int label, long *labels, long label_cnt);
-int lox_opcode_get_array_object(int array_label, int temp_label, long *label_indexs, long index_cnt, int flag);
+int lox_opcode_get_array_object(int array_label, int temp_label, long *label_indexs, long index_cnt);
+int lox_opcode_set_array_object(int array_label, int temp_label, long *label_indexs, long index_cnt);
 
 
 //int lox_opcode_get_var(char *var_name, int label);

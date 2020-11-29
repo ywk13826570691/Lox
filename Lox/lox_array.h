@@ -18,5 +18,6 @@ long lox_array_element_end(void);
 
 int lox_array_insert_obj(struct lox_object *arr, struct lox_object *obj);
 long lox_array_get_object(struct lox_object *arr, long *indexs, int index_cnt);
+long lox_array_set_object(struct lox_object *arr, long *indexs, int index_cnt, struct lox_object *obj_set);
 long lox_array_index_value(struct lox_object *arr, long index);
 #endif // LOX_ARRAY_H

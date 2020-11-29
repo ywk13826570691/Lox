@@ -16,5 +16,6 @@ long lox_handle_return(struct lox_cmd *cmd);
 long lox_handle_function_end(struct lox_cmd *cmd);
 
 long lox_handle_get_array_value(struct lox_cmd *cmd);
+long lox_handle_set_array_value(struct lox_cmd *cmd);
 
 #endif // LOX_HANDLE_H

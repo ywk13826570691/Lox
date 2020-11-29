@@ -5,9 +5,9 @@
 	--return a + b
 --end
 
---function add(a, b)
-	--return a+ b
---end
+function add(a, b)
+	return a+ b
+end
 
 --function sss()
     --print("mm")
@@ -17,12 +17,20 @@
 	--return;
 --end
 
---a = 1000
+a = 1000
 --c = a + 10
 --print(1)
 --print("hello vkang")
 --print(11.2);
---print(type(a))
+print(type(a))
+--c = add(10,25)
+--print(c)
+
+--hh = [10,20,30]
+ff = [1,2,3,4]
+ff[0] = 1000
+print(ff[0], ff[1], ff[2])
+--print(ff[0], ff[1], ff[2], ff[3])
 
 --print("hello", "vkang", "world")
 --print(a)
@@ -34,13 +42,13 @@
 
 --sss()
 --print("llllllllllllllllllllllllllllllllllllllllllllllllllllllllll\n");
-g = [10,11, "vkang"]
-s = [g, 1,2,3,7, 8, 9, "hello"]
-s[0][2] = "12345678"
-k = s
-print(k[0][2])
+--g = [10,11, "vkang"]
+--s = [g, 1,2,3,7, 8, 9, "hello"]
+--s[0][2] = "12345678"
+--k = s
+--print(k[0][2])
 
-s = "1000000"
-k = "5555555"
-print(s)
+--s = "1000000"
+--k = "5555555"
+--print(s)
 --print(k[0][2])

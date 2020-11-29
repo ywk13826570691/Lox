@@ -405,9 +405,6 @@ static void lox_inner_type(struct lox_symbol * sym, long *argv, int len, long re
 {
     struct lox_object *obj = (struct lox_object *)argv[0];
     struct lox_symbol *re = (struct lox_symbol *)ret;
-    struct lox_object *r_v = NULL;
-    if (re)
-        r_v = (struct lox_object*)re->sym_obj;
 
     char type[50] = "nil";
     strcpy(type, "nil");
@@ -419,12 +416,12 @@ static void lox_inner_type(struct lox_symbol * sym, long *argv, int len, long re
     {
         strcpy(type, "string");
     }
-    if (r_v)
+    lox_info("-----------------lox_inner_type------------------:%d\n", re->sym_obj->o_tag);
+    if (re && re->sym_obj)
     {
         struct lox_object *result = lox_object_new_string(type);
-        lox_info("calling type:%d %d\n", r_v->o_tag, result->o_tag);
-        lox_object_copy(r_v, result);
-        lox_info("calling type:%d %d %s\n", r_v->o_tag, result->o_tag, r_v->o_value.v_str);
+        lox_object_copy(re->sym_obj, result);
+        lox_info("-----------------lox_inner_type------------------:%d\n", re->sym_obj->o_tag);
     }
     //lox_info("calling type:%s %d\n", result->o_value.v_str, obj->o_tag);
 }

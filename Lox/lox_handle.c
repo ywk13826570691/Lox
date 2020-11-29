@@ -96,6 +96,8 @@ long lox_handle_move(struct lox_cmd *cmd)
 
     lox_info("--------lox_handle_move-------------%ld %ld\n", cmd->cmd_args[0], cmd->cmd_args[1]);
 
+    lox_info("--------lox_handle_move-------------%f %f\n", sym2->sym_obj->o_value.v_f, sym2->sym_obj->o_value.v_f);
+
     if (!sym1 || !sym2)
     {
 
@@ -104,13 +106,9 @@ long lox_handle_move(struct lox_cmd *cmd)
         return  ret;
     }
 
-    struct lox_object *obj1, *obj2;
+    lox_object_copy(sym1->sym_obj, sym2->sym_obj);
 
-    obj1 = sym1->sym_obj;
-    obj2 = sym2->sym_obj;
-
-    lox_object_copy(obj1, obj2);
-    lox_info("--------lox_handle_move end-------------%s %s\n", sym1->sym_name, sym2->sym_name);
+    lox_info("--------lox_handle_move-------------%f %f\n", sym1->sym_obj->o_value.v_f, sym1->sym_obj->o_value.v_f);
 
     return LOX_OK;
 }
@@ -119,9 +117,9 @@ long lox_handle_move(struct lox_cmd *cmd)
 long lox_handle_add(struct lox_cmd *cmd)
 {
     long ret = LOX_ERROR(LOX_INVALID);
-    struct lox_symbol * s1 = lox_find_symbol_by_label(cmd->cmd_args[0]);
-    struct lox_symbol * s2 = lox_find_symbol_by_label(cmd->cmd_args[1]);
-    struct lox_symbol * s3 = lox_find_symbol_by_label(cmd->cmd_label_index);
+    struct lox_symbol * s1 = (struct lox_symbol *)lox_find_symbol_by_label(cmd->cmd_args[0]);
+    struct lox_symbol * s2 = (struct lox_symbol *)lox_find_symbol_by_label(cmd->cmd_args[1]);
+    struct lox_symbol * s3 = (struct lox_symbol *)lox_find_symbol_by_label(cmd->cmd_label_index);
     struct lox_object *obj1, *obj2, *obj3;
     lox_info("-------------lox_handle_add:%ld %ld\n",cmd->cmd_args[0], cmd->cmd_args[1]);
     if (!s1 || !s2 || !s3)
@@ -156,20 +154,27 @@ long lox_handle_jmp_inner(struct lox_cmd *cmd)
 
     lox_info("callinng inner function:%s %d\n", sym->sym_name, argc);
     int i = 0;
-    int len = argc;
-    long *argv = (long *)malloc(len*sizeof (long));
+    long len = argc;
+    long *argv = (long *)malloc(len * sizeof (long));
 #if 1
     for(i = 0 ; i < argc; i++)
     {
-
         struct lox_symbol *s = lox_find_symbol_by_label(cmd->cmd_args[2+i]);
         struct lox_object *obj2 = s->sym_obj;
         struct lox_object *obj3 = lox_object_new_temp();
+lox_info("------------vvvv---1-__4444444444444444444:%d\n", obj2->o_tag);
+        if (!obj2)
+        {
+            lox_error("func invalid param nil\n");
+            exit(0);
+        }
+
         lox_object_copy(obj3, obj2);
+
         if (obj2->o_tag == LOX_NUMBER)
-            lox_info("----------------__4444444444444444444:%f %d\n", obj3->o_value.v_f, obj3->o_tag);
+            lox_info("----------------2__4444444444444444444:%f %d\n", obj3->o_value.v_f, obj3->o_tag);
         if (obj2->o_tag == LOX_STRING)
-                    lox_info("----------------__4444444444444444444:%s %d\n", obj3->o_value.v_str, obj3->o_tag);
+                    lox_info("----------------3__4444444444444444444:%s %d %s\n", obj3->o_value.v_str, obj3->o_tag, obj3->o_value.v_str);
 
         argv[i] = (long)obj3;
 
@@ -177,7 +182,7 @@ long lox_handle_jmp_inner(struct lox_cmd *cmd)
 
     struct lox_symbol *ret = lox_find_symbol_by_label(cmd->cmd_label_index);
     if (ret)
-        lox_info("---------------:%d\n", ret->sym_obj->o_tag);
+        lox_info("--------will return -------:\n");
     else
         lox_info("will not return %d %s\n", cmd->cmd_label_index, sym->sym_name);
 #endif
@@ -199,13 +204,13 @@ long lox_handle_jmp(struct lox_cmd *cmd)
     struct lox_symbol *sym = (struct lox_symbol *)cmd->cmd_args[0];
     struct lox_function *func;
     long *stack = lox_get_stack();
-
+#if 0
     for (int i = 0 ; i < SP; i++)
     {
         struct lox_symbol *sym = stack[i];
         lox_info("---------------------------:%ld \n", sym);
     }
-
+#endif
     if (sym->sym_obj)
     {
         func = sym->sym_obj->o_value.v_func;
@@ -263,18 +268,10 @@ long lox_handle_function_param_end(struct lox_cmd *cmd)
     {
         struct lox_symbol *s = stack[FP + LOX_STACK_TOP + i];
         struct lox_symbol *s2 = stack[FP + LOX_STACK_TOP + i + argc];
+
         if (s && s->sym_obj)
         {
-            if (s->sym_obj->o_tag == LOX_NUMBER)
-                lox_info("----------1--------lox_handle_function_param:%f\n", s->sym_obj->o_value.v_f);
-            if (s->sym_obj->o_tag == LOX_STRING)
-                lox_info("-----------2-------lox_handle_function_param:%s\n", s->sym_obj->o_value.v_str);
-
-            lox_info("-----------3-------lox_handle_function_param:%s\n", s2->sym_name);
-            if (s->sym_obj && s2->sym_obj)
-            {
-                lox_object_copy(s2->sym_obj, s->sym_obj);
-            }
+            lox_object_copy(s2->sym_obj, s->sym_obj);
         }
     }
     return LOX_OK;
@@ -291,7 +288,7 @@ long lox_handle_return(struct lox_cmd *cmd)
 
     struct lox_symbol *sym_ret = lox_find_symbol_by_label(cmd->cmd_args[0]);
     struct lox_symbol *s = (struct lox_symbol *)(stack[FP + 4]);
-    if (sym_ret && sym_ret->sym_obj)
+    if (sym_ret)
     {
         if (sym_ret->sym_obj->o_tag == LOX_NUMBER)
             lox_info("--------------lox_handle_return:%f\n", sym_ret->sym_obj->o_value.v_f);
@@ -301,8 +298,8 @@ long lox_handle_return(struct lox_cmd *cmd)
 
 
     if (s && s->sym_obj)
-    {
-        lox_object_copy(s->sym_obj, sym_ret->sym_obj);
+    { 
+        lox_object_copy(s, sym_ret);
         lox_info("----------------------------lox_handle_return will return %f\n", s->sym_obj->o_value.v_f);
     }
     else
@@ -352,11 +349,10 @@ long lox_handle_get_array_value(struct lox_cmd *cmd)
             exit(0);
         }
         int index_cnt = cmd->cmd_args[1];
-        int flag = cmd->cmd_args[2];
         long index_array[100] = { 0 };
         for(int i = 0; i < index_cnt; i++)
         {
-            long index_label = cmd->cmd_args[3 + i];
+            long index_label = cmd->cmd_args[2 + i];
             struct lox_symbol *res = lox_find_symbol_by_label(index_label);
             if (!res || !res->sym_obj)
             {
@@ -377,21 +373,68 @@ long lox_handle_get_array_value(struct lox_cmd *cmd)
             index_array[i] = (int)res->sym_obj->o_value.v_f;
 
         }
-        struct lox_object *get_res = lox_array_get_object(sym->sym_obj, index_array, index_cnt);
-        if (get_res->o_tag == LOX_NUMBER)
-            lox_info("lox_handle_get_array_value find element:%f\n", get_res->o_value.v_f);
 
-        if (sym_temp && get_res)
+        if (sym_temp)
         {
-            if (!flag)
+            struct lox_object *get_res = lox_array_get_object(sym->sym_obj, index_array, index_cnt);
+            if (get_res)
             {
+                lox_info("lox_handle_get_array_value get element value:%f\n", get_res->o_value.v_f);
                 lox_object_copy(sym_temp->sym_obj, get_res);
-            }
-            else
-            {
-                sym_temp->sym_obj = get_res;
             }
         }
     }
+
+    return LOX_OK;
+}
+
+
+long lox_handle_set_array_value(struct lox_cmd *cmd)
+{
+    lox_info("-----------------lox_handle_set_array_value \n");
+    struct lox_symbol *sym = lox_find_symbol_by_label(cmd->cmd_label_index);
+    struct lox_symbol *sym_set = lox_find_symbol_by_label(cmd->cmd_args[0]);
+    if (sym)
+    {
+        lox_info("lox_handle_set_array_value array:%s\n", sym->sym_name);
+        if (sym->sym_obj->o_tag != LOX_ARRAY)
+        {
+            lox_error("lox_handle_set_array_value %s is not an array\n", sym->sym_name);
+            exit(0);
+        }
+        long index_cnt = cmd->cmd_args[1];
+        long index_array[100] = { 0 };
+        for(int i = 0; i < index_cnt; i++)
+        {
+            long index_label = cmd->cmd_args[2 + i];
+            struct lox_symbol *res = lox_find_symbol_by_label(index_label);
+            if (!res || !res->sym_obj)
+            {
+                lox_error("lox_handle_get_array_value nil index\n");
+                exit(0);
+            }
+            if (res->sym_obj->o_tag != LOX_NUMBER)
+            {
+                lox_error("lox_handle_get_array_value index must number\n");
+                exit(0);
+            }
+            if (!lox_is_int_number(res->sym_obj->o_value.v_f))
+            {
+                lox_error("lox_handle_get_array_value  index must int number\n");
+                exit(0);
+            }
+            lox_info("lox_handle_set_array_value handle index:%f\n", res->sym_obj->o_value.v_f);
+            index_array[i] = (int)res->sym_obj->o_value.v_f;
+
+        }
+
+        if (sym_set)
+        {
+            lox_array_set_object(sym->sym_obj, index_array, index_cnt, sym_set->sym_obj);
+
+        }
+    }
+
+    return LOX_OK;
 }
 

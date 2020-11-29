@@ -140,7 +140,44 @@ sc	 : /* empty */ | ';' ;
 stat1 : IF expr THEN PrepJump block PrepJump elsepart END
 	| WHILE  expr DO PrepJump block PrepJump END
 	| REPEAT  block UNTIL expr PrepJump
-    | var_create '=' varlist { lox_opcode_move($1, $3);} 
+    | var_create '=' varlist
+            {
+				if (lox_get_is_array_element())
+				{
+					int ret = lox_find_local_symbol(lox_var_name);
+					if (ret < 0)
+					{
+						lox_error("Using an invalid array:%s\n", lox_var_name);
+						exit(0);
+					}
+					else
+					{
+						lox_info("Using array elememt:%s\n", lox_var_name);
+					}
+					extern long lox_array_ele_index;
+					extern long lox_arrary_ele_labels[50];
+					lox_opcode_set_array_object(ret, $3, lox_arrary_ele_labels, lox_array_ele_index);
+					lox_array_element_end();
+                    memset(lox_var_name, 0, 50);
+				}
+				else
+				{
+					int ret = lox_add_local_symbol(lox_var_name, lox_var_label_index);
+                    long label = 0;
+					if (ret > 0)
+					{
+		                printf("find same var:%s\n", lox_var_name);
+						label = ret;
+					}
+					else
+					{
+						lox_opcode_push_var(lox_var_name, lox_var_label_index);
+						label = lox_var_label_index;
+						lox_var_label_index++;
+					}
+                    lox_opcode_move(label, $3);
+				}
+			}
     | functioncall {
                        struct lox_symbol *sym = lox_get_cur_calling_function();
                        lox_opcode_jmp($1, -100);
@@ -162,7 +199,6 @@ ret	: /* empty */
                 lox_info("return must in function\n");
                 exit(0);
             }
-            //lox_opcode_return($2);
         }
         ;
 
@@ -173,6 +209,7 @@ var_decalre: NAME sc
 		   ;
 var_create: varlist1 
 			{
+/*
 				if (lox_get_is_array_element())
 				{
 					int ret = lox_find_local_symbol(lox_var_name);
@@ -208,6 +245,7 @@ var_create: varlist1
 						lox_var_label_index++;
 					}
 				}
+*/
 			}
 			;
 varlist1  :	NAME { 
@@ -357,9 +395,10 @@ var: varlist1
 					extern long lox_arrary_ele_labels[50];
 					$$ = lox_var_label_index;
 					lox_opcode_push_temp_var(lox_var_label_index);
-					lox_opcode_get_array_object(ret, lox_var_label_index, lox_arrary_ele_labels, lox_array_ele_index, 0);
+					lox_opcode_get_array_object(ret, lox_var_label_index, lox_arrary_ele_labels, lox_array_ele_index);
 					lox_var_label_index++;
 					lox_array_element_end();
+                    memset(lox_var_name, 0, 50);
 				}
 				else
 				{

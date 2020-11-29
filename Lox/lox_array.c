@@ -1,5 +1,6 @@
 #include "lox_array.h"
 #include "lox_def.h"
+#include "lox_object.h"
 #include <stdlib.h>
 
 long  lox_array_index = 0;
@@ -67,9 +68,10 @@ int lox_array_insert_obj(struct lox_object *arr, struct lox_object *obj)
     }
 
     struct lox_vector_value *v = malloc(sizeof (struct lox_vector_value));
-    v->vec_v = obj;
-    obj->o_is_array_object = 1;
-    obj->o_array_object_counter++;
+    struct lox_object *new_obj = lox_object_new_temp();
+    lox_object_copy(new_obj, obj);
+    v->vec_v = new_obj;
+
     struct lox_vector_value *vec = arr->o_value.v_vec->vec_head.next;
     if (!vec)
     {
@@ -106,6 +108,30 @@ long lox_array_get_object(struct lox_object *arr, long *indexs, int index_cnt)
         }
     }
     return (long)obj;
+}
+
+long lox_array_set_object(struct lox_object *arr, long *indexs, int index_cnt, struct lox_object *obj_set)
+{
+    struct lox_object *obj = arr;
+    int index = 0;
+
+    while(1)
+    {
+        if (!obj || obj->o_tag != LOX_ARRAY)
+        {
+            lox_error("array object is not a array\n");
+            exit(0);
+        }
+        obj = (struct lox_object *)lox_array_index_value(obj, indexs[index]);
+        index++;
+        if (index == index_cnt)
+        {
+            break;
+        }
+    }
+    if (obj_set)
+        lox_object_copy(obj, obj_set);
+    return LOX_OK;
 }
 
 long lox_array_index_value(struct lox_object *arr, long index)

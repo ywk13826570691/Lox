@@ -73,10 +73,12 @@ long lox_stack_push_var(char *name, long label)
 {
     struct lox_symbol *s = (struct lox_symbol *)malloc(sizeof (struct lox_symbol));
     struct lox_object *obj = lox_object_new_temp();
+
     memset(s, 0, sizeof (struct lox_symbol));
     s->sym_obj = obj;
     strcpy(s->sym_name, name);
     s->sym_label_value = label;
+
     return lox_stack_push(s);
 }
 
@@ -93,6 +95,7 @@ long lox_stack_push_temp_var(long label)
 long lox_stack_push_temp_ptr_var(long label_temp)
 {
     struct lox_symbol *s = (struct lox_symbol *)malloc(sizeof (struct lox_symbol));
+    memset(s, 0, sizeof (struct lox_symbol));
     s->sym_label_value = label_temp;
     return lox_stack_push(s);
 }
@@ -116,9 +119,10 @@ long lox_stack_push_array_var(long label, long *labels, long label_cnt)
         }
         else
         {
-            if (sym->sym_obj->o_tag == LOX_NUMBER)
+            lox_info("-----------------------------------------------------------:%s %p %d\n", sym->sym_name, sym->sym_obj, label_index);
+            if (sym->sym_obj && sym->sym_obj->o_tag == LOX_NUMBER)
                 lox_info("stack push array can find var %f\n", sym->sym_obj->o_value.v_f);
-            if (sym->sym_obj->o_tag == LOX_STRING)
+            if (sym->sym_obj && sym->sym_obj->o_tag == LOX_STRING)
                 lox_info("stack push array can find var %s\n", sym->sym_obj->o_value.v_str);
 
             lox_array_insert_obj(obj, sym->sym_obj);
@@ -218,36 +222,31 @@ void lox_stack_clear_and_return(void)
         lox_stack[i] = 0;
     }
 #endif
+#if 1
     for (long i = SP; i >= FP + LOX_STACK_TOP + argc; i--)
     {
         struct lox_symbol *sym = lox_stack[i];
         if (sym && sym->sym_obj)
         {
-            if (sym->sym_obj->o_is_array_object)
+            if (sym->sym_obj->o_tag != LOX_ARRAY)
             {
-                if (sym->sym_obj->o_tag == LOX_ARRAY)
-                {
-                    lox_object_destroy_array(sym->sym_obj);
-                }
-                else
-                {
-                    if (!sym->sym_obj->o_array_object_counter)
-                    {
-                        free(sym->sym_obj);
-                    }
-                }
+                lox_object_destroy(sym->sym_obj);
             }
             else
             {
-                free(sym->sym_obj);
+                lox_object_destroy_array(sym->sym_obj);
             }
+            free(sym->sym_obj);
         }
         if (sym)
             free(sym);
         lox_stack[i] = 0;
     }
 
+#endif
     SP = sp;
     PC = lr;
     FP = fp;
+
+    lox_info("============================================================================%ld\n", SP);
 }
