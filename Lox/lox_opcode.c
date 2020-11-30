@@ -178,7 +178,7 @@ int lox_opcode_push_array_var(int label, long *labels, long label_cnt)
     {
         cmd.cmd_args[1 + i] = labels[i];
     }
-
+    lox_info("---------push array\n");
     return lox_func_push_cmd(&cmd);
 }
 
@@ -362,33 +362,34 @@ int lox_opcode_move(long r1, long r2)
     return lox_func_push_cmd(&cmd);
 }
 
-int lox_opcode_jmp(long r1, int reg)
+int lox_opcode_jmp(long r1, int ret, long f)
 {
-    int ret = LOX_ERROR(LOX_INVALID);
+    int retv = LOX_ERROR(LOX_INVALID);
     struct lox_symbol *sym = lox_get_cur_parsing_function();
     struct lox_symbol *sym2 = (struct lox_symbol *)r1;
-    int args = sym2->sym_obj->o_value.v_func->func_call_args_index;
+    struct lox_function_calling *calf = (struct lox_function_calling *)f;
+    int argc = calf->argc;
 
     if (!sym)
     {
         lox_error("cur parse funcion is nil %s %d\n", __func__, __LINE__);
-        return  ret;
+        return  retv;
     }
 
     struct lox_cmd cmd;
 
     cmd.cmd_opcode = LOX_JMP;
     cmd.cmd_args[0] = r1;
-    cmd.cmd_args[1] = args;
-    cmd.cmd_label_index = reg;
+    cmd.cmd_args[1] = argc;
+    cmd.cmd_label_index = ret;
 
-    for(int i = 0; i < args; i++)
+    for(int i = 0; i < argc; i++)
     {
-        cmd.cmd_args[2 + i] = sym2->sym_obj->o_value.v_func->func_args[i];
+        cmd.cmd_args[2 + i] = calf->args[i];
     }
 
     //lox_push_cur_calling_function(r1);
-    lox_info("-------------------jmp---%p %d %s %d %d\n", r1, args, sym2->sym_name, args, reg);
+    lox_info("-------------------jmp---%p %d %s %d %d\n", r1, argc, sym2->sym_name, argc, ret);
     return lox_func_push_cmd(&cmd);
 }
 

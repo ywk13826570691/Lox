@@ -9,7 +9,7 @@
 #include <string.h>
 
 struct lox_symbol *cur_parsing_function = NULL;
-struct lox_symbol *cur_calling_function = NULL;
+struct lox_function_calling *cur_calling_function = NULL;
 struct lox_symbol *main_function = NULL;
 
 int lox_function_index = 0;
@@ -19,7 +19,8 @@ long *lox_function_table;
 int lox_function_parsing = 0;
 
 int cur_calling_function_index = -1;
-long cur_calling_function_table[100];
+//long cur_calling_function_table[100];
+struct lox_function_calling cur_calling_function_table[100];
 
 
 int lox_function_init(void)
@@ -112,27 +113,37 @@ int lox_set_cur_parsing_function(long f)
 
 int lox_set_cur_calling_function(long f)
 {
-    cur_calling_function = (struct lox_symbol *)f;
+    cur_calling_function = (struct lox_function_calling *)f;
     return LOX_OK;
 }
 
-struct lox_symbol * lox_get_cur_calling_function()
+struct lox_function_calling *lox_get_cur_calling_function()
 {
     return cur_calling_function;
 }
 
 int lox_push_cur_calling_function(long f)
 {
-    cur_calling_function_table[cur_calling_function_index + 1] = f;
+    struct lox_symbol *sym = (struct lox_symbol*)f;
+    struct lox_function_calling *call_f = &cur_calling_function_table[cur_calling_function_index + 1 ];
+    call_f->func = f;
+    strcpy(call_f->name, sym->sym_name);
     cur_calling_function_index++;
-    lox_set_cur_calling_function(f);
+    lox_set_cur_calling_function((long)call_f);
     return LOX_OK;
 }
 
 int lox_pop_cur_calling_function(void)
 {
+    struct lox_function_calling *call_f = &cur_calling_function_table[cur_calling_function_index];
+    call_f->argc = 0;
+    call_f->func = 0;
+    memset(call_f->args, 0, 100*sizeof (long));
+    memset(call_f->name, 0, 100);
+
     cur_calling_function_index--;
-    lox_set_cur_calling_function(cur_calling_function_table[cur_calling_function_index]);
+    lox_set_cur_calling_function((long)&cur_calling_function_table[cur_calling_function_index]);
+    lox_info("****************************************:%d\n", cur_calling_function_index);
     return LOX_OK;
 }
 
@@ -173,12 +184,11 @@ int lox_func_add_arg_name(char *name)
 
 int lox_func_push_arg_label(long label)
 {
-    struct lox_symbol *sym = lox_get_cur_calling_function();
-    struct lox_function *func = sym->sym_obj->o_value.v_func;
-
-    func->func_args[func->func_call_args_index] = label;
-    func->func_call_args_index++;
-    lox_info("----func push arg:%s %d\n", sym->sym_name, func->func_call_args_index);
+    struct lox_function_calling *cur_calling_func = lox_get_cur_calling_function();
+    cur_calling_func->args[cur_calling_func->argc] = label;
+    cur_calling_func->argc++;
+    struct lox_symbol *sym = (struct lox_symbol *)cur_calling_func->func;
+    lox_info("----func push arg:%s %d\n", sym->sym_name, cur_calling_func->argc);
 
     return LOX_OK;
 }
@@ -186,14 +196,15 @@ int lox_func_push_arg_label(long label)
 int lox_func_check_args(long f)
 {
     int ret = LOX_ERROR(LOX_INVALID);
-    struct lox_symbol *sym = (struct lox_symbol *)f;
+    struct lox_function_calling *call_f = (struct lox_function_calling *)f;
+    struct lox_symbol *sym = (struct lox_symbol *)call_f->func;
     struct lox_function *func = sym->sym_obj->o_value.v_func;
 
     if (func->is_inner_function)
     {
         if (func->func_def_args_cnt != 1000)
         {
-            if (func->func_def_args_cnt != func->func_call_args_index )
+            if (func->func_def_args_cnt != call_f->argc )
             {
                 lox_error("----function %s args not equal line:%d %d %d\n", sym->sym_name, lox_cur_line_number(), func->func_def_args_cnt
                           ,func->func_call_args_index);
@@ -203,7 +214,7 @@ int lox_func_check_args(long f)
     }
     else
     {
-        if (func->func_def_args_cnt != func->func_call_args_index)
+        if (func->func_def_args_cnt != call_f->argc)
         {
             lox_error("----function %s args not equal line:%d %d %d\n", sym->sym_name, lox_cur_line_number(), func->func_def_args_cnt
                       ,func->func_call_args_index);
@@ -243,10 +254,13 @@ int lox_func_has_arg(char *arg_name, long f)
 
 int lox_func_clear(long f)
 {
-    struct lox_symbol *sym = (struct lox_symbol *)f;
-    struct lox_function *func = sym->sym_obj->o_value.v_func;
-    func->func_call_args_index = 0;
-    memset(func->func_args, 0, 100);
+    struct lox_function_calling *calf = (struct lox_function_calling *)f;
+    struct lox_symbol *sym = (struct lox_symbol *)calf->func;
+    lox_info("-------lox_func_clear:%s\n", sym->sym_name);
+    calf->argc = 0;
+    calf->func = 0;
+    memset(calf->args, 0, 100*sizeof (long));
+    memset(calf->name, 0, 100);
     return LOX_OK;
 }
 
@@ -390,14 +404,15 @@ static void lox_inner_printf(struct lox_symbol * sym, long *argv, int len, long 
         {
             if (obj->o_tag == LOX_NUMBER)
             {
-                printf("%f\n", obj->o_value.v_f);
+                printf("%f ", obj->o_value.v_f);
             }
             if (obj->o_tag == LOX_STRING)
             {
-                printf("%s\n", obj->o_value.v_str);
+                printf("%s ", obj->o_value.v_str);
             }
         }
     }
+    printf("\n");
     lox_info("calling print\n");
 }
 

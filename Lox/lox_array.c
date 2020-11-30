@@ -2,10 +2,22 @@
 #include "lox_def.h"
 #include "lox_object.h"
 #include <stdlib.h>
-
+/*
+ * For parsing array
+ * Ex: a = [1,2,3,4]
+ * lox_array_index cnt
+ * lox_array_label--> 1,2,3,4
+*/
 long  lox_array_index = 0;
 long  lox_array_label[1000] = { 0 };
 
+/*
+ * For parsing array[x][y]
+ * lox_is_array_element: tell if is a[1][2]
+ * Ex: a[1][2][3]
+ * lox_array_ele_index:indx cnt
+ * lox_arrary_ele_labels--> 1,2,3
+*/
 long lox_is_array_element = 0;
 long lox_arrary_ele_cur_label = 0;
 
@@ -68,6 +80,7 @@ int lox_array_insert_obj(struct lox_object *arr, struct lox_object *obj)
     }
 
     struct lox_vector_value *v = malloc(sizeof (struct lox_vector_value));
+    memset(v, 0, sizeof(struct lox_vector_value));
     struct lox_object *new_obj = lox_object_new_temp();
     lox_object_copy(new_obj, obj);
     v->vec_v = new_obj;
@@ -81,6 +94,7 @@ int lox_array_insert_obj(struct lox_object *arr, struct lox_object *obj)
     }
     while (vec->next)
     {
+        lox_info("[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\n");
         vec = vec->next;
     }
     vec->next = v;

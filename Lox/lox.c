@@ -97,7 +97,6 @@ int lox_main(void)
 int lox_run(void)
 {
     lox_setup_stack();
-    lox_info("-------------------------------------------------%d\n", SP);
     lox_machine_run();
     return LOX_OK;
 }

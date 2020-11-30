@@ -211,17 +211,6 @@ void lox_stack_clear_and_return(void)
         lox_stack[FP + LOX_STACK_TOP + i] = 0;
     }
 #endif
-#if 0
-    for (int i = FP + LOX_STACK_TOP + argc ; i < SP ; i++ )
-    {
-        struct lox_symbol *s = lox_stack[i];
-        if (s && s->sym_obj)
-            free(s->sym_obj);
-        if (s)
-            free(s);
-        lox_stack[i] = 0;
-    }
-#endif
 #if 1
     for (long i = SP; i >= FP + LOX_STACK_TOP + argc; i--)
     {

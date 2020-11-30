@@ -33,6 +33,7 @@ struct lox_object* lox_object_new_array(void)
     obj->o_value.v_vec = malloc(sizeof(struct lox_vector));
     obj->o_tag = LOX_ARRAY;
     obj->o_value.v_vec->len = 0;
+    obj->o_value.v_vec->vec_head.next = NULL;
     return obj;
 }
 

@@ -3,6 +3,14 @@
 
 #include "lox_def.h"
 
+struct lox_function_calling
+{
+    char name[100];
+    long func;
+
+    long args[1000];
+    int argc;
+};
 
 int lox_function_init(void);
 
@@ -15,7 +23,7 @@ int lox_cur_parsing_function_end(void);
 int lox_set_cur_parsing_function(long f);
 
 int lox_set_cur_calling_function(long f);
-struct lox_symbol *lox_get_cur_calling_function(void);
+struct lox_function_calling *lox_get_cur_calling_function(void);
 
 
 int lox_push_cur_calling_function(long f);

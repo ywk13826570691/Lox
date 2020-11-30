@@ -13,9 +13,17 @@ enum lox_error_code
 };
 #define LOX_ERROR(err) (-err)
 
+#define LOX_DEBUG
+
+#ifdef LOX_DEBUG
 #define lox_error(...) printf("[Error]:" __VA_ARGS__)
 #define lox_info(...)  printf("[Info]:" __VA_ARGS__)
 #define lox_debug(...)  printf("[Debug]:" __VA_ARGS__)
+#else
+#define lox_error(...)
+#define lox_info(...)
+#define lox_debug(...)
+#endif
 
 enum lox_tag_type
 {

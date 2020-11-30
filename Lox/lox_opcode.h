@@ -140,7 +140,7 @@ int lox_opcode_div(long r1, long r2, int label);
 
 int lox_opcode_move(long r1, long r2);
 
-int lox_opcode_jmp(long r1, int reg);
+int lox_opcode_jmp(long r1, int ret, long f);
 
 int lox_opcode_return(long r1, int has_ret_expr);
 

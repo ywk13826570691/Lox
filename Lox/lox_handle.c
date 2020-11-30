@@ -162,7 +162,7 @@ long lox_handle_jmp_inner(struct lox_cmd *cmd)
         struct lox_symbol *s = lox_find_symbol_by_label(cmd->cmd_args[2+i]);
         struct lox_object *obj2 = s->sym_obj;
         struct lox_object *obj3 = lox_object_new_temp();
-lox_info("------------vvvv---1-__4444444444444444444:%d\n", obj2->o_tag);
+lox_info("------------vvvv---1-__4444444444444444444:%d %f\n", obj2->o_tag, obj2->o_value.v_f);
         if (!obj2)
         {
             lox_error("func invalid param nil\n");
@@ -299,7 +299,7 @@ long lox_handle_return(struct lox_cmd *cmd)
 
     if (s && s->sym_obj)
     { 
-        lox_object_copy(s, sym_ret);
+        lox_object_copy(s->sym_obj, sym_ret->sym_obj);
         lox_info("----------------------------lox_handle_return will return %f\n", s->sym_obj->o_value.v_f);
     }
     else

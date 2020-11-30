@@ -4,9 +4,9 @@ all: yacc lex
 	gcc -g $(source) -ll -ly
 
 yacc:
-	yacc -d  vkang.y
+	yacc -d -v vkang.y -Wconflicts-sr
 lex:
 	lex vkang.l
 
 clean:
-	rm y.tab.c lex.yy.c a.out *.o y.tab.h
+	rm y.tab.c lex.yy.c a.out  y.tab.h
