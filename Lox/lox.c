@@ -9,7 +9,7 @@ int lox_machine_run(void)
 {
     struct lox_cmd *cmd = (struct lox_cmd *)PC;
     int cmd_add = 0;
-    while (cmd->cmd_opcode != LOX_NOP)
+    while (cmd && cmd->cmd_opcode != LOX_NOP)
     {
         cmd_add = 1;
         lox_info("---------vm handle cmd------:%d %p %d\n",cmd->cmd_opcode, PC, SP);
@@ -68,6 +68,29 @@ int lox_machine_run(void)
 
         case LOX_SET_ARRAY_VALUE:
             lox_handle_set_array_value(cmd);
+            break;
+        case LOX_CMP:
+            lox_handle_cmp(cmd);
+            break;
+        case LOX_LABEL:
+            break;
+        case LOX_JMP_LABEL:
+            lox_handle_jmp_label(cmd);
+            cmd_add = 0;
+            break;
+        case LOX_JMPEQ_LABEL:
+        {
+            int ret = lox_handle_jmpeq_label(cmd);
+            if (ret == 0)
+                cmd_add = 0;
+        }
+            break;
+        case LOX_EQUAL:
+        case LOX_NEQUAL:
+        case LOX_LT:
+        case LOX_GT:
+        case LOX_LET:
+        case LOX_GET:
             break;
         default:
             break;

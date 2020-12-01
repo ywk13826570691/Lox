@@ -14,7 +14,9 @@ SOURCES += \
     lox_handle.c \
     lox_object.c \
     lox_keywords.c \
-    lox_array.c
+    lox_array.c \
+    lox_if.c \
+    lox_if.c
 
 HEADERS += \
     lox.h \
@@ -28,7 +30,9 @@ HEADERS += \
     lox_handle.h \
     lox_object.h \
     lox_keywords.h \
-    lox_array.h
+    lox_array.h \
+    lox_if.h \
+    lox_if.h
 
 OTHER_FILES += \
     vkang.l \

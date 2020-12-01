@@ -2,51 +2,6 @@
 #include "lox_function.h"
 #include "lox_stack.h"
 
-#if 0
-int lox_opcode_push_number(long n)
-{
-    int ret = LOX_ERROR(LOX_INVALID);
-    struct lox_object *obj = lox_cur_parse_function();
-
-    if (!obj)
-    {
-        lox_error("cur parse funcion is nil %s %d\n", __func__, __LINE__);
-        return  ret;
-    }
-
-    struct lox_cmd cmd;
-
-    cmd.cmd_opcode = LOX_PUSH;
-    cmd.cmd_push.p_type =  PUSH_NUMBER;
-    cmd.cmd_push.f_number = n;
-
-    return lox_func_push_cmd(&cmd);
-}
-
-
-int lox_opcode_push_arg(char *argname, int reg)
-{
-    int ret = LOX_ERROR(LOX_INVALID);
-    struct lox_object *obj = lox_cur_parse_function();
-
-    if (!obj)
-    {
-        lox_error("cur parse funcion is nil %s %d\n", __func__, __LINE__);
-        return  ret;
-    }
-
-    struct lox_cmd cmd;
-
-    cmd.cmd_opcode = LOX_PUSH;
-    cmd.cmd_push.p_type =  PUSH_ARG;
-
-    cmd.cmd_push.f_arg_name = argname;
-    cmd.cmd_push.f_label_index = reg;
-
-    return lox_func_push_cmd(&cmd);
-}
-#endif
-
 int lox_opcode_push_number_var(float f, int label)
 {
     int ret = LOX_ERROR(LOX_INVALID);
@@ -58,6 +13,7 @@ int lox_opcode_push_number_var(float f, int label)
     }
 
     struct lox_cmd cmd;
+    memset(&cmd, 0, sizeof (struct lox_cmd));
 
     cmd.cmd_opcode = LOX_PUSH;
     cmd.cmd_push.p_type =  PUSH_NUMBER_VAR;
@@ -80,6 +36,7 @@ int lox_opcode_push_string_var(char *str, int label)
     }
 
     struct lox_cmd cmd;
+    memset(&cmd, 0, sizeof (struct lox_cmd));
 
     cmd.cmd_opcode = LOX_PUSH;
     cmd.cmd_push.p_type =  PUSH_STRING_VAR;
@@ -102,6 +59,7 @@ int lox_opcode_push_var(char *var_name, int label)
     }
 
     struct lox_cmd cmd;
+    memset(&cmd, 0, sizeof (struct lox_cmd));
 
     cmd.cmd_opcode = LOX_PUSH;
     cmd.cmd_push.p_type =  PUSH_VAR;
@@ -126,6 +84,7 @@ int lox_opcode_push_temp_var(int label)
     }
 
     struct lox_cmd cmd;
+    memset(&cmd, 0, sizeof (struct lox_cmd));
 
     cmd.cmd_opcode = LOX_PUSH;
     cmd.cmd_push.p_type =  PUSH_TEMP_VAR;
@@ -147,11 +106,36 @@ int lox_opcode_push_temp_ptr_var(int label_temp)
     }
 
     struct lox_cmd cmd;
+    memset(&cmd, 0, sizeof (struct lox_cmd));
 
     cmd.cmd_opcode = LOX_PUSH;
     cmd.cmd_push.p_type =  PUSH_TEMP_PTR_VAR;
 
     cmd.cmd_push.f_label_index = label_temp;
+
+    return lox_func_push_cmd(&cmd);
+}
+
+int lox_opcode_push_bool_var(int label, int v)
+{
+    int ret = LOX_ERROR(LOX_INVALID);
+    struct lox_symbol *sym = lox_get_cur_parsing_function();
+
+    if (!sym)
+    {
+        lox_error("cur parse funcion is nil %s %d\n", __func__, __LINE__);
+        return  ret;
+    }
+
+    struct lox_cmd cmd;
+    memset(&cmd, 0, sizeof (struct lox_cmd));
+
+    cmd.cmd_opcode = LOX_PUSH;
+    cmd.cmd_push.p_type =  PUSH_BOOL;
+
+    cmd.cmd_push.f_label_index = label;
+    cmd.cmd_args[0] = v;
+    lox_info("lox_opcode_push_bool_var++++++++++++++xxxxxxxxxxxxxxxxxxxxxxxxxxxx+++++++++++++++++++++++++++:%d\n", v);
 
     return lox_func_push_cmd(&cmd);
 }
@@ -168,6 +152,7 @@ int lox_opcode_push_array_var(int label, long *labels, long label_cnt)
     }
 
     struct lox_cmd cmd;
+    memset(&cmd, 0, sizeof (struct lox_cmd));
 
     cmd.cmd_opcode = LOX_PUSH;
     cmd.cmd_push.p_type =  PUSH_ARRARY;
@@ -194,6 +179,7 @@ int lox_opcode_get_array_object(int array_label, int temp_label, long *label_ind
     }
 
     struct lox_cmd cmd;
+    memset(&cmd, 0, sizeof (struct lox_cmd));
 
     cmd.cmd_opcode = LOX_GET_ARRAY_VALUE;
     cmd.cmd_label_index = array_label;
@@ -221,6 +207,7 @@ int lox_opcode_set_array_object(int array_label, int temp_label, long *label_ind
     }
 
     struct lox_cmd cmd;
+    memset(&cmd, 0, sizeof (struct lox_cmd));
 
     cmd.cmd_opcode = LOX_SET_ARRAY_VALUE;
     cmd.cmd_label_index = array_label;
@@ -258,7 +245,7 @@ int lox_opcode_get_var(char *var_name, int label)
 }
 */
 
-int lox_opcode_add(long r1, long r2, int label)
+int lox_opcode_add(long r1, long r2, long label)
 {
     int ret = LOX_ERROR(LOX_INVALID);
     struct lox_symbol *sym = lox_get_cur_parsing_function();
@@ -270,6 +257,7 @@ int lox_opcode_add(long r1, long r2, int label)
     }
     lox_error("--------------------------------add %p %p %d\n", r1, r2, label);
     struct lox_cmd cmd;
+    memset(&cmd, 0, sizeof (struct lox_cmd));
 
     cmd.cmd_opcode = LOX_ADD;
     cmd.cmd_args[0] = r1;
@@ -279,7 +267,7 @@ int lox_opcode_add(long r1, long r2, int label)
     return lox_func_push_cmd(&cmd);
 }
 
-int lox_opcode_sub(long r1, long r2, int label)
+int lox_opcode_sub(long r1, long r2, long label)
 {
     int ret = LOX_ERROR(LOX_INVALID);
     struct lox_symbol *sym = lox_get_cur_parsing_function();
@@ -291,6 +279,7 @@ int lox_opcode_sub(long r1, long r2, int label)
     }
 
     struct lox_cmd cmd;
+    memset(&cmd, 0, sizeof (struct lox_cmd));
 
     cmd.cmd_opcode = LOX_SUB;
     cmd.cmd_args[0] = r1;
@@ -300,7 +289,7 @@ int lox_opcode_sub(long r1, long r2, int label)
     return lox_func_push_cmd(&cmd);
 }
 
-int lox_opcode_mul(long r1, long r2, int label)
+int lox_opcode_mul(long r1, long r2, long label)
 {
     int ret = LOX_ERROR(LOX_INVALID);
     struct lox_symbol *sym = lox_get_cur_parsing_function();
@@ -312,6 +301,7 @@ int lox_opcode_mul(long r1, long r2, int label)
     }
 
     struct lox_cmd cmd;
+    memset(&cmd, 0, sizeof (struct lox_cmd));
 
     cmd.cmd_opcode = LOX_MUL;
     cmd.cmd_args[0] = r1;
@@ -321,7 +311,7 @@ int lox_opcode_mul(long r1, long r2, int label)
     return lox_func_push_cmd(&cmd);
 }
 
-int lox_opcode_div(long r1, long r2, int label)
+int lox_opcode_div(long r1, long r2, long label)
 {
     int ret = LOX_ERROR(LOX_INVALID);
     struct lox_symbol *sym = lox_get_cur_parsing_function();
@@ -333,8 +323,141 @@ int lox_opcode_div(long r1, long r2, int label)
     }
 
     struct lox_cmd cmd;
+    memset(&cmd, 0, sizeof (struct lox_cmd));
 
     cmd.cmd_opcode = LOX_DIV;
+    cmd.cmd_args[0] = r1;
+    cmd.cmd_args[1] = r2;
+    cmd.cmd_label_index = label;
+
+    return lox_func_push_cmd(&cmd);
+}
+
+int lox_opcode_equal(long r1, long r2, long label)
+{
+    int ret = LOX_ERROR(LOX_INVALID);
+    struct lox_symbol *sym = lox_get_cur_parsing_function();
+
+    if (!sym)
+    {
+        lox_error("cur parse funcion is nil %s %d\n", __func__, __LINE__);
+        return  ret;
+    }
+
+    struct lox_cmd cmd;
+    memset(&cmd, 0, sizeof (struct lox_cmd));
+
+    cmd.cmd_opcode = LOX_EQUAL;
+    cmd.cmd_args[0] = r1;
+    cmd.cmd_args[1] = r2;
+    cmd.cmd_label_index = label;
+
+    return lox_func_push_cmd(&cmd);
+}
+
+int lox_opcode_nequal(long r1, long r2, long label)
+{
+    int ret = LOX_ERROR(LOX_INVALID);
+    struct lox_symbol *sym = lox_get_cur_parsing_function();
+
+    if (!sym)
+    {
+        lox_error("cur parse funcion is nil %s %d\n", __func__, __LINE__);
+        return  ret;
+    }
+
+    struct lox_cmd cmd;
+    memset(&cmd, 0, sizeof (struct lox_cmd));
+
+    cmd.cmd_opcode = LOX_NEQUAL;
+    cmd.cmd_args[0] = r1;
+    cmd.cmd_args[1] = r2;
+    cmd.cmd_label_index = label;
+
+    return lox_func_push_cmd(&cmd);
+}
+
+int lox_opcode_lt(long r1, long r2, long label)
+{
+    int ret = LOX_ERROR(LOX_INVALID);
+    struct lox_symbol *sym = lox_get_cur_parsing_function();
+
+    if (!sym)
+    {
+        lox_error("cur parse funcion is nil %s %d\n", __func__, __LINE__);
+        return  ret;
+    }
+
+    struct lox_cmd cmd;
+    memset(&cmd, 0, sizeof (struct lox_cmd));
+
+    cmd.cmd_opcode = LOX_LT;
+    cmd.cmd_args[0] = r1;
+    cmd.cmd_args[1] = r2;
+    cmd.cmd_label_index = label;
+
+    return lox_func_push_cmd(&cmd);
+}
+
+int lox_opcode_gt(long r1, long r2, long label)
+{
+    int ret = LOX_ERROR(LOX_INVALID);
+    struct lox_symbol *sym = lox_get_cur_parsing_function();
+
+    if (!sym)
+    {
+        lox_error("cur parse funcion is nil %s %d\n", __func__, __LINE__);
+        return  ret;
+    }
+
+    struct lox_cmd cmd;
+    memset(&cmd, 0, sizeof (struct lox_cmd));
+
+    cmd.cmd_opcode = LOX_GT;
+    cmd.cmd_args[0] = r1;
+    cmd.cmd_args[1] = r2;
+    cmd.cmd_label_index = label;
+
+    return lox_func_push_cmd(&cmd);
+}
+
+int lox_opcode_let(long r1, long r2, long label)
+{
+    int ret = LOX_ERROR(LOX_INVALID);
+    struct lox_symbol *sym = lox_get_cur_parsing_function();
+
+    if (!sym)
+    {
+        lox_error("cur parse funcion is nil %s %d\n", __func__, __LINE__);
+        return  ret;
+    }
+
+    struct lox_cmd cmd;
+    memset(&cmd, 0, sizeof (struct lox_cmd));
+
+    cmd.cmd_opcode = LOX_LET;
+    cmd.cmd_args[0] = r1;
+    cmd.cmd_args[1] = r2;
+    cmd.cmd_label_index = label;
+
+    return lox_func_push_cmd(&cmd);
+}
+
+int lox_opcode_get(long r1, long r2, long label)
+{
+    int ret = LOX_ERROR(LOX_INVALID);
+    struct lox_symbol *sym = lox_get_cur_parsing_function();
+
+    if (!sym)
+    {
+        lox_error("cur parse funcion is nil %s %d\n", __func__, __LINE__);
+        return  ret;
+    }
+
+    struct lox_cmd cmd;
+    memset(&cmd, 0, sizeof (struct lox_cmd));
+
+    cmd.cmd_opcode = LOX_GET;
     cmd.cmd_args[0] = r1;
     cmd.cmd_args[1] = r2;
     cmd.cmd_label_index = label;
@@ -354,6 +477,7 @@ int lox_opcode_move(long r1, long r2)
     }
 
     struct lox_cmd cmd;
+    memset(&cmd, 0, sizeof (struct lox_cmd));
 
     cmd.cmd_opcode = LOX_MOVE;
     cmd.cmd_args[0] = r1;
@@ -377,6 +501,7 @@ int lox_opcode_jmp(long r1, int ret, long f)
     }
 
     struct lox_cmd cmd;
+    memset(&cmd, 0, sizeof (struct lox_cmd));
 
     cmd.cmd_opcode = LOX_JMP;
     cmd.cmd_args[0] = r1;
@@ -404,6 +529,7 @@ int lox_opcode_return(long r1, int has_ret_expr)
     }
 
     struct lox_cmd cmd;
+    memset(&cmd, 0, sizeof (struct lox_cmd));
 
     cmd.cmd_opcode = LOX_RETURN;
     cmd.cmd_args[0] = r1;
@@ -425,6 +551,7 @@ int lox_opcode_function_end(void)
     }
 
     struct lox_cmd cmd;
+    memset(&cmd, 0, sizeof (struct lox_cmd));
 
     cmd.cmd_opcode = LOX_END_FUNCTION;
 
@@ -443,9 +570,92 @@ int lox_opcode_function_param_end(void)
     }
 
     struct lox_cmd cmd;
+    memset(&cmd, 0, sizeof (struct lox_cmd));
 
     cmd.cmd_opcode = LOX_FUNCTION_PARAM_END;
 
     lox_info("-------------------end function---%s\n", sym->sym_name);
+    return lox_func_push_cmd(&cmd);
+}
+
+
+int lox_opcode_push_label(char *label)
+{
+    int ret = LOX_ERROR(LOX_INVALID);
+    struct lox_symbol *sym = lox_get_cur_parsing_function();
+    if (!sym)
+    {
+        lox_error("cur parse funcion is nil %s %d\n", __func__, __LINE__);
+        return  ret;
+    }
+
+    struct lox_cmd cmd;
+    memset(&cmd, 0, sizeof (struct lox_cmd));
+
+    cmd.cmd_opcode = LOX_LABEL;
+    strcpy(cmd.cmd_jmp_label, label);
+
+    lox_info("-------------------lox_opcode_push_label:%s\n", label);
+    return lox_func_push_cmd(&cmd);
+}
+
+int lox_opcode_cmp(long label)
+{
+    int ret = LOX_ERROR(LOX_INVALID);
+    struct lox_symbol *sym = lox_get_cur_parsing_function();
+    if (!sym)
+    {
+        lox_error("cur parse funcion is nil %s %d\n", __func__, __LINE__);
+        return  ret;
+    }
+
+    struct lox_cmd cmd;
+    memset(&cmd, 0, sizeof (struct lox_cmd));
+
+    cmd.cmd_opcode = LOX_CMP;
+    cmd.cmd_label_index = label;
+
+    lox_info("-------------------lox_opcode_cmp\n");
+    return lox_func_push_cmd(&cmd);
+}
+
+int lox_opcode_jmp_label(char *label)
+{
+    int ret = LOX_ERROR(LOX_INVALID);
+    struct lox_symbol *sym = lox_get_cur_parsing_function();
+    if (!sym)
+    {
+        lox_error("cur parse funcion is nil %s %d\n", __func__, __LINE__);
+        return  ret;
+    }
+
+    struct lox_cmd cmd;
+    memset(&cmd, 0, sizeof (struct lox_cmd));
+
+    cmd.cmd_opcode = LOX_JMP_LABEL;
+    strcpy(cmd.cmd_jmp_label, label);
+
+    lox_info("-------------------lox_opcode_jmp_label:%s\n", label);
+    return lox_func_push_cmd(&cmd);
+}
+
+//cmp result is zero
+int lox_opcode_jmpeq_label(char *label)
+{
+    int ret = LOX_ERROR(LOX_INVALID);
+    struct lox_symbol *sym = lox_get_cur_parsing_function();
+    if (!sym)
+    {
+        lox_error("cur parse funcion is nil %s %d\n", __func__, __LINE__);
+        return  ret;
+    }
+
+    struct lox_cmd cmd;
+    memset(&cmd, 0, sizeof (struct lox_cmd));
+
+    cmd.cmd_opcode = LOX_JMPEQ_LABEL;
+    strcpy(cmd.cmd_jmp_label, label);
+
+    lox_info("-------------------lox_opcode_jmpeq_label:%s\n", label);
     return lox_func_push_cmd(&cmd);
 }

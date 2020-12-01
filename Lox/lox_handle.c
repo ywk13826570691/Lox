@@ -77,6 +77,10 @@ long lox_handle_push_cmd(struct lox_cmd *cmd)
         lox_info("---------------------handle push array:%d\n", cmd->cmd_args[0]);
         ret = lox_stack_push_array_var(push_type->f_label_index, &cmd->cmd_args[1], cmd->cmd_args[0]);
     }
+    else if (push_type->p_type == PUSH_BOOL)
+    {
+        ret =  lox_stack_push_bool_var(push_type->f_label_index, cmd->cmd_args[0]);
+    }
     else
     {
         lox_error("finding an invalid push cmd:%d\n", push_type->p_type);
@@ -204,13 +208,7 @@ long lox_handle_jmp(struct lox_cmd *cmd)
     struct lox_symbol *sym = (struct lox_symbol *)cmd->cmd_args[0];
     struct lox_function *func;
     long *stack = lox_get_stack();
-#if 0
-    for (int i = 0 ; i < SP; i++)
-    {
-        struct lox_symbol *sym = stack[i];
-        lox_info("---------------------------:%ld \n", sym);
-    }
-#endif
+
     if (sym->sym_obj)
     {
         func = sym->sym_obj->o_value.v_func;
@@ -436,5 +434,107 @@ long lox_handle_set_array_value(struct lox_cmd *cmd)
     }
 
     return LOX_OK;
+}
+
+long lox_find_label(char *label)
+{
+    long ret = 0;
+    if (!label)
+    {
+        lox_error("We are finding an nil label to jmp!!!!\n");
+        exit(0);
+    }
+
+    struct lox_cmd *cmd = (struct lox_cmd *)(PC + sizeof (struct lox_cmd));
+
+    while(cmd->cmd_opcode != LOX_NOP)
+    {
+        if (cmd->cmd_opcode == LOX_LABEL && strcmp(cmd->cmd_jmp_label, label) == 0)
+        {
+            ret =  (long)cmd;
+            break;
+        }
+        cmd++;
+    }
+    return ret;
+}
+
+long lox_handle_cmp(struct lox_cmd *cmd)
+{
+    lox_info("-----------xxx------lox_handle_cmp\n");
+    struct lox_symbol * sym = lox_find_symbol_by_label(cmd->cmd_label_index);
+
+    if (sym && sym->sym_obj)
+    {
+        struct lox_object *obj = sym->sym_obj;
+        lox_info("-----------xxx2------lox_handle_cmp:%d\n",obj->o_tag);
+        switch (obj->o_tag)
+        {
+            case LOX_NUMBER:
+                SPR = obj->o_value.v_f == 0.0 ? 0 : 1;
+                break;
+            case LOX_STRING:
+                if (!obj->o_value.v_str)
+                {
+                    SPR = 0;
+                }
+                else
+                {
+                    SPR = strlen(obj->o_value.v_str) ? 1 : 0;
+                }
+                break;
+            case LOX_NIL:
+                SPR = 0;
+                break;
+            case LOX_ARRAY:
+                if (!obj->o_value.v_vec)
+                {
+                    SPR = 0;
+                }
+                else
+                {
+                    SPR = obj->o_value.v_vec->len ? 1 : 0;
+                }
+                break;
+            case LOX_BOOL_FALSE:
+                SPR = 0;
+                break;
+            case LOX_BOOL_TRUE:
+                SPR = 1;
+                break;
+            default:
+                SPR = 0;
+                break;
+         }
+    }
+    else
+    {
+        SPR = 0;
+    }
+    return LOX_OK;
+}
+
+long lox_handle_jmp_label(struct lox_cmd *cmd)
+{
+    lox_info("-----------------lox_handle_jmp_label:%s\n", cmd->cmd_jmp_label);
+    long ret = lox_find_label(cmd->cmd_jmp_label);
+    if (ret)
+    {
+        struct lox_cmd *cmd2 = (struct lox_cmd *)ret;
+        PC = (long)cmd2;
+    }
+    return LOX_OK;
+}
+
+long lox_handle_jmpeq_label(struct lox_cmd *cmd)
+{
+    int ret = 0;
+    ret = SPR;
+    lox_info("-----------------lox_handle_jmpeq_label:%s %d\n", cmd->cmd_jmp_label, SPR);
+    if (SPR == 0)
+    {
+        lox_handle_jmp_label(cmd);
+    }
+    return ret;
 }
 

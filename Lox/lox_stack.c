@@ -92,6 +92,17 @@ long lox_stack_push_temp_var(long label)
     return lox_stack_push(s);
 }
 
+long lox_stack_push_bool_var(long label, int v)
+{
+    struct lox_symbol *s = (struct lox_symbol *)malloc(sizeof (struct lox_symbol));
+    struct lox_object *obj = lox_object_new_bool(v);
+    memset(s, 0, sizeof (struct lox_symbol));
+    s->sym_obj = obj;
+    s->sym_label_value = label;
+    lox_info("00000000000000000000000000000000000000000000000000000000000000:%d %d\n", obj->o_tag, v);
+    return lox_stack_push(s);
+}
+
 long lox_stack_push_temp_ptr_var(long label_temp)
 {
     struct lox_symbol *s = (struct lox_symbol *)malloc(sizeof (struct lox_symbol));

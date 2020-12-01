@@ -32,8 +32,8 @@ enum lox_tag_type
     LOX_STRING,
     LOX_ARRAY,
     LOX_NIL,
-    LOX_TRUE,
-    LOX_FALSE,
+    LOX_BOOL_TRUE,
+    LOX_BOOL_FALSE,
     LOX_FUNCTION,
 };
 

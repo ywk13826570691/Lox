@@ -18,4 +18,9 @@ long lox_handle_function_end(struct lox_cmd *cmd);
 long lox_handle_get_array_value(struct lox_cmd *cmd);
 long lox_handle_set_array_value(struct lox_cmd *cmd);
 
+
+long lox_handle_cmp(struct lox_cmd *cmd);
+long lox_handle_jmp_label(struct lox_cmd *cmd);
+long lox_handle_jmpeq_label(struct lox_cmd *cmd);
+
 #endif // LOX_HANDLE_H

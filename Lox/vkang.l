@@ -34,8 +34,8 @@ extern int lox_linenumber;
 "<="					return LE;
 ">="					return GE;
 ".."					return CONC;
-"true"					return TRUE;
-"false"					return FALSE;
+"true"					return LOX_TRUE;
+"false"					return LOX_FALSE;
 \"[^\"]*\" 			| 
 \'[^\']*\'			      {
                        yylval.vChar = (char*)malloc(strlen(yytext));

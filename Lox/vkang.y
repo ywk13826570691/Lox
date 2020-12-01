@@ -5,6 +5,7 @@
     #include "lox_opcode.h"
     #include "lox_register.h"
     #include "lox_array.h"
+    #include "lox_if.h"
     extern int lox_linenumber;
     extern unsigned int lox_var_label_index;
     extern int lox_function_parsing;
@@ -45,8 +46,8 @@
 %token  LE
 %token  GE
 %token  CONC
-%token  TRUE
-%token  FALSE
+%token  <vLong> LOX_TRUE
+%token  <vLong> LOX_FALSE
 %token  <vChar> STRING
 %token  <vFloat> NUMBER
 %token  <vChar> NAME
@@ -138,7 +139,23 @@ stat : stat1
 sc	 : /* empty */ | ';' ;
 
 
-stat1 : IF expr THEN PrepJump block PrepJump elsepart END
+stat1 : IF expr THEN {
+            int ret = lox_if_index_increase();
+            lox_if_index_push(ret);
+            lox_info("-------------1---------:%d\n", ret);
+            lox_opcode_cmp($2);
+            lox_opcode_jmpeq_label(lox_else_label());
+            } 
+            block  {
+                        lox_info("-------------3---------:%d\n",lox_if_get_cur_index());
+                        lox_opcode_jmp_label(lox_if_end_label());
+                   }
+            elsepart END {
+            				lox_opcode_push_label(lox_else_label());
+                            lox_opcode_push_label(lox_if_end_label());
+                            lox_info("-------------2---------:%d\n", lox_if_get_cur_index());
+                            lox_if_index_pop();
+                         }
 	| WHILE  expr DO PrepJump block PrepJump END
 	| REPEAT  block UNTIL expr PrepJump
     | var_create '=' varlist
@@ -190,7 +207,15 @@ stat1 : IF expr THEN PrepJump block PrepJump elsepart END
 	//| typeconstructor                
 	//| LOCAL localdeclist decinit
 	;
-	   ;
+elsepart : /* empty */
+	 | ELSE { lox_opcode_push_label(lox_else_label()); } block
+     | ELSEIF expr THEN 
+     { 
+     	lox_opcode_push_label(lox_else_label()); 
+     	lox_opcode_cmp($2); 
+     	lox_opcode_jmpeq_label(lox_else_label());
+     } block { lox_opcode_jmp_label(lox_if_end_label()); }  elsepart   
+     ;
 ret	: /* empty */
         /*| RETURN exprlist sc */
         | RETURN  retlist sc
@@ -238,34 +263,30 @@ exprlist1 :	expr
 	  ; 
 */
 
-elsepart : /* empty */
-	 | ELSE block
-     | ELSEIF expr THEN PrepJump block PrepJump elsepart   
-     ;
      
 PrepJump : /* empty */
 		 ;
 
 expr : '(' expr ')' { $$ = $2; }
-     |	expr EQ expr	
-     |	expr '<' expr	
-     |	expr '>' expr	
-     |	expr NE  expr	
-     |	expr LE  expr	
-     |	expr GE  expr	
+     |	expr EQ expr	{ $$ = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_equal($1, $3, lox_var_label_index);lox_var_label_index++;}
+     |	expr '<' expr	{ $$ = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_lt($1, $3, lox_var_label_index);lox_var_label_index++;}
+     |	expr '>' expr	{ $$ = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_gt($1, $3, lox_var_label_index);lox_var_label_index++;}
+     |	expr NE  expr	{ $$ = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_nequal($1, $3, lox_var_label_index);lox_var_label_index++;}
+     |	expr LE  expr	{ $$ = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_let($1, $3, lox_var_label_index);lox_var_label_index++;}
+     |	expr GE  expr	{ $$ = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_get($1, $3, lox_var_label_index);lox_var_label_index++;}
      |	expr '+' expr { $$ = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_add($1, $3, lox_var_label_index);lox_var_label_index++;}
      |	expr '-' expr { $$ = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_sub($1, $3, lox_var_label_index); lox_var_label_index++;}
      |	expr '*' expr { $$ = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_mul($1, $3, lox_var_label_index); lox_var_label_index++;}
      |	expr '/' expr { $$ = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_div($1, $3, lox_var_label_index); lox_var_label_index++;}
      |	expr CONC expr 
-     //	'+' expr %prec UMINUS
+     //|	'+' expr %prec UMINUS
      //|	'-' expr %prec UMINUS
      //| typeconstructor
      //|  '@' '(' dimension ')'
      |	var { $$ = $1; }
      |	NUMBER { $$ = lox_var_label_index; lox_opcode_push_number_var($1, lox_var_label_index);lox_var_label_index++; }
      |	STRING { $$ = lox_var_label_index; lox_opcode_push_string_var($1, lox_var_label_index);lox_var_label_index++; }
-     |	NIL
+     |	NIL { $$ = lox_var_label_index; lox_opcode_push_temp_var(lox_var_label_index);lox_var_label_index++; }
      |	functioncall {
                        struct lox_function_calling *call_f = lox_get_cur_calling_function();
                        struct lox_symbol *sym = (struct lox_symbol *)call_f->func;
@@ -278,8 +299,10 @@ expr : '(' expr ')' { $$ = $2; }
                        lox_info("---------------------function call end2:%s\n", sym->sym_name);
                      }
      //|	NOT expr %prec UMINUS
-     |	expr AND PrepJump expr
-     |	expr OR PrepJump expr	
+     |	expr AND  expr
+     |	expr OR   expr
+     |  LOX_FALSE { $$ = lox_var_label_index; lox_opcode_push_bool_var(lox_var_label_index, 0);lox_var_label_index++; }
+     |  LOX_TRUE { $$ = lox_var_label_index; lox_opcode_push_bool_var(lox_var_label_index, 1);lox_var_label_index++; }
      ;
     /*
 dimension    :

@@ -86,6 +86,7 @@ struct lox_symbol * lox_new_function(char *name)
     fun->is_inner_function = 0;
     fun->func_code = (struct lox_cmd *)malloc(LOX_FUNCTION_CODE_STEP * sizeof (struct lox_cmd));
     fun->func_code_len += LOX_FUNCTION_CODE_STEP;
+    memset(fun->func_code, 0, LOX_FUNCTION_CODE_STEP * sizeof (struct lox_cmd));
 
     lox_set_cur_parsing_function((long)sym);
 
@@ -430,6 +431,14 @@ static void lox_inner_type(struct lox_symbol * sym, long *argv, int len, long re
     if (obj->o_tag == LOX_STRING)
     {
         strcpy(type, "string");
+    }
+    if (obj->o_tag == LOX_ARRAY)
+    {
+        strcpy(type, "table");
+    }
+    if (obj->o_tag == LOX_BOOL_TRUE || obj->o_tag == LOX_BOOL_FALSE)
+    {
+        strcpy(type, "bool");
     }
     lox_info("-----------------lox_inner_type------------------:%d\n", re->sym_obj->o_tag);
     if (re && re->sym_obj)
