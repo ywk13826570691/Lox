@@ -94,7 +94,6 @@ int lox_array_insert_obj(struct lox_object *arr, struct lox_object *obj)
     }
     while (vec->next)
     {
-        lox_info("[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\n");
         vec = vec->next;
     }
     vec->next = v;

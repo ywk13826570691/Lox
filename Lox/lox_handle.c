@@ -166,6 +166,51 @@ long lox_handle_logical_operation(struct lox_cmd *cmd)
     return ret;
 }
 
+long lox_handle_and(struct lox_cmd *cmd)
+{
+    long ret = LOX_ERROR(LOX_INVALID);
+    struct lox_symbol * s1 = (struct lox_symbol *)lox_find_symbol_by_label(cmd->cmd_args[0]);
+    struct lox_symbol * s2 = (struct lox_symbol *)lox_find_symbol_by_label(cmd->cmd_args[1]);
+    struct lox_symbol * s3 = (struct lox_symbol *)lox_find_symbol_by_label(cmd->cmd_label_index);
+
+    if (!s1 || !s2 || !s3)
+    {
+        lox_error("lox_handle_and invalid symbold %d %d %d\n", cmd->cmd_args[0], cmd->cmd_args[1],cmd->cmd_label_index);
+        exit(0);
+        return  ret;
+    }
+    struct lox_object *obj1, *obj2, *obj3;
+
+    obj1 = s1->sym_obj;
+    obj2 = s2->sym_obj;
+    obj3 = s3->sym_obj;
+
+    ret = lox_object_and(obj1, obj2, obj3);
+    return ret;
+}
+
+long lox_handle_or(struct lox_cmd *cmd)
+{
+    long ret = LOX_ERROR(LOX_INVALID);
+    struct lox_symbol * s1 = (struct lox_symbol *)lox_find_symbol_by_label(cmd->cmd_args[0]);
+    struct lox_symbol * s2 = (struct lox_symbol *)lox_find_symbol_by_label(cmd->cmd_args[1]);
+    struct lox_symbol * s3 = (struct lox_symbol *)lox_find_symbol_by_label(cmd->cmd_label_index);
+
+    if (!s1 || !s2 || !s3)
+    {
+        lox_error("lox_handle_or invalid symbold %d %d %d\n", cmd->cmd_args[0], cmd->cmd_args[1],cmd->cmd_label_index);
+        exit(0);
+        return  ret;
+    }
+    struct lox_object *obj1, *obj2, *obj3;
+
+    obj1 = s1->sym_obj;
+    obj2 = s2->sym_obj;
+    obj3 = s3->sym_obj;
+
+    ret = lox_object_or(obj1, obj2, obj3);
+    return ret;
+}
 
 long lox_handle_jmp_inner(struct lox_cmd *cmd)
 {

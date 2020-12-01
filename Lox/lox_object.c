@@ -756,3 +756,49 @@ long lox_object_logical_operation_get(struct lox_object *obj1, struct lox_object
     lox_object_copy(dst, &obj_new);
     return LOX_OK;
 }
+
+long lox_object_and(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst)
+{
+    struct lox_object obj_new;
+    obj_new.o_tag = LOX_BOOL_FALSE;
+    if (!dst)
+    {
+        lox_info("---------lox_object_and nil dst\n");
+        exit(0);
+    }
+    if (!obj1 || !obj2)
+    {
+        lox_object_copy(dst, &obj_new);
+        return LOX_OK;
+    }
+
+    if (obj1->o_tag != LOX_NIL && obj1->o_tag != LOX_NIL)
+    {
+        obj_new.o_tag = LOX_BOOL_TRUE;
+    }
+    lox_object_copy(dst, &obj_new);
+    return LOX_OK;
+}
+
+long lox_object_or(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst)
+{
+    struct lox_object obj_new;
+    obj_new.o_tag = LOX_BOOL_FALSE;
+    if (!dst)
+    {
+        lox_info("---------lox_object_or nil dst\n");
+        exit(0);
+    }
+    if (!obj1 || !obj2)
+    {
+        lox_object_copy(dst, &obj_new);
+        return LOX_OK;
+    }
+
+    if (obj1->o_tag != LOX_NIL || obj2->o_tag != LOX_NIL)
+    {
+        obj_new.o_tag = LOX_BOOL_TRUE;
+    }
+    lox_object_copy(dst, &obj_new);
+    return LOX_OK;
+}

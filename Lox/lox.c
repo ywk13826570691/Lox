@@ -93,6 +93,12 @@ int lox_machine_run(void)
         case LOX_GET:
             lox_handle_logical_operation(cmd);
             break;
+        case LOX_AND:
+            lox_handle_and(cmd);
+            break;
+        case LOX_OR:
+            lox_handle_or(cmd);
+            break;
         default:
             break;
         }

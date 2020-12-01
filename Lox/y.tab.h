@@ -67,8 +67,8 @@ extern int yydebug;
     LE = 277,
     GE = 278,
     CONC = 279,
-    TRUE = 280,
-    FALSE = 281,
+    LOX_TRUE = 280,
+    LOX_FALSE = 281,
     STRING = 282,
     NUMBER = 283,
     NAME = 284,
@@ -100,8 +100,8 @@ extern int yydebug;
 #define LE 277
 #define GE 278
 #define CONC 279
-#define TRUE 280
-#define FALSE 281
+#define LOX_TRUE 280
+#define LOX_FALSE 281
 #define STRING 282
 #define NUMBER 283
 #define NAME 284
@@ -114,7 +114,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 16 "vkang.y" /* yacc.c:1909  */
+#line 18 "vkang.y" /* yacc.c:1909  */
 
  long   vLong;
  float vFloat;

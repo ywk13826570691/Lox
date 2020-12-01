@@ -30,6 +30,9 @@ long lox_object_logical_operation_lt(struct lox_object *obj1, struct lox_object 
 long lox_object_logical_operation_gt(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst);
 long lox_object_logical_operation_let(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst);
 long lox_object_logical_operation_get(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst);
+long lox_object_and(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst);
+long lox_object_or(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst);
+
 
 
 #endif // LOX_OBJECT_H

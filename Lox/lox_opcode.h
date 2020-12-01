@@ -100,7 +100,7 @@ struct lox_cmd_push
     float f_f;
     char *f_str;
     char f_var_name[100];
-    int  f_label_index;
+    long  f_label_index;
 };
 
 struct lox_cmd_jmp
@@ -128,15 +128,15 @@ struct lox_cmd
 //int lox_opcode_push_number(long n);
 //int lox_opcode_push_arg(char *argname, int reg);
 
-int lox_opcode_push_number_var(float f, int label);
-int lox_opcode_push_string_var(char *str, int label);
-int lox_opcode_push_var(char *var_name, int label);
-int lox_opcode_push_temp_var(int label);
+int lox_opcode_push_number_var(float f, long label);
+int lox_opcode_push_string_var(char *str, long label);
+int lox_opcode_push_var(char *var_name, long label);
+int lox_opcode_push_temp_var(long label);
 int lox_opcode_push_temp_ptr_var(int label_temp);
-int lox_opcode_push_bool_var(int label, int v);
-int lox_opcode_push_array_var(int label, long *labels, long label_cnt);
-int lox_opcode_get_array_object(int array_label, int temp_label, long *label_indexs, long index_cnt);
-int lox_opcode_set_array_object(int array_label, int temp_label, long *label_indexs, long index_cnt);
+int lox_opcode_push_bool_var(long label, int v);
+int lox_opcode_push_array_var(long label, long *labels, long label_cnt);
+int lox_opcode_get_array_object(long array_label, long temp_label, long *label_indexs, long index_cnt);
+int lox_opcode_set_array_object(long array_label, long temp_label, long *label_indexs, long index_cnt);
 
 
 //int lox_opcode_get_var(char *var_name, int label);
@@ -153,6 +153,9 @@ int lox_opcode_lt(long r1, long r2, long label);
 int lox_opcode_gt(long r1, long r2, long label);
 int lox_opcode_let(long r1, long r2, long label);
 int lox_opcode_get(long r1, long r2, long label);
+
+int lox_opcode_and(long r1, long r2, long label);
+int lox_opcode_or(long r1, long r2, long label);
 
 
 int lox_opcode_move(long r1, long r2);

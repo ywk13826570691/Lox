@@ -1,64 +1,11 @@
-function sum(a, b)
-    f = 1000;
-    f = 100
-    print("---------------------------------------------------------------------------------vkang hello\n")
-	return a + b
+k = [1,2,3,4]
+a = "hello"
+b = "hello"
+if nil or 100  then
+	print("111111111111kkkkkkkkkkk222");
+else
+	print("111111111111kkkkkkkkkkk444");
 end
 
-function add(a, b)
-	return a+ b
-end
-
-function sss()
-    print("mm")
-end
-
-function rrrr()
-	return;
-end
-
-function array_print(a)
-	print("+++++++++++++++++++++++++++", a[0])
-end
-
-m ="hello vkang ooo"
-a = 1000
-c = a + 10
-print(1)
-print("hello vkang")
-print(11.2);
-print(type(a))
-print(type(m))
-c = add(10,25)
-print(c)
-
-hh = [10,20,30]
-ff = [1,2,3,4]
-ff[0] = 1000
-print(ff[0], ff[1], ff[2])
-array_print(ff)
-print(ff[0], ff[1], ff[2])
-op = add(add(add(1,2),add(3,4)),add(add(1,2),add(3,4)))
-
-print(op)
-print(ff[0], ff[1], ff[2], ff[3])
-
-print("hello", "vkang", "world")
-print(a)
-print(c)
-gg = sum(1,8)
-ff = sum(3,5)
-print(gg)
-print(sum(55,25))
-
---sss()
-print("llllllllllllllllllllllllllllllllllllllllllllllllllllllllll\n");
-g = [10, 11, "vkang"]
-sk = [g, 1,2,3,7, 8, 9, "hello"]
-sk[0][2] = "12345678"
-print(sk[0][2])
-
---s = "1000000"
---k = "5555555"
---print(s)
---print(k[0][2])
+c = nil
+print(type(c))
