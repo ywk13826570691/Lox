@@ -7,6 +7,7 @@ int lox_setup_stack(void);
 long lox_handle_push_cmd(struct lox_cmd *cmd);
 long lox_handle_move(struct lox_cmd *cmd);
 long lox_handle_add(struct lox_cmd *cmd);
+long lox_handle_logical_operation(struct lox_cmd *cmd);
 
 long lox_handle_jmp_inner(struct lox_cmd *cmd);
 long lox_handle_jmp(struct lox_cmd *cmd);

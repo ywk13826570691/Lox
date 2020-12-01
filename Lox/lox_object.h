@@ -23,8 +23,13 @@ int lox_object_destroy_array(struct lox_object *obj);
 long lox_object_destroy(struct lox_object *obj1);
 
 long lox_object_add(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst);
-
-
+long lox_object_logical_operation(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst, int opcode);
+long lox_object_logical_operation_eq(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst);
+long lox_object_logical_operation_neq(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst);
+long lox_object_logical_operation_lt(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst);
+long lox_object_logical_operation_gt(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst);
+long lox_object_logical_operation_let(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst);
+long lox_object_logical_operation_get(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst);
 
 
 #endif // LOX_OBJECT_H

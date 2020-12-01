@@ -1,6 +1,8 @@
 #include "lox_object.h"
+#include "lox_array.h"
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 
 struct lox_object* lox_object_new_number(float f)
@@ -371,5 +373,386 @@ long lox_object_add(struct lox_object *obj1, struct lox_object *obj2, struct lox
         dst->o_tag = LOX_NUMBER;
         dst->o_value.v_f = obj1->o_value.v_f + obj2->o_value.v_f;
     }
+    return LOX_OK;
+}
+
+long lox_object_logical_operation(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst, int opcode)
+{
+    if (!obj1 || !obj2 || !dst)
+    {
+        lox_error("---------logical opearation nil obj\n");
+        exit(0);
+    }
+    struct lox_object obj_new;
+    obj_new.o_tag = LOX_BOOL_FALSE;
+    switch (opcode)
+    {
+        case LOX_EQUAL:
+            lox_object_logical_operation_eq(obj1, obj2, dst);
+            break;
+        case LOX_NEQUAL:
+            lox_object_logical_operation_neq(obj1, obj2, dst);
+            break;
+        case LOX_LT:
+            lox_object_logical_operation_lt(obj1, obj2, dst);
+            break;
+        case LOX_GT:
+            lox_object_logical_operation_gt(obj1, obj2, dst);
+            break;
+        case LOX_LET:
+            lox_object_logical_operation_let(obj1, obj2, dst);
+            break;
+        case LOX_GET:
+            lox_object_logical_operation_get(obj1, obj2, dst);
+            break;
+        default:
+            lox_object_copy(dst, &obj_new);
+            break;
+    }
+
+    return LOX_OK;
+}
+
+long lox_object_logical_operation_eq(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst)
+{
+    struct lox_object obj_new;
+    obj_new.o_tag = LOX_BOOL_FALSE;
+    if (obj1->o_tag != obj2->o_tag)
+    {
+        lox_info("---------logical opearation eq type not equal:%d %d\n", obj1->o_tag, obj2->o_tag);
+        lox_object_copy(dst, &obj_new);
+        return  LOX_OK;
+    }
+    switch (obj1->o_tag)
+    {
+        case LOX_NUMBER:
+            {
+                if (fabs(obj1->o_value.v_f - obj2->o_value.v_f) < 1e-10)
+                {
+                    obj_new.o_tag = LOX_BOOL_TRUE;
+                }
+            }
+            break;
+        case LOX_STRING:
+            {
+                if (obj1->o_value.v_str && obj2->o_value.v_str)
+                {
+                    if (strcmp(obj1->o_value.v_str, obj2->o_value.v_str) == 0)
+                    {
+                        obj_new.o_tag = LOX_BOOL_TRUE;
+                    }
+                }
+            }
+            break;
+        case LOX_NIL:
+            obj_new.o_tag = LOX_BOOL_TRUE;
+            break;
+        case LOX_ARRAY:
+            if(obj1->o_value.v_vec && obj2->o_value.v_vec)
+            {
+                if (obj1->o_value.v_vec == obj2->o_value.v_vec)
+                {
+                    obj_new.o_tag = LOX_BOOL_TRUE;
+                }
+                else
+                {
+                    if (obj1->o_value.v_vec->len == obj2->o_value.v_vec->len)
+                    {
+                        int ret = lox_arrary_equal(obj1, obj2);
+                        if (ret == 0)
+                        {
+                            obj_new.o_tag = LOX_BOOL_TRUE;
+                        }
+                    }
+                }
+            }
+            break;
+        case LOX_BOOL_TRUE:
+            obj_new.o_tag = LOX_BOOL_TRUE;
+            break;
+        case LOX_BOOL_FALSE:
+            obj_new.o_tag = LOX_BOOL_TRUE;
+            break;
+        default:
+            break;
+    }
+    lox_object_copy(dst, &obj_new);
+    return LOX_OK;
+}
+
+long lox_object_logical_operation_neq(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst)
+{
+    struct lox_object obj_new;
+    obj_new.o_tag = LOX_BOOL_FALSE;
+    if (obj1->o_tag != obj2->o_tag)
+    {
+        lox_info("---------logical opearation neq type not equal:%d %d\n", obj1->o_tag, obj2->o_tag);
+        obj_new.o_tag = LOX_BOOL_TRUE;
+        lox_object_copy(dst, &obj_new);
+        return  LOX_OK;
+    }
+    switch (obj1->o_tag)
+    {
+        case LOX_NUMBER:
+            {
+                if (fabs(obj1->o_value.v_f - obj2->o_value.v_f) > 1e-10)
+                {
+                    obj_new.o_tag = LOX_BOOL_TRUE;
+                }
+            }
+            break;
+        case LOX_STRING:
+            {
+                if (obj1->o_value.v_str && obj2->o_value.v_str)
+                {
+                    if (strcmp(obj1->o_value.v_str, obj2->o_value.v_str))
+                    {
+                        obj_new.o_tag = LOX_BOOL_TRUE;
+                    }
+                }
+                else
+                {
+                    if (!obj1->o_value.v_str && obj2->o_value.v_str)
+                        obj_new.o_tag = LOX_BOOL_TRUE;
+                    if (obj1->o_value.v_str && !obj2->o_value.v_str)
+                        obj_new.o_tag = LOX_BOOL_TRUE;
+                }
+            }
+            break;
+        case LOX_NIL:
+            obj_new.o_tag = LOX_BOOL_FALSE;
+            break;
+        case LOX_ARRAY:
+            if(obj1->o_value.v_vec && obj2->o_value.v_vec)
+            {
+                if (obj1->o_value.v_vec != obj2->o_value.v_vec)
+                {
+                    int ret = lox_arrary_equal(obj1, obj2);
+                    if (ret < 0)
+                        obj_new.o_tag = LOX_BOOL_TRUE;
+                }
+            }
+            else
+            {
+                if(!obj1->o_value.v_vec && obj2->o_value.v_vec)
+                    obj_new.o_tag = LOX_BOOL_TRUE;
+                if(obj1->o_value.v_vec && !obj2->o_value.v_vec)
+                    obj_new.o_tag = LOX_BOOL_TRUE;
+            }
+            break;
+        case LOX_BOOL_TRUE:
+            obj_new.o_tag = LOX_BOOL_FALSE;
+            break;
+        case LOX_BOOL_FALSE:
+            obj_new.o_tag = LOX_BOOL_FALSE;
+            break;
+        default:
+            break;
+    }
+    lox_object_copy(dst, &obj_new);
+    return LOX_OK;
+}
+
+long lox_object_logical_operation_lt(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst)
+{
+    struct lox_object obj_new;
+    obj_new.o_tag = LOX_BOOL_FALSE;
+    if ((obj1->o_tag != obj2->o_tag))
+    {
+        lox_info("---------logical opearation lt type not equal:%d %d\n", obj1->o_tag, obj2->o_tag);
+        lox_object_copy(dst, &obj_new);
+        return  LOX_OK;
+    }
+
+    switch (obj1->o_tag)
+    {
+        case LOX_NUMBER:
+            {
+                if (obj1->o_value.v_f - obj2->o_value.v_f < 0)
+                {
+                    obj_new.o_tag = LOX_BOOL_TRUE;
+                }
+            }
+            break;
+        case LOX_STRING:
+            {
+                if (obj1->o_value.v_str && obj2->o_value.v_str)
+                {
+                    if (strcmp(obj1->o_value.v_str, obj2->o_value.v_str) < 0)
+                    {
+                        obj_new.o_tag = LOX_BOOL_TRUE;
+                    }
+                }
+            }
+            break;
+        case LOX_NIL:
+            obj_new.o_tag = LOX_BOOL_FALSE;
+            break;
+        case LOX_ARRAY:
+            obj_new.o_tag = LOX_BOOL_FALSE;
+            break;
+        case LOX_BOOL_TRUE:
+            obj_new.o_tag = LOX_BOOL_FALSE;
+            break;
+        case LOX_BOOL_FALSE:
+            obj_new.o_tag = LOX_BOOL_FALSE;
+            break;
+        default:
+            break;
+    }
+    lox_object_copy(dst, &obj_new);
+    return LOX_OK;
+}
+
+long lox_object_logical_operation_gt(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst)
+{
+    struct lox_object obj_new;
+    obj_new.o_tag = LOX_BOOL_FALSE;
+    if ((obj1->o_tag != obj2->o_tag))
+    {
+        lox_info("---------logical opearation gt type not equal:%d %d\n", obj1->o_tag, obj2->o_tag);
+        lox_object_copy(dst, &obj_new);
+        return  LOX_OK;
+    }
+
+    switch (obj1->o_tag)
+    {
+        case LOX_NUMBER:
+            {
+                if (obj1->o_value.v_f - obj2->o_value.v_f > 0)
+                {
+                    obj_new.o_tag = LOX_BOOL_TRUE;
+                }
+            }
+            break;
+        case LOX_STRING:
+            {
+                if (obj1->o_value.v_str && obj2->o_value.v_str)
+                {
+                    if (strcmp(obj1->o_value.v_str, obj2->o_value.v_str) > 0)
+                    {
+                        obj_new.o_tag = LOX_BOOL_TRUE;
+                    }
+                }
+            }
+            break;
+        case LOX_NIL:
+            obj_new.o_tag = LOX_BOOL_FALSE;
+            break;
+        case LOX_ARRAY:
+            obj_new.o_tag = LOX_BOOL_FALSE;
+            break;
+        case LOX_BOOL_TRUE:
+            obj_new.o_tag = LOX_BOOL_FALSE;
+            break;
+        case LOX_BOOL_FALSE:
+            obj_new.o_tag = LOX_BOOL_FALSE;
+            break;
+        default:
+            break;
+    }
+    lox_object_copy(dst, &obj_new);
+    return LOX_OK;
+}
+
+long lox_object_logical_operation_let(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst)
+{
+    struct lox_object obj_new;
+    obj_new.o_tag = LOX_BOOL_FALSE;
+    if ((obj1->o_tag != obj2->o_tag))
+    {
+        lox_info("---------logical opearation let type not equal:%d %d\n", obj1->o_tag, obj2->o_tag);
+        lox_object_copy(dst, &obj_new);
+        return  LOX_OK;
+    }
+
+    switch (obj1->o_tag)
+    {
+        case LOX_NUMBER:
+            {
+                if (obj1->o_value.v_f - obj2->o_value.v_f < 0 || fabs(obj1->o_value.v_f - obj2->o_value.v_f) < 1e-10)
+                {
+                    obj_new.o_tag = LOX_BOOL_TRUE;
+                }
+            }
+            break;
+        case LOX_STRING:
+            {
+                if (obj1->o_value.v_str && obj2->o_value.v_str)
+                {
+                    if (strcmp(obj1->o_value.v_str, obj2->o_value.v_str) < 0 || strcmp(obj1->o_value.v_str, obj2->o_value.v_str) == 0)
+                    {
+                        obj_new.o_tag = LOX_BOOL_TRUE;
+                    }
+                }
+            }
+            break;
+        case LOX_NIL:
+            obj_new.o_tag = LOX_BOOL_FALSE;
+            break;
+        case LOX_ARRAY:
+            obj_new.o_tag = LOX_BOOL_FALSE;
+            break;
+        case LOX_BOOL_TRUE:
+            obj_new.o_tag = LOX_BOOL_FALSE;
+            break;
+        case LOX_BOOL_FALSE:
+            obj_new.o_tag = LOX_BOOL_FALSE;
+            break;
+        default:
+            break;
+    }
+    lox_object_copy(dst, &obj_new);
+    return LOX_OK;
+}
+
+long lox_object_logical_operation_get(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst)
+{
+    struct lox_object obj_new;
+    obj_new.o_tag = LOX_BOOL_FALSE;
+    if ((obj1->o_tag != obj2->o_tag))
+    {
+        lox_info("---------logical opearation get type not equal:%d %d\n", obj1->o_tag, obj2->o_tag);
+        lox_object_copy(dst, &obj_new);
+        return  LOX_OK;
+    }
+
+    switch (obj1->o_tag)
+    {
+        case LOX_NUMBER:
+            {
+                if (obj1->o_value.v_f - obj2->o_value.v_f > 0 || fabs(obj1->o_value.v_f - obj2->o_value.v_f) < 1e-10)
+                {
+                    obj_new.o_tag = LOX_BOOL_TRUE;
+                }
+            }
+            break;
+        case LOX_STRING:
+            {
+                if (obj1->o_value.v_str && obj2->o_value.v_str)
+                {
+                    if (strcmp(obj1->o_value.v_str, obj2->o_value.v_str) > 0 || strcmp(obj1->o_value.v_str, obj2->o_value.v_str) == 0)
+                    {
+                        obj_new.o_tag = LOX_BOOL_TRUE;
+                    }
+                }
+            }
+            break;
+        case LOX_NIL:
+            obj_new.o_tag = LOX_BOOL_FALSE;
+            break;
+        case LOX_ARRAY:
+            obj_new.o_tag = LOX_BOOL_FALSE;
+            break;
+        case LOX_BOOL_TRUE:
+            obj_new.o_tag = LOX_BOOL_FALSE;
+            break;
+        case LOX_BOOL_FALSE:
+            obj_new.o_tag = LOX_BOOL_FALSE;
+            break;
+        default:
+            break;
+    }
+    lox_object_copy(dst, &obj_new);
     return LOX_OK;
 }

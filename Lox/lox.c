@@ -91,6 +91,7 @@ int lox_machine_run(void)
         case LOX_GT:
         case LOX_LET:
         case LOX_GET:
+            lox_handle_logical_operation(cmd);
             break;
         default:
             break;

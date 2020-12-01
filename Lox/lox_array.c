@@ -164,3 +164,79 @@ long lox_array_index_value(struct lox_object *arr, long index)
     }
     return  (long)v->vec_v;
 }
+
+int lox_arrary_equal(struct lox_object *obj1, struct lox_object *obj2)
+{
+    int ret = LOX_ERROR(LOX_INVALID);
+    if (!obj1 || !obj2)
+    {
+        return ret;
+    }
+
+    if (!obj1->o_value.v_vec || !obj2->o_value.v_vec)
+    {
+        return ret;
+    }
+
+    if (obj1->o_value.v_vec->len != obj2->o_value.v_vec->len)
+    {
+        return ret;
+    }
+
+    if (obj1->o_value.v_vec->len == 0 && obj2->o_value.v_vec->len == 0)
+    {
+        ret = LOX_OK;
+        return ret;
+    }
+
+    struct lox_vector *v1 = obj1->o_value.v_vec;
+    struct lox_vector *v2 = obj2->o_value.v_vec;
+
+    struct lox_vector_value *value1 = v1->vec_head.next;
+    struct lox_vector_value *value2 = v2->vec_head.next;
+    while (value1 && value2)
+    {
+        if (!value1->vec_v && !value2->vec_v)
+        {
+            value1 = value1->next;
+            value2 = value2->next;
+            continue;
+        }
+
+        if ((value1->vec_v && !value2->vec_v) || (!value1->vec_v && value2->vec_v))
+        {
+            return LOX_ERROR(LOX_INVALID);
+        }
+
+        if (value1->vec_v->o_tag != value2->vec_v->o_tag)
+        {
+            return LOX_ERROR(LOX_INVALID);
+        }
+
+        if (value1->vec_v->o_tag == LOX_NUMBER)
+        {
+            if (fabs(value1->vec_v->o_value.v_f - value2->vec_v->o_value.v_f) > 1e-10)
+            {
+                return LOX_ERROR(LOX_INVALID);
+            }
+        }
+        else if (value1->vec_v->o_tag == LOX_STRING)
+        {
+            if (strcmp(value1->vec_v->o_value.v_str, value2->vec_v->o_value.v_str))
+            {
+                return LOX_ERROR(LOX_INVALID);
+            }
+        }
+        else if (value1->vec_v->o_tag == LOX_ARRAY)
+        {
+            int ret = lox_arrary_equal(value1->vec_v->o_value.v_vec, value2->vec_v->o_value.v_vec);
+            if (ret < 0)
+            {
+                return LOX_ERROR(LOX_INVALID);
+            }
+        }
+        value1 = value1->next;
+        value2 = value2->next;
+    }
+    return LOX_OK;
+}
