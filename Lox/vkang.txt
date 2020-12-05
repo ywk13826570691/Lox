@@ -58,5 +58,19 @@ function name(param....)
 global 全局变量
 
 
+for i in string
+do
+done
+
+for i in table
+do
+done
+
+for i in [1,100]
+do
+done
+
+
+
 
 

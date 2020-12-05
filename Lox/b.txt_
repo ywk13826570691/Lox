@@ -51,14 +51,14 @@ ff = sum(3,5)
 print(gg)
 print(sum(55,25))
 
---sss()
+@sss()
 print("llllllllllllllllllllllllllllllllllllllllllllllllllllllllll\n");
 g = [10, 11, "vkang"]
 sk = [g, 1,2,3,7, 8, 9, "hello"]
 sk[0][2] = "12345678"
 print(sk[0][2])
 
---s = "1000000"
---k = "5555555"
---print(s)
---print(k[0][2])
+@s = "1000000"
+@k = "5555555"
+@print(s)
+@print(k[0][2])

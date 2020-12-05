@@ -1,5 +1,8 @@
 #include "lox_if.h"
 #include <stdio.h>
+#include<stdlib.h>
+
+#include<string.h>
 
 static int lox_if_index = 0;
 

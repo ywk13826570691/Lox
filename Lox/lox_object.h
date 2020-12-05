@@ -8,6 +8,7 @@ struct lox_object* lox_object_new_string(char *str);
 struct lox_object* lox_object_new_temp(void);
 struct lox_object* lox_object_new_bool(int v);
 struct lox_object* lox_object_new_array(void);
+struct lox_object* lox_object_new_range(int min, int len);
 
 struct lox_object* lox_object_new_func(void);
 

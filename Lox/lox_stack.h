@@ -17,6 +17,7 @@ long lox_stack_push_temp_var(long label);
 long lox_stack_push_bool_var(long label, int v);
 long lox_stack_push_temp_ptr_var(long label_temp);
 long lox_stack_push_array_var(long label, long *labels, long label_cnt);
+long lox_stack_push_range_var(long label, long label_min, long label_len);
 
 long lox_find_symbol_by_name(char *s_name);
 long lox_find_symbol_by_label(unsigned long label);

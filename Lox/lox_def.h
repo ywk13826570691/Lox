@@ -13,7 +13,7 @@ enum lox_error_code
 };
 #define LOX_ERROR(err) (-err)
 
-#define LOX_DEBUG
+//#define LOX_DEBUG
 
 #ifdef LOX_DEBUG
 #define lox_error(...) printf("[Error]:" __VA_ARGS__)
@@ -35,6 +35,7 @@ enum lox_tag_type
     LOX_BOOL_TRUE,
     LOX_BOOL_FALSE,
     LOX_FUNCTION,
+    LOX_RANGE,
 };
 
 struct lox_vector_value
@@ -50,6 +51,12 @@ struct lox_vector
     struct lox_vector_value vec_head;
 };
 
+struct lox_range
+{
+    int min;
+    int len;
+    int index;
+};
 
 struct lox_function
 {
@@ -72,6 +79,7 @@ struct lox_object_value
     char *v_str;
     struct lox_vector *v_vec;
     struct lox_function *v_func;
+    struct lox_range v_range;
 };
 
 struct lox_object

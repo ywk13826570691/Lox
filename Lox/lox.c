@@ -99,6 +99,9 @@ int lox_machine_run(void)
         case LOX_OR:
             lox_handle_or(cmd);
             break;
+        case LOX_CMP_IN_RANGE:
+            lox_handle_cmp_inrange(cmd);
+            break;
         default:
             break;
         }

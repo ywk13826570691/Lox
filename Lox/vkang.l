@@ -9,7 +9,7 @@ extern int lox_linenumber;
 %%
 [ \t]*					;
 \n						{ lox_linenumber ++; }
-"--".*					;
+"@".*					;
 "if"					return IF;
 "then"					return THEN;
 "else"					return ELSE;
@@ -18,6 +18,8 @@ extern int lox_linenumber;
 "do"					return DO;
 "repeat"				return REPEAT;
 "until"					return UNTIL;
+"foreach"               return FOREACH;
+"in"                    return LOX_IN;
 "function"				{
                             return FUNCTION;
 						}

@@ -2,6 +2,7 @@
 #include "lox_register.h"
 #include "lox_object.h"
 #include "lox_array.h"
+#include "lox_lib.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -99,7 +100,6 @@ long lox_stack_push_bool_var(long label, int v)
     memset(s, 0, sizeof (struct lox_symbol));
     s->sym_obj = obj;
     s->sym_label_value = label;
-    lox_info("00000000000000000000000000000000000000000000000000000000000000:%d %d\n", obj->o_tag, v);
     return lox_stack_push(s);
 }
 
@@ -139,6 +139,69 @@ long lox_stack_push_array_var(long label, long *labels, long label_cnt)
             lox_array_insert_obj(obj, sym->sym_obj);
         }
     }
+    return  lox_stack_push(s);
+}
+
+long lox_stack_push_range_var(long label, long label_min, long label_len)
+{
+
+    struct lox_symbol *s = NULL;
+    struct lox_symbol *s_min = (struct lox_symbol *)lox_find_symbol_by_label(label_min);
+    struct lox_symbol *s_len = (struct lox_symbol *)lox_find_symbol_by_label(label_len);
+
+    struct lox_object *obj = NULL;
+
+    if (!s_min || !s_len)
+    {
+        lox_error("stack push range range number nil\n");
+        exit(0);
+    }
+
+    s = (struct lox_symbol *)lox_find_symbol_by_label(label);
+
+    if (!s)
+    {
+        s = (struct lox_symbol *)malloc(sizeof (struct lox_symbol));
+        memset(s, 0, sizeof (struct lox_symbol));
+        obj = lox_object_new_range(s_min->sym_obj->o_value.v_f, s_len->sym_obj->o_value.v_f);
+    }
+    else
+    {
+        obj = s->sym_obj;
+        obj->o_tag = LOX_RANGE;
+        obj->o_value.v_range.min = s_min->sym_obj->o_value.v_f;
+        obj->o_value.v_range.len = s_len->sym_obj->o_value.v_f;
+        obj->o_value.v_range.index = s_min->sym_obj->o_value.v_f;
+    }
+
+    if (!s || !s_min || !s_len)
+    {
+        lox_error("stack push range range number nil\n");
+        exit(0);
+    }
+
+    if (!s_min->sym_obj || !s_len->sym_obj)
+    {
+        lox_error("stack push range range obj nil\n");
+        exit(0);
+    }
+
+    if (s_min->sym_obj->o_tag != LOX_NUMBER || s_len->sym_obj->o_tag != LOX_NUMBER)
+    {
+        lox_error("stack push range range obj must number\n");
+        exit(0);
+    }
+
+    if (lox_is_int_number(s_min->sym_obj->o_value.v_f) == 0
+            || lox_is_int_number(s_len->sym_obj->o_value.v_f) == 0)
+    {
+        lox_error("stack push range range obj must int number\n");
+        exit(0);
+    }
+
+    s->sym_label_value = label;
+    s->sym_obj = obj;
+    lox_info("11111111111111111111111111111111111111111111111111111111111111111111111111111%d %d %p\n", label, obj->o_value.v_range.index, obj);
     return  lox_stack_push(s);
 }
 

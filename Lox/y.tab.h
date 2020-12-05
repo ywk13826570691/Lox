@@ -53,28 +53,30 @@ extern int yydebug;
     DO = 263,
     REPEAT = 264,
     UNTIL = 265,
-    FUNCTION = 266,
-    END = 267,
-    RETURN = 268,
-    GLOBAL = 269,
-    LOCAL = 270,
-    NIL = 271,
-    AND = 272,
-    OR = 273,
-    NOT = 274,
-    EQ = 275,
-    NE = 276,
-    LE = 277,
-    GE = 278,
-    CONC = 279,
-    LOX_TRUE = 280,
-    LOX_FALSE = 281,
-    STRING = 282,
-    NUMBER = 283,
-    NAME = 284,
-    LEFT_BRACKETS = 285,
-    RIGHT_BRACKETS = 286,
-    UMINUS = 287
+    FOREACH = 266,
+    LOX_IN = 267,
+    FUNCTION = 268,
+    END = 269,
+    RETURN = 270,
+    GLOBAL = 271,
+    LOCAL = 272,
+    NIL = 273,
+    AND = 274,
+    OR = 275,
+    NOT = 276,
+    EQ = 277,
+    NE = 278,
+    LE = 279,
+    GE = 280,
+    CONC = 281,
+    LOX_TRUE = 282,
+    LOX_FALSE = 283,
+    STRING = 284,
+    NUMBER = 285,
+    NAME = 286,
+    LEFT_BRACKETS = 287,
+    RIGHT_BRACKETS = 288,
+    UMINUS = 289
   };
 #endif
 /* Tokens.  */
@@ -86,41 +88,43 @@ extern int yydebug;
 #define DO 263
 #define REPEAT 264
 #define UNTIL 265
-#define FUNCTION 266
-#define END 267
-#define RETURN 268
-#define GLOBAL 269
-#define LOCAL 270
-#define NIL 271
-#define AND 272
-#define OR 273
-#define NOT 274
-#define EQ 275
-#define NE 276
-#define LE 277
-#define GE 278
-#define CONC 279
-#define LOX_TRUE 280
-#define LOX_FALSE 281
-#define STRING 282
-#define NUMBER 283
-#define NAME 284
-#define LEFT_BRACKETS 285
-#define RIGHT_BRACKETS 286
-#define UMINUS 287
+#define FOREACH 266
+#define LOX_IN 267
+#define FUNCTION 268
+#define END 269
+#define RETURN 270
+#define GLOBAL 271
+#define LOCAL 272
+#define NIL 273
+#define AND 274
+#define OR 275
+#define NOT 276
+#define EQ 277
+#define NE 278
+#define LE 279
+#define GE 280
+#define CONC 281
+#define LOX_TRUE 282
+#define LOX_FALSE 283
+#define STRING 284
+#define NUMBER 285
+#define NAME 286
+#define LEFT_BRACKETS 287
+#define RIGHT_BRACKETS 288
+#define UMINUS 289
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 
 union YYSTYPE
 {
-#line 18 "vkang.y" /* yacc.c:1909  */
+#line 19 "vkang.y" /* yacc.c:1909  */
 
  long   vLong;
  float vFloat;
  char *vChar;
 
-#line 124 "y.tab.h" /* yacc.c:1909  */
+#line 128 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

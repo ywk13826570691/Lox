@@ -6,6 +6,8 @@
 #include "lox_object.h"
 #include "lox_lib.h"
 #include "lox_array.h"
+#include <string.h>
+#include <stdlib.h>
 
 
 /*
@@ -80,6 +82,10 @@ long lox_handle_push_cmd(struct lox_cmd *cmd)
     else if (push_type->p_type == PUSH_BOOL)
     {
         ret =  lox_stack_push_bool_var(push_type->f_label_index, cmd->cmd_args[0]);
+    }
+    else if(push_type->p_type == PUSH_RANGE)
+    {
+        ret = lox_stack_push_range_var(push_type->f_label_index, cmd->cmd_args[0], cmd->cmd_args[1]);
     }
     else
     {
@@ -504,7 +510,7 @@ long lox_handle_set_array_value(struct lox_cmd *cmd)
     return LOX_OK;
 }
 
-long lox_find_label(char *label)
+long lox_find_label_back(char *label)
 {
     long ret = 0;
     if (!label)
@@ -515,7 +521,7 @@ long lox_find_label(char *label)
 
     struct lox_cmd *cmd = (struct lox_cmd *)(PC + sizeof (struct lox_cmd));
 
-    while(cmd->cmd_opcode != LOX_NOP)
+    while(cmd && cmd->cmd_opcode != LOX_NOP)
     {
         if (cmd->cmd_opcode == LOX_LABEL && strcmp(cmd->cmd_jmp_label, label) == 0)
         {
@@ -523,6 +529,29 @@ long lox_find_label(char *label)
             break;
         }
         cmd++;
+    }
+    return ret;
+}
+
+long lox_find_label_front(char *label)
+{
+    long ret = 0;
+    if (!label)
+    {
+        lox_error("We are finding an nil label to jmp!!!!\n");
+        exit(0);
+    }
+
+    struct lox_cmd *cmd = (struct lox_cmd *)(PC - sizeof (struct lox_cmd));
+
+    while(cmd && cmd->cmd_opcode != LOX_NOP)
+    {
+        if (cmd->cmd_opcode == LOX_LABEL && strcmp(cmd->cmd_jmp_label, label) == 0)
+        {
+            ret =  (long)cmd;
+            break;
+        }
+        cmd--;
     }
     return ret;
 }
@@ -582,10 +611,60 @@ long lox_handle_cmp(struct lox_cmd *cmd)
     return LOX_OK;
 }
 
+long lox_handle_cmp_inrange(struct lox_cmd *cmd)
+{
+    lox_info("-----------xxx------lox_handle_cmp_inrange\n");
+    struct lox_symbol * sym_range = lox_find_symbol_by_label(cmd->cmd_label_index);
+    struct lox_symbol * sym_var = lox_find_symbol_by_label(cmd->cmd_args[0]);
+
+    if (sym_range && sym_range->sym_obj && sym_var && sym_var->sym_obj)
+    {
+        struct lox_object *obj = sym_range->sym_obj;
+        lox_info("-----------xxx2------lox_handle_cmp_inrange:%d %d %p\n",obj->o_tag, cmd->cmd_label_index, obj);
+        if (obj->o_tag != LOX_RANGE)
+        {
+            SPR = 0;
+        }
+        else
+        {
+            int v = obj->o_value.v_range.min + obj->o_value.v_range.len;
+            lox_info("-----------xxx3------lox_handle_cmp_inrange:%d\n",obj->o_value.v_range.index);
+            if (obj->o_value.v_range.index < v)
+            {
+
+                struct lox_object new_obj;
+                new_obj.o_tag = LOX_NUMBER;
+                new_obj.o_value.v_f = obj->o_value.v_range.index * 1.0;
+                obj->o_value.v_range.index++;
+                lox_object_copy(sym_var->sym_obj, &new_obj);
+                SPR = 1;
+            }
+            else
+            {
+                SPR = 0;
+            }
+        }
+    }
+    else
+    {
+        SPR = 0;
+    }
+    return LOX_OK;
+}
+
 long lox_handle_jmp_label(struct lox_cmd *cmd)
 {
-    lox_info("-----------------lox_handle_jmp_label:%s\n", cmd->cmd_jmp_label);
-    long ret = lox_find_label(cmd->cmd_jmp_label);
+    int flag = cmd->cmd_args[0];
+    lox_info("-----------------lox_handle_jmp_label:%s %d\n", cmd->cmd_jmp_label, flag);
+    long ret = 0;
+    if (flag == 0)
+    {
+        ret = lox_find_label_back(cmd->cmd_jmp_label);
+    }
+    else
+    {
+        ret = lox_find_label_front(cmd->cmd_jmp_label);
+    }
     if (ret)
     {
         struct lox_cmd *cmd2 = (struct lox_cmd *)ret;

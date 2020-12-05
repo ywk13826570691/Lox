@@ -4,7 +4,9 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
+    lex.yy.c \
         lox.c \
+    lox_foreach.c \
         lox_function.c \
     lox_lib.c \
         lox_opcode.c \
@@ -16,12 +18,13 @@ SOURCES += \
     lox_keywords.c \
     lox_array.c \
     lox_if.c \
-    lox_if.c
+    y.tab.c
 
 HEADERS += \
     lox.h \
     lox_config.h \
     lox_def.h \
+    lox_foreach.h \
     lox_function.h \
     lox_lib.h \
     lox_opcode.h \
@@ -31,7 +34,6 @@ HEADERS += \
     lox_object.h \
     lox_keywords.h \
     lox_array.h \
-    lox_if.h \
     lox_if.h
 
 OTHER_FILES += \

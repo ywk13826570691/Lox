@@ -2,6 +2,8 @@
 #include "lox_def.h"
 #include "lox_object.h"
 #include <stdlib.h>
+#include <string.h>
+
 /*
  * For parsing array
  * Ex: a = [1,2,3,4]

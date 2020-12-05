@@ -54,6 +54,8 @@ enum lox_opcode
     LOX_SR,         //sr r1,r2,r3   :r1 = r2 >> r3
     LOX_CMP,        //cmp r1,r2,r3  :r1 = r2 == r3
 
+    LOX_CMP_IN_RANGE,
+
     LOX_EQUAL, //==
     LOX_NEQUAL, //~=
     LOX_LT, //<
@@ -91,6 +93,7 @@ enum lox_push_type
     PUSH_TEMP_PTR_VAR,
     PUSH_ARRARY,
     PUSH_BOOL,
+    PUSH_RANGE,
 };
 
 struct lox_cmd_push
@@ -134,6 +137,7 @@ int lox_opcode_push_var(char *var_name, long label);
 int lox_opcode_push_temp_var(long label);
 int lox_opcode_push_temp_ptr_var(int label_temp);
 int lox_opcode_push_bool_var(long label, int v);
+int lox_opcode_push_range_var(long label, long label_min, long label_len);
 int lox_opcode_push_array_var(long label, long *labels, long label_cnt);
 int lox_opcode_get_array_object(long array_label, long temp_label, long *label_indexs, long index_cnt);
 int lox_opcode_set_array_object(long array_label, long temp_label, long *label_indexs, long index_cnt);
@@ -170,8 +174,9 @@ int lox_opcode_function_param_end(void);
 
 int lox_opcode_push_label(char *label);
 int lox_opcode_cmp(long label);
-int lox_opcode_jmp_label(char *label);
-int lox_opcode_jmpeq_label(char *label);
+int lox_opcode_cmp_inrange(long label_range, long label_var);
+int lox_opcode_jmp_label(char *label, int f_b);
+int lox_opcode_jmpeq_label(char *label, int f_b);
 
 
 

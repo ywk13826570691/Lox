@@ -24,6 +24,7 @@ long lox_handle_set_array_value(struct lox_cmd *cmd);
 
 
 long lox_handle_cmp(struct lox_cmd *cmd);
+long lox_handle_cmp_inrange(struct lox_cmd *cmd);
 long lox_handle_jmp_label(struct lox_cmd *cmd);
 long lox_handle_jmpeq_label(struct lox_cmd *cmd);
 

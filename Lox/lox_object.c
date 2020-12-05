@@ -54,6 +54,17 @@ struct lox_object* lox_object_new_array(void)
     return obj;
 }
 
+struct lox_object* lox_object_new_range(int min, int len)
+{
+    struct lox_object *obj = (struct lox_object *)malloc(sizeof (struct lox_object));
+    memset(obj, 0, sizeof (struct lox_object));
+    obj->o_tag = LOX_RANGE;
+    obj->o_value.v_range.min = min;
+    obj->o_value.v_range.len = len;
+    obj->o_value.v_range.index = min;
+    return obj;
+}
+
 struct lox_object* lox_object_new_func(void)
 {
     struct lox_object *obj = (struct lox_object *)malloc(sizeof (struct lox_object));
@@ -772,9 +783,12 @@ long lox_object_and(struct lox_object *obj1, struct lox_object *obj2, struct lox
         return LOX_OK;
     }
 
-    if (obj1->o_tag != LOX_NIL && obj1->o_tag != LOX_NIL)
+    if (obj1->o_tag != LOX_NIL && obj2->o_tag != LOX_NIL)
     {
-        obj_new.o_tag = LOX_BOOL_TRUE;
+        if (obj1->o_tag != LOX_BOOL_FALSE && obj2->o_tag != LOX_BOOL_FALSE)
+        {
+            obj_new.o_tag = LOX_BOOL_TRUE;
+        }
     }
     lox_object_copy(dst, &obj_new);
     return LOX_OK;
@@ -783,7 +797,7 @@ long lox_object_and(struct lox_object *obj1, struct lox_object *obj2, struct lox
 long lox_object_or(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst)
 {
     struct lox_object obj_new;
-    obj_new.o_tag = LOX_BOOL_FALSE;
+    obj_new.o_tag = LOX_BOOL_TRUE;
     if (!dst)
     {
         lox_info("---------lox_object_or nil dst\n");
@@ -791,14 +805,21 @@ long lox_object_or(struct lox_object *obj1, struct lox_object *obj2, struct lox_
     }
     if (!obj1 || !obj2)
     {
+        obj_new.o_tag = LOX_BOOL_FALSE;
         lox_object_copy(dst, &obj_new);
         return LOX_OK;
     }
 
-    if (obj1->o_tag != LOX_NIL || obj2->o_tag != LOX_NIL)
+    if (obj1->o_tag == LOX_NIL && obj2->o_tag == LOX_NIL)
     {
-        obj_new.o_tag = LOX_BOOL_TRUE;
+        obj_new.o_tag = LOX_BOOL_FALSE;
     }
+
+    if (obj1->o_tag == LOX_BOOL_FALSE && obj2->o_tag == LOX_BOOL_FALSE)
+    {
+        obj_new.o_tag = LOX_BOOL_FALSE;
+    }
+
     lox_object_copy(dst, &obj_new);
     return LOX_OK;
 }

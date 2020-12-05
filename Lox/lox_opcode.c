@@ -135,9 +135,36 @@ int lox_opcode_push_bool_var(long label, int v)
 
     cmd.cmd_push.f_label_index = label;
     cmd.cmd_args[0] = v;
-    lox_info("lox_opcode_push_bool_var++++++++++++++xxxxxxxxxxxxxxxxxxxxxxxxxxxx+++++++++++++++++++++++++++:%d\n", v);
+    lox_info("lox_opcode_push_bool_var++++++++++++++++++++++++++++++++:%d\n", v);
 
     return lox_func_push_cmd(&cmd);
+}
+
+int lox_opcode_push_range_var(long label, long label_min, long label_len)
+{
+
+    int ret = LOX_ERROR(LOX_INVALID);
+    struct lox_symbol *sym = lox_get_cur_parsing_function();
+
+    if (!sym)
+    {
+        lox_error("cur parse funcion is nil %s %d\n", __func__, __LINE__);
+        return  ret;
+    }
+
+    struct lox_cmd cmd;
+    memset(&cmd, 0, sizeof (struct lox_cmd));
+
+    cmd.cmd_opcode = LOX_PUSH;
+    cmd.cmd_push.p_type =  PUSH_RANGE;
+
+    cmd.cmd_push.f_label_index = label;
+    cmd.cmd_args[0] = label_min;
+    cmd.cmd_args[1] = label_len;
+    lox_info("lox_opcode_push_range_var++++++++++++++++++++++++++++++++ %d %d %d\n", label, label_min, label_len);
+
+    return lox_func_push_cmd(&cmd);
+
 }
 
 int lox_opcode_push_array_var(long label, long *labels, long label_cnt)
@@ -663,7 +690,32 @@ int lox_opcode_cmp(long label)
     return lox_func_push_cmd(&cmd);
 }
 
-int lox_opcode_jmp_label(char *label)
+int lox_opcode_cmp_inrange(long label_range, long label_var)
+{
+    int ret = LOX_ERROR(LOX_INVALID);
+    struct lox_symbol *sym = lox_get_cur_parsing_function();
+    if (!sym)
+    {
+        lox_error("cur parse funcion is nil %s %d\n", __func__, __LINE__);
+        return  ret;
+    }
+
+    struct lox_cmd cmd;
+    memset(&cmd, 0, sizeof (struct lox_cmd));
+
+    cmd.cmd_opcode = LOX_CMP_IN_RANGE;
+    cmd.cmd_label_index = label_range;
+    cmd.cmd_args[0] = label_var;
+
+    lox_info("-------------------lox_opcode_cmp_inrange\n");
+    return lox_func_push_cmd(&cmd);
+}
+/*
+ * param:f_b
+ * 0-->back
+ * 1-->front
+*/
+int lox_opcode_jmp_label(char *label, int f_b)
 {
     int ret = LOX_ERROR(LOX_INVALID);
     struct lox_symbol *sym = lox_get_cur_parsing_function();
@@ -678,14 +730,15 @@ int lox_opcode_jmp_label(char *label)
 
     cmd.cmd_opcode = LOX_JMP_LABEL;
     strcpy(cmd.cmd_jmp_label, label);
+    cmd.cmd_args[0] = f_b;
 
     lox_info("-------------------lox_opcode_jmp_label:%s\n", label);
     return lox_func_push_cmd(&cmd);
 }
 
 //cmp result is zero
-int lox_opcode_jmpeq_label(char *label)
-{
+int lox_opcode_jmpeq_label(char *label, int f_b)
+{lox_info("-------------------1lox_opcode_jmpeq_label: %p\n", label);
     int ret = LOX_ERROR(LOX_INVALID);
     struct lox_symbol *sym = lox_get_cur_parsing_function();
     if (!sym)
@@ -699,6 +752,7 @@ int lox_opcode_jmpeq_label(char *label)
 
     cmd.cmd_opcode = LOX_JMPEQ_LABEL;
     strcpy(cmd.cmd_jmp_label, label);
+    cmd.cmd_args[0] = f_b;
 
     lox_info("-------------------lox_opcode_jmpeq_label:%s\n", label);
     return lox_func_push_cmd(&cmd);

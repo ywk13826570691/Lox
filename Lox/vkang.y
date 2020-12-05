@@ -6,6 +6,7 @@
     #include "lox_register.h"
     #include "lox_array.h"
     #include "lox_if.h"
+    #include "lox_foreach.h"
     extern int lox_linenumber;
     extern unsigned int lox_var_label_index;
     extern int lox_function_parsing;
@@ -31,6 +32,8 @@
 %token DO 
 %token REPEAT 
 %token UNTIL 
+%token FOREACH
+%token LOX_IN
 %token FUNCTION
 %token END
 %token RETURN
@@ -59,7 +62,7 @@
 
 //%type <pChar> parlist1
 
-%type <vLong> expr var  varlist functionvalue  functioncall retlist
+%type <vLong> expr var  varlist functionvalue  functioncall retlist forexpr forrange for_range_list
 
 %left AND OR
 %left EQ NE '>' '<' LE GE
@@ -142,22 +145,38 @@ sc	 : /* empty */ | ';' ;
 stat1 : IF expr THEN {
             int ret = lox_if_index_increase();
             lox_if_index_push(ret);
-            lox_info("-------------1---------:%d\n", ret);
+            //lox_info("-------------1---------:%d\n", ret);
             lox_opcode_cmp($2);
-            lox_opcode_jmpeq_label(lox_else_label());
+            lox_opcode_jmpeq_label(lox_else_label(), 0);
             } 
             block  {
-                        lox_info("-------------3---------:%d\n",lox_if_get_cur_index());
-                        lox_opcode_jmp_label(lox_if_end_label());
+                        //lox_info("-------------3---------:%d\n",lox_if_get_cur_index());
+                        lox_opcode_jmp_label(lox_if_end_label(), 0);
                    }
             elsepart END {
             				lox_opcode_push_label(lox_else_label());
                             lox_opcode_push_label(lox_if_end_label());
-                            lox_info("-------------2---------:%d\n", lox_if_get_cur_index());
+                            //lox_info("-------------2---------:%d\n", lox_if_get_cur_index());
                             lox_if_index_pop();
                          }
 	| WHILE  expr DO PrepJump block PrepJump END
 	| REPEAT  block UNTIL expr PrepJump
+    | FOREACH 
+    		{  
+    			int ret = lox_foreach_index_increase();
+    			lox_foreach_index_push(ret);
+    			lox_info("-------------1---------:\n"); 
+    		}
+    forexpr LOX_IN forrange {
+        						lox_opcode_push_label(lox_foreach_label());
+    							lox_opcode_cmp_inrange($5, $3);
+    							lox_opcode_jmpeq_label(lox_foreach_end_label(), 0);
+    						} block END {
+    										lox_info("-------------2---------:\n");
+    										lox_opcode_jmp_label(lox_foreach_label(), 1);
+    										lox_opcode_push_label(lox_foreach_end_label());
+    										lox_foreach_index_pop();
+    								 	}
     | var_create '=' varlist
             {
 				if (lox_get_is_array_element())
@@ -207,14 +226,38 @@ stat1 : IF expr THEN {
 	//| typeconstructor                
 	//| LOCAL localdeclist decinit
 	;
+forexpr:NAME {
+				int ret = lox_add_local_symbol($1, lox_var_label_index);
+				if (ret > 0)
+				{
+					lox_info("find same var foreach:%s\n", $1);
+					$$ = ret;
+				}
+				else
+				{
+					lox_opcode_push_var($1, lox_var_label_index);
+					$$ = lox_var_label_index;
+					lox_var_label_index++;
+				}
+			}
+;
+forrange: for_range_list {$$ = $1;}
+         ;
+;
+for_range_list:'[' expr ',' expr ']' { 
+								lox_opcode_push_range_var(lox_var_label_index, $2, $4);
+								$$ = lox_var_label_index;
+								lox_var_label_index++;
+							}
+;
 elsepart : /* empty */
 	 | ELSE { lox_opcode_push_label(lox_else_label()); } block
      | ELSEIF expr THEN 
      { 
      	lox_opcode_push_label(lox_else_label()); 
      	lox_opcode_cmp($2); 
-     	lox_opcode_jmpeq_label(lox_else_label());
-     } block { lox_opcode_jmp_label(lox_if_end_label()); }  elsepart   
+     	lox_opcode_jmpeq_label(lox_else_label(), 0);
+     } block { lox_opcode_jmp_label(lox_if_end_label(), 0); }  elsepart   
      ;
 ret	: /* empty */
         /*| RETURN exprlist sc */

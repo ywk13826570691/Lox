@@ -1,11 +1,17 @@
-k = [1,2,3,4]
-a = "hello"
-b = "hello"
-if nil or 100  then
-	print("111111111111kkkkkkkkkkk222");
-else
-	print("111111111111kkkkkkkkkkk444");
+
+a = nil
+foreach a in [2,10]
+	print("----------------------------:", a)
+	foreach k in [1,5]
+		print("+++++++++++", k)
+	end
 end
 
-c = nil
-print(type(c))
+a = nil
+b = "hello"
+if a and b then
+
+    print("-----------------")
+else
+    print("--------------2");
+end
