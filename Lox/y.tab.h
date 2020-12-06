@@ -122,7 +122,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 21 "vkang.y" /* yacc.c:1909  */
+#line 22 "vkang.y" /* yacc.c:1909  */
 
  long   vLong;
  float vFloat;

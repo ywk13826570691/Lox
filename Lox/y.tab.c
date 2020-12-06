@@ -74,6 +74,7 @@
     #include "lox_foreach.h"
     #include "lox_while.h"
     #include "lox_repeat.h"
+    #include "lox_loop.h"
     extern int lox_linenumber;
     extern unsigned int lox_var_label_index;
     extern int lox_function_parsing;
@@ -81,7 +82,7 @@
     char lox_var_name[50];
     char lox_var_name2[50];
 
-#line 85 "y.tab.c" /* yacc.c:339  */
+#line 86 "y.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -193,13 +194,13 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 21 "vkang.y" /* yacc.c:355  */
+#line 22 "vkang.y" /* yacc.c:355  */
 
  long   vLong;
  float vFloat;
  char *vChar;
 
-#line 203 "y.tab.c" /* yacc.c:355  */
+#line 204 "y.tab.c" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -216,7 +217,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 220 "y.tab.c" /* yacc.c:358  */
+#line 221 "y.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -517,16 +518,16 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,    86,    86,    89,    90,    91,    94,    94,    94,    97,
-      98,   101,   115,   136,   139,   140,   143,   146,   146,   149,
-     156,   149,   167,   173,   178,   166,   185,   184,   197,   201,
-     196,   210,   248,   254,   255,   258,   259,   261,   276,   279,
-     285,   286,   286,   288,   292,   287,   294,   296,   306,   307,
-     309,   311,   313,   316,   319,   321,   345,   346,   347,   348,
-     349,   350,   351,   352,   353,   354,   355,   356,   361,   362,
-     363,   364,   365,   377,   378,   379,   380,   388,   391,   392,
-     396,   397,   400,   408,   409,   412,   413,   416,   442,   470,
-     473
+       0,    87,    87,    90,    91,    92,    95,    95,    95,    98,
+      99,   102,   116,   137,   140,   141,   144,   147,   147,   150,
+     157,   150,   168,   177,   181,   167,   188,   187,   207,   214,
+     206,   226,   264,   270,   271,   274,   282,   291,   306,   309,
+     315,   316,   316,   318,   322,   317,   324,   326,   336,   337,
+     339,   341,   343,   346,   349,   351,   375,   376,   377,   378,
+     379,   380,   381,   382,   383,   384,   385,   386,   391,   392,
+     393,   394,   395,   407,   408,   409,   410,   418,   421,   422,
+     426,   427,   430,   438,   439,   442,   443,   446,   472,   500,
+     503
 };
 #endif
 
@@ -1439,25 +1440,25 @@ yyreduce:
   switch (yyn)
     {
         case 6:
-#line 94 "vkang.y" /* yacc.c:1646  */
+#line 95 "vkang.y" /* yacc.c:1646  */
     { lox_new_function((yyvsp[0].vChar)); lox_function_parsing = 1;}
-#line 1445 "y.tab.c" /* yacc.c:1646  */
+#line 1446 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 94 "vkang.y" /* yacc.c:1646  */
+#line 95 "vkang.y" /* yacc.c:1646  */
     { lox_opcode_function_param_end(); }
-#line 1451 "y.tab.c" /* yacc.c:1646  */
+#line 1452 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 94 "vkang.y" /* yacc.c:1646  */
+#line 95 "vkang.y" /* yacc.c:1646  */
     { lox_opcode_function_end();lox_cur_parsing_function_end(); lox_function_parsing = 0;}
-#line 1457 "y.tab.c" /* yacc.c:1646  */
+#line 1458 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 101 "vkang.y" /* yacc.c:1646  */
+#line 102 "vkang.y" /* yacc.c:1646  */
     { 
 					lox_func_add_arg_name((yyvsp[0].vChar)); 
 					int ret = lox_add_local_symbol((yyvsp[0].vChar), lox_var_label_index);
@@ -1472,11 +1473,11 @@ yyreduce:
 						lox_var_label_index++;
 					}
 				}
-#line 1476 "y.tab.c" /* yacc.c:1646  */
+#line 1477 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 115 "vkang.y" /* yacc.c:1646  */
+#line 116 "vkang.y" /* yacc.c:1646  */
     {
       						lox_func_add_arg_name((yyvsp[0].vChar)); 
       
@@ -1492,122 +1493,143 @@ yyreduce:
 								lox_var_label_index++;
 							}
       					}
-#line 1496 "y.tab.c" /* yacc.c:1646  */
+#line 1497 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 149 "vkang.y" /* yacc.c:1646  */
+#line 150 "vkang.y" /* yacc.c:1646  */
     {
-            int ret = lox_if_index_increase();
-            lox_if_index_push(ret);
-            //lox_info("-------------1---------:%d\n", ret);
-            lox_opcode_cmp((yyvsp[-1].vLong));
-            lox_opcode_jmpeq_label(lox_else_label(), 0);
-            }
-#line 1508 "y.tab.c" /* yacc.c:1646  */
+                        int ret = lox_if_index_increase();
+                        lox_if_index_push(ret);
+                        //lox_info("-------------1---------:%d\n", ret);
+                        lox_opcode_cmp((yyvsp[-1].vLong));
+                        lox_opcode_jmpeq_label(lox_else_label(), 0);
+                    }
+#line 1509 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 156 "vkang.y" /* yacc.c:1646  */
+#line 157 "vkang.y" /* yacc.c:1646  */
     {
                         //lox_info("-------------3---------:%d\n",lox_if_get_cur_index());
                         lox_opcode_jmp_label(lox_if_end_label(), 0);
                    }
-#line 1517 "y.tab.c" /* yacc.c:1646  */
+#line 1518 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 160 "vkang.y" /* yacc.c:1646  */
+#line 161 "vkang.y" /* yacc.c:1646  */
     {
             				lox_opcode_push_label(lox_else_label());
                             lox_opcode_push_label(lox_if_end_label());
                             //lox_info("-------------2---------:%d\n", lox_if_get_cur_index());
                             lox_if_index_pop();
                          }
-#line 1528 "y.tab.c" /* yacc.c:1646  */
+#line 1529 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 167 "vkang.y" /* yacc.c:1646  */
+#line 168 "vkang.y" /* yacc.c:1646  */
     {
             int ret = lox_while_index_increase();
             lox_while_index_push(ret);
             lox_opcode_push_label(lox_while_label());
+            lox_push_loop_index();
+            lox_push_loop_end_label(lox_while_end_label());
+            lox_push_loop_start_label(lox_while_label());
         }
-#line 1538 "y.tab.c" /* yacc.c:1646  */
+#line 1542 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 173 "vkang.y" /* yacc.c:1646  */
+#line 177 "vkang.y" /* yacc.c:1646  */
     {
-            
             lox_opcode_cmp((yyvsp[-1].vLong));
             lox_opcode_jmpeq_label(lox_while_end_label(), 0);
         }
-#line 1548 "y.tab.c" /* yacc.c:1646  */
+#line 1551 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 178 "vkang.y" /* yacc.c:1646  */
+#line 181 "vkang.y" /* yacc.c:1646  */
     {
             lox_opcode_jmp_label(lox_while_label(), 1);
             lox_opcode_push_label(lox_while_end_label());
             lox_while_index_pop();
         }
-#line 1558 "y.tab.c" /* yacc.c:1646  */
+#line 1561 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 25:
+#line 186 "vkang.y" /* yacc.c:1646  */
+    { lox_pop_loop_index(); lox_pop_loop_end_label();lox_pop_loop_start_label();}
+#line 1567 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 185 "vkang.y" /* yacc.c:1646  */
+#line 188 "vkang.y" /* yacc.c:1646  */
     {
         int ret = lox_foreach_index_increase();
     	lox_repeat_index_push(ret);
         lox_opcode_push_label(lox_repeat_label());
+        lox_push_loop_index();
+        lox_push_loop_end_label(lox_repeat_end_label());
+        lox_push_loop_start_label(lox_repeat_label());
     }
-#line 1568 "y.tab.c" /* yacc.c:1646  */
+#line 1580 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 191 "vkang.y" /* yacc.c:1646  */
+#line 197 "vkang.y" /* yacc.c:1646  */
     {
         lox_opcode_cmp((yyvsp[0].vLong));
         lox_opcode_jmpneq_label(lox_repeat_label(), 1);
+        lox_opcode_push_label(lox_repeat_end_label());
         lox_repeat_index_pop();
+        lox_pop_loop_index();
+        lox_pop_loop_end_label();
+        lox_pop_loop_start_label();
     }
-#line 1578 "y.tab.c" /* yacc.c:1646  */
+#line 1594 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 28:
-#line 197 "vkang.y" /* yacc.c:1646  */
+#line 207 "vkang.y" /* yacc.c:1646  */
     {  
     			int ret = lox_foreach_index_increase();
     			lox_foreach_index_push(ret);
+                lox_push_loop_index();
+                lox_push_loop_end_label(lox_foreach_end_label());
+                lox_push_loop_start_label(lox_foreach_label());
     		}
-#line 1587 "y.tab.c" /* yacc.c:1646  */
+#line 1606 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 201 "vkang.y" /* yacc.c:1646  */
+#line 214 "vkang.y" /* yacc.c:1646  */
     {
         						lox_opcode_push_label(lox_foreach_label());
     							lox_opcode_cmp_inrange((yyvsp[0].vLong), (yyvsp[-2].vLong));
     							lox_opcode_jmpeq_label(lox_foreach_end_label(), 0);
     						}
-#line 1597 "y.tab.c" /* yacc.c:1646  */
+#line 1616 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 205 "vkang.y" /* yacc.c:1646  */
+#line 218 "vkang.y" /* yacc.c:1646  */
     {
     										lox_opcode_jmp_label(lox_foreach_label(), 1);
     										lox_opcode_push_label(lox_foreach_end_label());
     										lox_foreach_index_pop();
+                                            lox_pop_loop_index();
+                                            lox_pop_loop_end_label();
+                                            lox_pop_loop_start_label();
     								 	}
-#line 1607 "y.tab.c" /* yacc.c:1646  */
+#line 1629 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 211 "vkang.y" /* yacc.c:1646  */
+#line 227 "vkang.y" /* yacc.c:1646  */
     {
 				if (lox_get_is_array_element())
 				{
@@ -1645,22 +1667,48 @@ yyreduce:
                     lox_opcode_move(label, (yyvsp[0].vLong));
 				}
 			}
-#line 1649 "y.tab.c" /* yacc.c:1646  */
+#line 1671 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 248 "vkang.y" /* yacc.c:1646  */
+#line 264 "vkang.y" /* yacc.c:1646  */
     {
                        struct lox_function_calling *call_f = lox_get_cur_calling_function();
                        lox_opcode_jmp((yyvsp[0].vLong), -100, (long)call_f);
                        lox_func_clear((long)call_f);
                        lox_pop_cur_calling_function();
     				}
-#line 1660 "y.tab.c" /* yacc.c:1646  */
+#line 1682 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 35:
+#line 274 "vkang.y" /* yacc.c:1646  */
+    { 
+                if (lox_is_loop_parsing() <= 0)
+                {
+                    lox_error("!!!break must in while/foreach/repeat\n");
+                    exit(0);
+                }
+                lox_opcode_jmp_label(lox_get_cur_loop_end_label(), 0);
+            }
+#line 1695 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 36:
+#line 282 "vkang.y" /* yacc.c:1646  */
+    {
+                    if (lox_is_loop_parsing() <= 0)
+                    {
+                        lox_error("!!!continue must in while/foreach/repeat\n");
+                        exit(0);
+                    }
+                    lox_opcode_jmp_label(lox_get_cur_loop_start_label(), 1);
+                }
+#line 1708 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 37:
-#line 261 "vkang.y" /* yacc.c:1646  */
+#line 291 "vkang.y" /* yacc.c:1646  */
     {
 				int ret = lox_add_local_symbol((yyvsp[0].vChar), lox_var_label_index);
 				if (ret > 0)
@@ -1675,49 +1723,49 @@ yyreduce:
 					lox_var_label_index++;
 				}
 			}
-#line 1679 "y.tab.c" /* yacc.c:1646  */
+#line 1727 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 38:
-#line 276 "vkang.y" /* yacc.c:1646  */
+#line 306 "vkang.y" /* yacc.c:1646  */
     {(yyval.vLong) = (yyvsp[0].vLong);}
-#line 1685 "y.tab.c" /* yacc.c:1646  */
+#line 1733 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 39:
-#line 279 "vkang.y" /* yacc.c:1646  */
+#line 309 "vkang.y" /* yacc.c:1646  */
     { 
 								lox_opcode_push_range_var(lox_var_label_index, (yyvsp[-3].vLong), (yyvsp[-1].vLong));
 								(yyval.vLong) = lox_var_label_index;
 								lox_var_label_index++;
 							}
-#line 1695 "y.tab.c" /* yacc.c:1646  */
+#line 1743 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 41:
-#line 286 "vkang.y" /* yacc.c:1646  */
+#line 316 "vkang.y" /* yacc.c:1646  */
     { lox_opcode_push_label(lox_else_label()); }
-#line 1701 "y.tab.c" /* yacc.c:1646  */
+#line 1749 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 43:
-#line 288 "vkang.y" /* yacc.c:1646  */
+#line 318 "vkang.y" /* yacc.c:1646  */
     { 
      	lox_opcode_push_label(lox_else_label()); 
      	lox_opcode_cmp((yyvsp[-1].vLong)); 
      	lox_opcode_jmpeq_label(lox_else_label(), 0);
      }
-#line 1711 "y.tab.c" /* yacc.c:1646  */
+#line 1759 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 44:
-#line 292 "vkang.y" /* yacc.c:1646  */
+#line 322 "vkang.y" /* yacc.c:1646  */
     { lox_opcode_jmp_label(lox_if_end_label(), 0); }
-#line 1717 "y.tab.c" /* yacc.c:1646  */
+#line 1765 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 47:
-#line 297 "vkang.y" /* yacc.c:1646  */
+#line 327 "vkang.y" /* yacc.c:1646  */
     {
             if (!lox_function_parsing)
             {
@@ -1725,43 +1773,43 @@ yyreduce:
                 exit(0);
             }
         }
-#line 1729 "y.tab.c" /* yacc.c:1646  */
+#line 1777 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 48:
-#line 306 "vkang.y" /* yacc.c:1646  */
+#line 336 "vkang.y" /* yacc.c:1646  */
     { lox_opcode_return(0, 0);}
-#line 1735 "y.tab.c" /* yacc.c:1646  */
+#line 1783 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 49:
-#line 307 "vkang.y" /* yacc.c:1646  */
+#line 337 "vkang.y" /* yacc.c:1646  */
     { (yyval.vLong) = (yyvsp[0].vLong); lox_opcode_return((yyvsp[0].vLong), 1);}
-#line 1741 "y.tab.c" /* yacc.c:1646  */
+#line 1789 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 52:
-#line 313 "vkang.y" /* yacc.c:1646  */
+#line 343 "vkang.y" /* yacc.c:1646  */
     { 
 					strcpy(lox_var_name, (yyvsp[0].vChar));
 				 }
-#line 1749 "y.tab.c" /* yacc.c:1646  */
+#line 1797 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 53:
-#line 316 "vkang.y" /* yacc.c:1646  */
+#line 346 "vkang.y" /* yacc.c:1646  */
     { lox_set_is_array_element(); lox_array_element_index_push_label((yyvsp[-1].vLong)); }
-#line 1755 "y.tab.c" /* yacc.c:1646  */
+#line 1803 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 54:
-#line 319 "vkang.y" /* yacc.c:1646  */
+#line 349 "vkang.y" /* yacc.c:1646  */
     { (yyval.vLong) = (yyvsp[0].vLong); }
-#line 1761 "y.tab.c" /* yacc.c:1646  */
+#line 1809 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 55:
-#line 321 "vkang.y" /* yacc.c:1646  */
+#line 351 "vkang.y" /* yacc.c:1646  */
     {
                     extern long  lox_array_index;
                     extern long  lox_array_label[1000];
@@ -1770,101 +1818,101 @@ yyreduce:
                     lox_var_label_index++;
                     lox_array_parsing_end();
                 }
-#line 1774 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 56:
-#line 345 "vkang.y" /* yacc.c:1646  */
-    { (yyval.vLong) = (yyvsp[-1].vLong); }
-#line 1780 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 57:
-#line 346 "vkang.y" /* yacc.c:1646  */
-    { (yyval.vLong) = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_equal((yyvsp[-2].vLong), (yyvsp[0].vLong), lox_var_label_index);lox_var_label_index++;}
-#line 1786 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 58:
-#line 347 "vkang.y" /* yacc.c:1646  */
-    { (yyval.vLong) = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_lt((yyvsp[-2].vLong), (yyvsp[0].vLong), lox_var_label_index);lox_var_label_index++;}
-#line 1792 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 59:
-#line 348 "vkang.y" /* yacc.c:1646  */
-    { (yyval.vLong) = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_gt((yyvsp[-2].vLong), (yyvsp[0].vLong), lox_var_label_index);lox_var_label_index++;}
-#line 1798 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 60:
-#line 349 "vkang.y" /* yacc.c:1646  */
-    { (yyval.vLong) = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_nequal((yyvsp[-2].vLong), (yyvsp[0].vLong), lox_var_label_index);lox_var_label_index++;}
-#line 1804 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 61:
-#line 350 "vkang.y" /* yacc.c:1646  */
-    { (yyval.vLong) = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_let((yyvsp[-2].vLong), (yyvsp[0].vLong), lox_var_label_index);lox_var_label_index++;}
-#line 1810 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 62:
-#line 351 "vkang.y" /* yacc.c:1646  */
-    { (yyval.vLong) = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_get((yyvsp[-2].vLong), (yyvsp[0].vLong), lox_var_label_index);lox_var_label_index++;}
-#line 1816 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 63:
-#line 352 "vkang.y" /* yacc.c:1646  */
-    { (yyval.vLong) = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_add((yyvsp[-2].vLong), (yyvsp[0].vLong), lox_var_label_index);lox_var_label_index++;}
 #line 1822 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 64:
-#line 353 "vkang.y" /* yacc.c:1646  */
-    { (yyval.vLong) = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_sub((yyvsp[-2].vLong), (yyvsp[0].vLong), lox_var_label_index); lox_var_label_index++;}
+  case 56:
+#line 375 "vkang.y" /* yacc.c:1646  */
+    { (yyval.vLong) = (yyvsp[-1].vLong); }
 #line 1828 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 65:
-#line 354 "vkang.y" /* yacc.c:1646  */
-    { (yyval.vLong) = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_mul((yyvsp[-2].vLong), (yyvsp[0].vLong), lox_var_label_index); lox_var_label_index++;}
+  case 57:
+#line 376 "vkang.y" /* yacc.c:1646  */
+    { (yyval.vLong) = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_equal((yyvsp[-2].vLong), (yyvsp[0].vLong), lox_var_label_index);lox_var_label_index++;}
 #line 1834 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 66:
-#line 355 "vkang.y" /* yacc.c:1646  */
-    { (yyval.vLong) = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_div((yyvsp[-2].vLong), (yyvsp[0].vLong), lox_var_label_index); lox_var_label_index++;}
+  case 58:
+#line 377 "vkang.y" /* yacc.c:1646  */
+    { (yyval.vLong) = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_lt((yyvsp[-2].vLong), (yyvsp[0].vLong), lox_var_label_index);lox_var_label_index++;}
 #line 1840 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 68:
-#line 361 "vkang.y" /* yacc.c:1646  */
-    { (yyval.vLong) = (yyvsp[0].vLong); }
+  case 59:
+#line 378 "vkang.y" /* yacc.c:1646  */
+    { (yyval.vLong) = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_gt((yyvsp[-2].vLong), (yyvsp[0].vLong), lox_var_label_index);lox_var_label_index++;}
 #line 1846 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 69:
-#line 362 "vkang.y" /* yacc.c:1646  */
-    { (yyval.vLong) = lox_var_label_index; lox_opcode_push_number_var((yyvsp[0].vFloat), lox_var_label_index);lox_var_label_index++; }
+  case 60:
+#line 379 "vkang.y" /* yacc.c:1646  */
+    { (yyval.vLong) = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_nequal((yyvsp[-2].vLong), (yyvsp[0].vLong), lox_var_label_index);lox_var_label_index++;}
 #line 1852 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 70:
-#line 363 "vkang.y" /* yacc.c:1646  */
-    { (yyval.vLong) = lox_var_label_index; lox_opcode_push_string_var((yyvsp[0].vChar), lox_var_label_index);lox_var_label_index++; }
+  case 61:
+#line 380 "vkang.y" /* yacc.c:1646  */
+    { (yyval.vLong) = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_let((yyvsp[-2].vLong), (yyvsp[0].vLong), lox_var_label_index);lox_var_label_index++;}
 #line 1858 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 71:
-#line 364 "vkang.y" /* yacc.c:1646  */
-    { (yyval.vLong) = lox_var_label_index; lox_opcode_push_temp_var(lox_var_label_index);lox_var_label_index++;       }
+  case 62:
+#line 381 "vkang.y" /* yacc.c:1646  */
+    { (yyval.vLong) = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_get((yyvsp[-2].vLong), (yyvsp[0].vLong), lox_var_label_index);lox_var_label_index++;}
 #line 1864 "y.tab.c" /* yacc.c:1646  */
     break;
 
+  case 63:
+#line 382 "vkang.y" /* yacc.c:1646  */
+    { (yyval.vLong) = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_add((yyvsp[-2].vLong), (yyvsp[0].vLong), lox_var_label_index);lox_var_label_index++;}
+#line 1870 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 64:
+#line 383 "vkang.y" /* yacc.c:1646  */
+    { (yyval.vLong) = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_sub((yyvsp[-2].vLong), (yyvsp[0].vLong), lox_var_label_index); lox_var_label_index++;}
+#line 1876 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 65:
+#line 384 "vkang.y" /* yacc.c:1646  */
+    { (yyval.vLong) = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_mul((yyvsp[-2].vLong), (yyvsp[0].vLong), lox_var_label_index); lox_var_label_index++;}
+#line 1882 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 66:
+#line 385 "vkang.y" /* yacc.c:1646  */
+    { (yyval.vLong) = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_div((yyvsp[-2].vLong), (yyvsp[0].vLong), lox_var_label_index); lox_var_label_index++;}
+#line 1888 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 68:
+#line 391 "vkang.y" /* yacc.c:1646  */
+    { (yyval.vLong) = (yyvsp[0].vLong); }
+#line 1894 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 69:
+#line 392 "vkang.y" /* yacc.c:1646  */
+    { (yyval.vLong) = lox_var_label_index; lox_opcode_push_number_var((yyvsp[0].vFloat), lox_var_label_index);lox_var_label_index++; }
+#line 1900 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 70:
+#line 393 "vkang.y" /* yacc.c:1646  */
+    { (yyval.vLong) = lox_var_label_index; lox_opcode_push_string_var((yyvsp[0].vChar), lox_var_label_index);lox_var_label_index++; }
+#line 1906 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 71:
+#line 394 "vkang.y" /* yacc.c:1646  */
+    { (yyval.vLong) = lox_var_label_index; lox_opcode_push_temp_var(lox_var_label_index);lox_var_label_index++;       }
+#line 1912 "y.tab.c" /* yacc.c:1646  */
+    break;
+
   case 72:
-#line 365 "vkang.y" /* yacc.c:1646  */
+#line 395 "vkang.y" /* yacc.c:1646  */
     {
                        struct lox_function_calling *call_f = lox_get_cur_calling_function();
                        struct lox_symbol *sym = (struct lox_symbol *)call_f->func;
@@ -1876,70 +1924,70 @@ yyreduce:
                        lox_var_label_index++;
                        lox_info("---------------------function call end2:%s\n", sym->sym_name);
                      }
-#line 1880 "y.tab.c" /* yacc.c:1646  */
+#line 1928 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 73:
-#line 377 "vkang.y" /* yacc.c:1646  */
+#line 407 "vkang.y" /* yacc.c:1646  */
     { (yyval.vLong) = lox_var_label_index; lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_and((yyvsp[-2].vLong), (yyvsp[0].vLong), lox_var_label_index);lox_var_label_index++;}
-#line 1886 "y.tab.c" /* yacc.c:1646  */
+#line 1934 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 74:
-#line 378 "vkang.y" /* yacc.c:1646  */
+#line 408 "vkang.y" /* yacc.c:1646  */
     { (yyval.vLong) = lox_var_label_index; lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_or((yyvsp[-2].vLong),  (yyvsp[0].vLong), lox_var_label_index);lox_var_label_index++;}
-#line 1892 "y.tab.c" /* yacc.c:1646  */
+#line 1940 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 75:
-#line 379 "vkang.y" /* yacc.c:1646  */
+#line 409 "vkang.y" /* yacc.c:1646  */
     { (yyval.vLong) = lox_var_label_index; lox_opcode_push_bool_var(lox_var_label_index, 0);lox_var_label_index++;  }
-#line 1898 "y.tab.c" /* yacc.c:1646  */
+#line 1946 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 76:
-#line 380 "vkang.y" /* yacc.c:1646  */
+#line 410 "vkang.y" /* yacc.c:1646  */
     { (yyval.vLong) = lox_var_label_index; lox_opcode_push_bool_var(lox_var_label_index, 1);lox_var_label_index++;  }
-#line 1904 "y.tab.c" /* yacc.c:1646  */
+#line 1952 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 80:
-#line 396 "vkang.y" /* yacc.c:1646  */
+#line 426 "vkang.y" /* yacc.c:1646  */
     {   lox_array_push_label((yyvsp[0].vLong)); }
-#line 1910 "y.tab.c" /* yacc.c:1646  */
+#line 1958 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 81:
-#line 397 "vkang.y" /* yacc.c:1646  */
+#line 427 "vkang.y" /* yacc.c:1646  */
     { lox_array_push_label((yyvsp[0].vLong));}
-#line 1916 "y.tab.c" /* yacc.c:1646  */
+#line 1964 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 82:
-#line 400 "vkang.y" /* yacc.c:1646  */
+#line 430 "vkang.y" /* yacc.c:1646  */
     { 
 									(yyval.vLong) = (yyvsp[-3].vLong); 
                                     struct lox_function_calling *call_f = lox_get_cur_calling_function();
                                     struct lox_symbol *sym = (struct lox_symbol *)call_f->func;
                                     lox_func_check_args((long)call_f);
 								}
-#line 1927 "y.tab.c" /* yacc.c:1646  */
+#line 1975 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 85:
-#line 412 "vkang.y" /* yacc.c:1646  */
+#line 442 "vkang.y" /* yacc.c:1646  */
     { lox_func_push_arg_label((yyvsp[0].vLong)); }
-#line 1933 "y.tab.c" /* yacc.c:1646  */
+#line 1981 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 86:
-#line 413 "vkang.y" /* yacc.c:1646  */
+#line 443 "vkang.y" /* yacc.c:1646  */
     { lox_func_push_arg_label((yyvsp[0].vLong)); }
-#line 1939 "y.tab.c" /* yacc.c:1646  */
+#line 1987 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 87:
-#line 416 "vkang.y" /* yacc.c:1646  */
+#line 446 "vkang.y" /* yacc.c:1646  */
     {
             (yyval.vLong) = lox_find_function((yyvsp[0].vChar));
             lox_info("calling function:%s\n", (yyvsp[0].vChar));
@@ -1950,11 +1998,11 @@ yyreduce:
                 exit(0);
             }
           }
-#line 1954 "y.tab.c" /* yacc.c:1646  */
+#line 2002 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 88:
-#line 443 "vkang.y" /* yacc.c:1646  */
+#line 473 "vkang.y" /* yacc.c:1646  */
     {
 				int ret = lox_find_local_symbol(lox_var_name2);
 				
@@ -1980,25 +2028,25 @@ yyreduce:
 					(yyval.vLong) = ret;
 				}
 			}
-#line 1984 "y.tab.c" /* yacc.c:1646  */
+#line 2032 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 89:
-#line 470 "vkang.y" /* yacc.c:1646  */
+#line 500 "vkang.y" /* yacc.c:1646  */
     { 
 					strcpy(lox_var_name2, (yyvsp[0].vChar));
 				 }
-#line 1992 "y.tab.c" /* yacc.c:1646  */
+#line 2040 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 90:
-#line 473 "vkang.y" /* yacc.c:1646  */
+#line 503 "vkang.y" /* yacc.c:1646  */
     { lox_set_is_array_element(); lox_array_element_index_push_label((yyvsp[-1].vLong)); }
-#line 1998 "y.tab.c" /* yacc.c:1646  */
+#line 2046 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 2002 "y.tab.c" /* yacc.c:1646  */
+#line 2050 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2226,7 +2274,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 476 "vkang.y" /* yacc.c:1906  */
+#line 506 "vkang.y" /* yacc.c:1906  */
 
 
 #if 0

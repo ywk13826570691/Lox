@@ -29,14 +29,24 @@ j = 0
     @end
 @end
 
-j = 0
-i = 0
-repeat
-    print("kkkkkkkkkkk", j)
-    j = j + 1
-    i = 0
-    repeat
-        print("mmmmmmmm",i)
-        i = i + 1
-    until i < 2
-until j < 2
+@j = 0
+@i = 0
+@repeat
+    @print("kkkkkkkkkkk", j)
+    @j = j + 1
+    @i = 0
+    @repeat
+        @print("mmmmmmmm",i)
+        @i = i + 1
+        @break
+    @until i < 2
+@until j < 2
+
+k = 0
+foreach k in [1,10]
+    if k < 5 then
+        continue
+    end
+    print("-----------", k);
+end
+
