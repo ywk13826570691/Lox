@@ -177,6 +177,7 @@ int lox_opcode_cmp(long label);
 int lox_opcode_cmp_inrange(long label_range, long label_var);
 int lox_opcode_jmp_label(char *label, int f_b);
 int lox_opcode_jmpeq_label(char *label, int f_b);
+int lox_opcode_jmpneq_label(char *label, int f_b);
 
 
 

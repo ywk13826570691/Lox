@@ -19,6 +19,8 @@ extern int lox_linenumber;
 "repeat"				return REPEAT;
 "until"					return UNTIL;
 "foreach"               return FOREACH;
+"break"                 return BREAK;
+"continue"              return CONTINUE;
 "in"                    return LOX_IN;
 "function"				{
                             return FUNCTION;

@@ -79,9 +79,16 @@ int lox_machine_run(void)
             cmd_add = 0;
             break;
         case LOX_JMPEQ_LABEL:
+            {
+                int ret = lox_handle_jmpeq_label(cmd);
+                if (ret == 0)
+                    cmd_add = 0;
+            }
+            break;
+        case LOX_JMPNEQ_LABEL:
         {
-            int ret = lox_handle_jmpeq_label(cmd);
-            if (ret == 0)
+            int ret = lox_handle_jmpneq_label(cmd);
+            if (ret == 1)
                 cmd_add = 0;
         }
             break;

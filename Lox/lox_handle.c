@@ -685,3 +685,15 @@ long lox_handle_jmpeq_label(struct lox_cmd *cmd)
     return ret;
 }
 
+long lox_handle_jmpneq_label(struct lox_cmd *cmd)
+{
+    int ret = 0;
+    ret = SPR;
+    lox_info("-----------------lox_handle_jmpneq_label:%s %d\n", cmd->cmd_jmp_label, SPR);
+    if (SPR == 1)
+    {
+        lox_handle_jmp_label(cmd);
+    }
+    return ret;
+}
+

@@ -7,6 +7,8 @@
     #include "lox_array.h"
     #include "lox_if.h"
     #include "lox_foreach.h"
+    #include "lox_while.h"
+    #include "lox_repeat.h"
     extern int lox_linenumber;
     extern unsigned int lox_var_label_index;
     extern int lox_function_parsing;
@@ -33,6 +35,8 @@
 %token REPEAT 
 %token UNTIL 
 %token FOREACH
+%token BREAK
+%token CONTINUE
 %token LOX_IN
 %token FUNCTION
 %token END
@@ -159,20 +163,46 @@ stat1 : IF expr THEN {
                             //lox_info("-------------2---------:%d\n", lox_if_get_cur_index());
                             lox_if_index_pop();
                          }
-	| WHILE  expr DO PrepJump block PrepJump END
-	| REPEAT  block UNTIL expr PrepJump
+	| WHILE  
+        {
+            int ret = lox_while_index_increase();
+            lox_while_index_push(ret);
+            lox_opcode_push_label(lox_while_label());
+        }
+        expr DO 
+        {
+            
+            lox_opcode_cmp($3);
+            lox_opcode_jmpeq_label(lox_while_end_label(), 0);
+        } block   
+        {
+            lox_opcode_jmp_label(lox_while_label(), 1);
+            lox_opcode_push_label(lox_while_end_label());
+            lox_while_index_pop();
+        }
+        END
+	| REPEAT  
+    {
+        int ret = lox_foreach_index_increase();
+    	lox_repeat_index_push(ret);
+        lox_opcode_push_label(lox_repeat_label());
+    }     
+    block UNTIL expr
+    {
+        lox_opcode_cmp($5);
+        lox_opcode_jmpneq_label(lox_repeat_label(), 1);
+        lox_repeat_index_pop();
+    }
     | FOREACH 
     		{  
     			int ret = lox_foreach_index_increase();
     			lox_foreach_index_push(ret);
-    			lox_info("-------------1---------:\n"); 
     		}
     forexpr LOX_IN forrange {
         						lox_opcode_push_label(lox_foreach_label());
     							lox_opcode_cmp_inrange($5, $3);
     							lox_opcode_jmpeq_label(lox_foreach_end_label(), 0);
     						} block END {
-    										lox_info("-------------2---------:\n");
     										lox_opcode_jmp_label(lox_foreach_label(), 1);
     										lox_opcode_push_label(lox_foreach_end_label());
     										lox_foreach_index_pop();
@@ -225,6 +255,8 @@ stat1 : IF expr THEN {
     | ret
 	//| typeconstructor                
 	//| LOCAL localdeclist decinit
+    | BREAK;
+    | CONTINUE;
 	;
 forexpr:NAME {
 				int ret = lox_add_local_symbol($1, lox_var_label_index);

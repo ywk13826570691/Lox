@@ -18,7 +18,9 @@ SOURCES += \
     lox_keywords.c \
     lox_array.c \
     lox_if.c \
-    y.tab.c
+    y.tab.c \
+    lox_while.c \
+    lox_repeat.c
 
 HEADERS += \
     lox.h \
@@ -34,7 +36,9 @@ HEADERS += \
     lox_object.h \
     lox_keywords.h \
     lox_array.h \
-    lox_if.h
+    lox_if.h \
+    lox_while.h \
+    lox_repeat.h
 
 OTHER_FILES += \
     vkang.l \

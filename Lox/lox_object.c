@@ -575,6 +575,7 @@ long lox_object_logical_operation_lt(struct lox_object *obj1, struct lox_object 
         return  LOX_OK;
     }
 
+    lox_info("lox_object_logical_operation_lt-----------[-------------------:%d %f %f\n\n", obj1->o_tag, obj1->o_value.v_f, obj2->o_value.v_f);
     switch (obj1->o_tag)
     {
         case LOX_NUMBER:

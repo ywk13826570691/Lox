@@ -757,3 +757,25 @@ int lox_opcode_jmpeq_label(char *label, int f_b)
     lox_info("-------------------lox_opcode_jmpeq_label:%s\n", label);
     return lox_func_push_cmd(&cmd);
 }
+
+int lox_opcode_jmpneq_label(char *label, int f_b)
+{
+    lox_info("-------------------1lox_opcode_jmpneq_label: %p\n", label);
+        int ret = LOX_ERROR(LOX_INVALID);
+        struct lox_symbol *sym = lox_get_cur_parsing_function();
+        if (!sym)
+        {
+            lox_error("cur parse funcion is nil %s %d\n", __func__, __LINE__);
+            return  ret;
+        }
+
+        struct lox_cmd cmd;
+        memset(&cmd, 0, sizeof (struct lox_cmd));
+
+        cmd.cmd_opcode = LOX_JMPNEQ_LABEL;
+        strcpy(cmd.cmd_jmp_label, label);
+        cmd.cmd_args[0] = f_b;
+
+        lox_info("-------------------lox_opcode_jmpneq_label:%s\n", label);
+        return lox_func_push_cmd(&cmd);
+}
