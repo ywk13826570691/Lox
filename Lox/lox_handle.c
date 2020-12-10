@@ -316,7 +316,7 @@ lox_info("------------vvvv---1-__4444444444444444444:%d %f\n", obj2->o_tag, obj2
         lox_info("will not return %d %s\n", cmd->cmd_label_index, sym->sym_name);
 #endif
 
-    lox_run_inner_func((long)sym, argv, len, (long)ret);
+    lox_run_lib_func((long)sym, argv, len, (long)ret);
     for(i = 0; i < len; i++)
     {
         free(argv[i]);

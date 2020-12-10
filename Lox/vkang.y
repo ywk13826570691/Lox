@@ -416,16 +416,16 @@ function_parlistlist1 :	expr { lox_func_push_arg_label($1); }
           ;
 
 functionvalue : NAME {
-            $$ = lox_find_function($1);
-            lox_info("calling function:%s\n", $1);
-            lox_push_cur_calling_function($$);
-            if ($$ < 0)
-            {
-                lox_info("Call invalid function at line:%d %s\n", lox_linenumber, $1);
-                exit(0);
-            }
-          }
-	      ;
+                        $$ = lox_find_function($1);
+                        lox_info("calling function:%s\n", $1);
+                        lox_push_cur_calling_function($$);
+                        if ($$ < 0)
+                        {
+                            lox_info("Call invalid function at line:%d %s\n", lox_linenumber, $1);
+                            exit(0);
+                        }
+                    }
+	         ;
 /*
 var	  :	NAME  { 
 				struct lox_symbol *sym = lox_get_cur_parsing_function();

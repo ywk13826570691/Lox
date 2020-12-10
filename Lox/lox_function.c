@@ -5,6 +5,7 @@
 #include "lox_register.h"
 #include "lox_config.h"
 #include "lox_object.h"
+#include "lox_lib.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -29,7 +30,7 @@ int lox_function_init(void)
     lox_function_total += LOX_FUNCTION_TABLE_STEP;
     main_function = lox_new_function("main");
     lox_set_cur_calling_function((long)main_function);
-    lox_inner_func_init();
+    lox_lib_init();
     return LOX_OK;
 }
 
@@ -165,9 +166,6 @@ int lox_func_push_cmd(struct lox_cmd *cmd)
     }
 
     memcpy(&func->func_code[func->func_code_index], cmd, sizeof (struct lox_cmd));
-
-    //strcpy(func->func_code[func->func_code_index].cmd_var_name, cmd->cmd_var_name);
-    //strcpy(func->func_code[func->func_code_index].cmd_jmp_label, cmd->cmd_jmp_label);
 
     func->func_code_index++;
     return LOX_OK;
@@ -323,13 +321,6 @@ void lox_local_symbol_destory(void)
     memset(local_lable_table, 0, 1000*sizeof (struct lox_local_symbol));
 }
 
-
-
-
-
-
-
-
 void lox_func_scan(long f)
 {
 #if 0
@@ -375,199 +366,4 @@ void lox_func_scan(long f)
         }
     }
 #endif
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-void lox_print_array(struct lox_object *obj)
-{
-    if (!obj->o_value.v_vec)
-    {
-        return;
-    }
-
-    if(!obj->o_value.v_vec->len)
-    {
-        printf("[,]\n");
-        return;
-    }
-
-    struct lox_vector *vec = obj->o_value.v_vec;
-    struct lox_vector_value *v = vec->vec_head.next;
-
-    printf("[ ");
-
-    while(v)
-    {
-        if (v->vec_v)
-        {
-            switch (v->vec_v->o_tag)
-            {
-             case LOX_NUMBER:
-                printf("%f ", v->vec_v->o_value.v_f);
-                break;
-            case LOX_STRING:
-                printf("%s ", v->vec_v->o_value.v_str);
-                break;
-            case LOX_ARRAY:
-                lox_print_array(v->vec_v);
-                break;
-            default:
-                printf("''");
-                break;
-            }
-        }
-        v = v->next;
-    }
-    printf("]");
-}
-
-static void lox_inner_printf(struct lox_symbol * sym, long *argv, int len, long ret)
-{
-    int i = 0;
-    for(i = 0; i < len; i++)
-    {
-        struct lox_object *obj = (struct lox_object *)argv[i];
-        if (obj)
-        {
-            switch (obj->o_tag)
-            {
-                case LOX_NUMBER:
-                printf("%f ", obj->o_value.v_f);
-                break;
-            case LOX_STRING:
-                printf("%s ", obj->o_value.v_str);
-                break;
-            case LOX_ARRAY:
-                 lox_print_array(obj);
-                break;
-            default:
-                printf("%s ", lox_object_name(obj->o_tag));
-                break;
-            }
-        }
-    }
-    printf("\n");
-    lox_info("calling print\n");
-}
-
-static void lox_inner_type(struct lox_symbol * sym, long *argv, int len, long ret)
-{
-    struct lox_object *obj = (struct lox_object *)argv[0];
-    struct lox_symbol *re = (struct lox_symbol *)ret;
-
-    char type[50] = "nil";
-    strcpy(type, "nil");
-    if (obj->o_tag == LOX_NUMBER)
-    {
-        strcpy(type, "number");
-    }
-    if (obj->o_tag == LOX_STRING)
-    {
-        strcpy(type, "string");
-    }
-    if (obj->o_tag == LOX_ARRAY)
-    {
-        strcpy(type, "table");
-    }
-    if (obj->o_tag == LOX_BOOL_TRUE || obj->o_tag == LOX_BOOL_FALSE)
-    {
-        strcpy(type, "bool");
-    }
-
-    if (re && re->sym_obj)
-    {
-        struct lox_object *result = lox_object_new_string(type);
-        lox_object_copy(re->sym_obj, result);
-        free(result);
-    }
-}
-
-static void lox_inner_len(struct lox_symbol * sym, long *argv, int len, long ret)
-{
-    struct lox_object *obj = (struct lox_object *)argv[0];
-    struct lox_symbol *re = (struct lox_symbol *)ret;
-    int ret_v = -1;
-    if (obj && len == 1)
-    {
-        if(obj->o_tag == LOX_STRING && obj->o_value.v_str)
-        {
-            ret_v = strlen(obj->o_value.v_str);
-        }
-
-        if(obj->o_tag == LOX_ARRAY && obj->o_value.v_vec)
-        {
-            ret_v = obj->o_value.v_vec->len;
-        }
-    }
-
-    if (re && re->sym_obj)
-    {
-        struct lox_object *result = lox_object_new_number((float)ret_v);
-        lox_object_copy(re->sym_obj, result);
-        free(result);
-    }
-}
-
-static struct lox_inner_function inner_func_table[] =
-{
-    {"print", lox_inner_printf , 1000},
-    {"type", lox_inner_type , 1},
-    {"len", lox_inner_len, 1}
-};
-
-#define INNER_FUNC_COUNT (sizeof(inner_func_table)/sizeof(inner_func_table[0]))
-
-int lox_inner_func_init(void)
-{
-    unsigned int i = 0;
-    for (i = 0; i < INNER_FUNC_COUNT; i++)
-    {
-        struct lox_symbol *sym = (struct lox_symbol*)malloc(sizeof (struct lox_symbol));
-        memset(sym, 0, sizeof (struct lox_symbol));
-
-        struct lox_object *obj = lox_object_new_func();
-        sym->sym_obj = obj;
-
-        struct lox_function *func;
-
-        func = (struct lox_function*)malloc(sizeof (struct lox_function));
-        sym->sym_obj->o_value.v_func = func;
-
-        func->is_inner_function = 1;
-        func->func_def_args_cnt = inner_func_table[i].func_args_define;
-        strcpy(sym->sym_name, inner_func_table[i].name);
-        lox_register_func(sym);
-    }
-    return LOX_OK;
-}
-
-long lox_run_inner_func(long f, long *argv, int len, long ret)
-{
-    struct lox_symbol *sym = (struct lox_symbol*)f;
-    struct lox_symbol *re = (struct lox_symbol *)ret;
-    for (unsigned int i = 0 ; i < INNER_FUNC_COUNT; i++)
-    {
-        if (strcmp(inner_func_table[i].name, sym->sym_name) == 0)
-        {
-            inner_func_table[i].func(sym, argv, len, re);
-            break;
-        }
-    }
-    return LOX_OK;
 }

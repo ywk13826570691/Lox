@@ -1,6 +1,6 @@
 #include "lox_object.h"
 #include "lox_array.h"
-#include "lox_lib.h"
+#include "lox_string.h"
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>

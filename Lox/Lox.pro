@@ -21,7 +21,10 @@ SOURCES += \
     y.tab.c \
     lox_while.c \
     lox_repeat.c \
-    lox_loop.c
+    lox_loop.c \
+    lox_string.c \
+    lox_string.c \
+    lox_builtin_lib.c
 
 HEADERS += \
     lox.h \
@@ -40,7 +43,10 @@ HEADERS += \
     lox_if.h \
     lox_while.h \
     lox_repeat.h \
-    lox_loop.h
+    lox_loop.h \
+    lox_string.h \
+    lox_string.h \
+    lox_builtin_lib.h
 
 OTHER_FILES += \
     vkang.l \

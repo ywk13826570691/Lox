@@ -1,149 +1,65 @@
 #include "lox_lib.h"
-#include <string.h>
-int lox_is_int_number(float f)
+
+static struct lox_lib **lox_lib_table;
+static long lox_lib_index = 0;
+static long lox_lib_cnt = 0;
+
+extern int lox_builtin_lib_init(void);
+
+int lox_lib_init(void)
 {
-    float f1 = f;
-    int f2 = f;
-    float f3 = f - f2;
-    if (f3 == 0)
-    {
-        return 1;
-    }
-    return 0;
+    lox_lib_cnt = 500;
+    lox_lib_table = malloc(lox_lib_cnt * sizeof (struct lox_lib *));
+    lox_lib_index = 0;
+
+    lox_builtin_lib_init();
+    return LOX_OK;
 }
 
-char *lox_replace_string(char *src, char *target, char *rep_val)
+int lox_lib_register_lib(struct lox_lib *lib)
 {
-    char *p = NULL;
-    char *p_last = NULL;
-    char *p_res = NULL;
-    char *ret = p_res;
-    int len = 500;
-    int len_cnt = 0;
-
-    if (!src || !target || !rep_val)
+    if (lox_lib_index == lox_lib_cnt)
     {
-        return src;
+        lox_lib_cnt += 500;
+        lox_lib_table = realloc(lox_lib_table, lox_lib_cnt * sizeof (struct lox_lib *));
     }
+    lox_lib_table[lox_lib_index] = lib;
+    lox_lib_index++;
 
-    if (strlen(target) == 0 || !target)
-    {
-        return src;
-    }
+    struct lox_symbol *sym = (struct lox_symbol*)malloc(sizeof (struct lox_symbol));
+    memset(sym, 0, sizeof (struct lox_symbol));
 
-    p = strstr(src, target);
+    struct lox_object *obj = lox_object_new_func();
+    sym->sym_obj = obj;
 
-    if (!p)
-    {
-        return src;
-    }
-    p_res = (char*)malloc(500);
-    ret = p_res;
-    len = 500;
+    struct lox_function *func;
 
-    p_last = src;
+    func = (struct lox_function*)malloc(sizeof (struct lox_function));
+    sym->sym_obj->o_value.v_func = func;
 
-    if (p_last != p)
-    {
-        if (len < strlen(rep_val))
-        {
-            len = len + 500 + strlen(rep_val);
-            p_res = realloc(p_res, len + 500 + strlen(rep_val));
-        }
-        memcpy(p_res, src, p - src);
-        len_cnt += (p - src);
-        p_res += (p - src);
-    }
+    func->is_inner_function = 1;
+    func->func_def_args_cnt = lib->func_argc;
+    strcpy(sym->sym_name, lib->name);
 
-    p_last = p;
-    while(p)
-    {
-        p = strstr(p + strlen(target), target);
-        if (p)
-        {
-            if (len - len_cnt < strlen(rep_val))
-            {
-                len = len + 500 + strlen(rep_val);
-                p_res = realloc(p_res, len + 500 + strlen(rep_val));
-            }
+    lib->s = sym;
+    lox_register_func(sym);
 
-            memcpy(p_res, rep_val, strlen(rep_val));
-
-            len_cnt += strlen(rep_val);
-            p_res += strlen(rep_val);
-
-            int len_copy = p - p_last - strlen(target);
-
-            if (len - len_cnt < len_copy)
-            {
-                len = len + 500 + len_copy;
-                p_res = realloc(p_res, len + 500 + len_copy);
-            }
-            memcpy(p_res, p_last + strlen(target), p - p_last - strlen(target));
-            len_cnt += len_copy;
-            p_res += len_copy;
-            p_last = p;
-
-
-        }
-        else
-        {
-            if (len - len_cnt < strlen(rep_val))
-            {
-                len = len + 500 + strlen(rep_val);
-                p_res = realloc(p_res, len + 500 + strlen(rep_val));
-            }
-
-            memcpy(p_res, rep_val, strlen(rep_val));
-            p_res += strlen(rep_val);
-            len_cnt += strlen(rep_val);
-
-             int len_copy = src + strlen(src) - p_last - strlen(target);
-
-            if (len - len_cnt < len_copy)
-            {
-                len = len + 500 + len_copy;
-                p_res = realloc(p_res, len + 500 + len_copy);
-            }
-            memcpy(p_res, p_last + strlen(target), len_copy);
-        }
-    }
-    return ret;
+    return lox_lib_index;
 }
 
-char *lox_string_repeat(char *src, int cnt)
-{
-    int len = (strlen(src) + 1)*cnt;
-    char *ret = (char *)malloc(len);
-    char *p = ret;
-    for(int i = 0; i < cnt; i++)
-    {
-        memcpy(ret, src, strlen(src));
-        ret += strlen(src);
-    }
-    return p;
-}
 
-int lox_string_tolower(char *src)
+long lox_run_lib_func(long f, long *argv, int len, long ret)
 {
-    if (!src)
+    struct lox_symbol *sym = (struct lox_symbol*)f;
+    struct lox_symbol *re = (struct lox_symbol *)ret;
+    for (unsigned int i = 0 ; i < lox_lib_index; i++)
     {
-        return 0;
-    }
-
-    int len = strlen(src);
-    for (int i =0 ;i < len; i++)
-    {
-        if(src[i] >= 'a' && src[i] <= 'z')
+        struct lox_symbol *s_func = lox_lib_table[i]->s;
+        if (strcmp(s_func->sym_name, sym->sym_name) == 0)
         {
-            src[i] = src[i] - 32;
-            continue;
-        }
-        if(src[i] >= 'A' && src[i] <= 'Z')
-        {
-            src[i] = src[i] + 32;
-            continue;
+            lox_lib_table[i]->func(sym, argv, len, re);
+            break;
         }
     }
-    return 1;
+    return LOX_OK;
 }
