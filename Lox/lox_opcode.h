@@ -45,6 +45,8 @@ enum lox_opcode
     LOX_SUB,        // sub r1,r2,r3 :r1 = r2 - r3
     LOX_MUL,        //mul r1,r2,r3  :r1 = r2*r3
     LOX_DIV,        //div r1,r2,r3  :r1 = r2/r3
+    LOX_PLUS,       // +10 +12
+    LOX_MINUS,       //-10 -12
     LOX_MOD,        //mod r1,r2,r3  :r1 = r2%r3
     LOX_NOT,        //not r1,r2     :r1 = !r2
     LOX_XOR,        //xor r1,r2,r3  :r1 = r2^r3
@@ -150,6 +152,8 @@ int lox_opcode_add(long r1, long r2, long label);
 int lox_opcode_sub(long r1, long r2, long label);
 int lox_opcode_mul(long r1, long r2, long label);
 int lox_opcode_div(long r1, long r2, long label);
+int lox_opcode_plus(long r1, long label);
+int lox_opcode_minus(long r1, long label);
 
 int lox_opcode_equal(long r1, long r2, long label);
 int lox_opcode_nequal(long r1, long r2, long label);

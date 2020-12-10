@@ -1,6 +1,7 @@
 #include "lox_array.h"
 #include "lox_def.h"
 #include "lox_object.h"
+#include "lox_lib.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -74,6 +75,60 @@ long lox_array_element_end(void)
     return LOX_OK;
 }
 
+int lox_array_deep_copy(struct lox_object *dst, struct lox_object *src)
+{
+    int ret = LOX_ERROR(LOX_INVALID);
+    if (!dst || !src)
+    {
+        lox_error("lox_array_deep_copy nil\n");
+        return ret;
+    }
+
+    struct lox_vector *vec = src->o_value.v_vec;
+    if (!vec)
+    {
+        lox_error("lox_array_deep_copy src nil\n");
+        return ret;
+    }
+
+    if (dst->o_tag == LOX_ARRAY)
+    {
+        lox_object_destroy_array(dst);
+    }
+    else
+    {
+        lox_object_destroy(dst);
+    }
+
+    struct lox_vector_value *v = vec->vec_head.next;
+    struct lox_vector *dstvec = malloc(sizeof (struct lox_vector));
+    memset(dstvec, 0, sizeof (struct lox_vector));
+
+    dst->o_tag = LOX_ARRAY;
+    dst->o_value.v_vec = dstvec;
+
+    while(v)
+    {
+        if (v->vec_v)
+        {
+            struct lox_object *obj = lox_object_new_temp();
+            if (v->vec_v->o_tag != LOX_ARRAY)
+            {
+                lox_object_copy(obj, v->vec_v);
+                lox_array_insert_obj(dst, obj);
+            }
+            else
+            {
+                lox_array_deep_copy(obj, v->vec_v);
+                lox_array_insert_obj(dst, obj);
+            }
+        }
+        v = v->next;
+    }
+
+    return LOX_OK;
+}
+
 int lox_array_insert_obj(struct lox_object *arr, struct lox_object *obj)
 {
     if (!arr || !obj)
@@ -101,6 +156,201 @@ int lox_array_insert_obj(struct lox_object *arr, struct lox_object *obj)
     vec->next = v;
     arr->o_value.v_vec->len += 1;
     return  LOX_OK;
+}
+
+int lox_array_delete_obj(struct lox_object *arr, struct lox_object *obj)
+{
+    if (!arr || !obj)
+    {
+        lox_debug("lox_array_delete_obj nil\n");
+    }
+
+    struct lox_vector_value *vec = arr->o_value.v_vec->vec_head.next;
+    if (!vec)
+    {
+        return LOX_OK;
+    }
+    struct lox_vector_value *vec_p = &arr->o_value.v_vec->vec_head;
+    while (vec)
+    {
+        int obj_del = 0;
+        if (vec->vec_v && vec->vec_v->o_tag == obj->o_tag)
+        {
+            struct lox_object *v = vec->vec_v;
+            if (obj->o_tag == LOX_NUMBER)
+            {
+                if (obj->o_value.v_f - v->o_value.v_f < 1e-10)
+                {
+                    obj_del = 1;
+                }
+            }
+            if (obj->o_tag == LOX_STRING)
+            {
+                if (obj->o_value.v_str && v->o_value.v_str)
+                {
+                    if (strcmp(obj->o_value.v_str, v->o_value.v_str) == 0)
+                    {
+                        obj_del = 1;
+                    }
+                }
+            }
+            if (obj->o_tag == LOX_ARRAY)
+            {
+                if (lox_arrary_equal(obj, v) == 0)
+                {
+                    obj_del = 1;
+                }
+            }
+            if (obj->o_tag == LOX_NIL || obj->o_tag == LOX_BOOL_TRUE || obj->o_tag == LOX_BOOL_FALSE)
+            {
+                obj_del = 1;
+            }
+
+            if (obj_del)
+            {
+                vec_p->next = vec->next;
+                if (v->o_tag == LOX_ARRAY)
+                {
+                    lox_object_destroy_array(v);
+                }
+                else
+                {
+                    lox_object_destroy(v);
+                }
+                free(v);
+                free(vec);
+                arr->o_value.v_vec->len--;
+            }
+        }
+        vec_p = vec;
+        vec =  vec->next;
+    }
+    return  LOX_OK;
+}
+
+int lox_array_connect_array(struct lox_object *arr1, struct lox_object *arr2)
+{
+    int ret = LOX_ERROR(LOX_INVALID);
+    if (!arr1 || !arr2)
+    {
+        return ret;
+    }
+
+    struct lox_vector *vec = arr1->o_value.v_vec;
+    struct lox_vector *vec2 = arr2->o_value.v_vec;
+
+    if (!vec->vec_head.next)
+    {
+        vec->vec_head.next = vec2->vec_head.next;
+        return LOX_OK;
+    }
+
+    if (vec && vec2)
+    {
+        while (vec)
+        {
+            if (vec->vec_head.next == NULL)
+            {
+                vec->vec_head.next = vec->vec_head.next;
+                break;
+            }
+        }
+    }
+    return ret;
+}
+
+int lox_array_mul_number(struct lox_object *arr1, struct lox_object *obj)
+{
+    int ret = LOX_ERROR(LOX_INVALID);
+    if (!arr1 || !obj)
+    {
+        return ret;
+    }
+
+    struct lox_vector *vec = arr1->o_value.v_vec;
+    struct lox_vector_value *v = vec->vec_head.next;
+
+    if (!vec->vec_head.next)
+    {
+        return LOX_OK;
+    }
+
+    while(v)
+    {
+        if (v->vec_v)
+        {
+            if (v->vec_v->o_tag == LOX_NUMBER)
+            {
+                v->vec_v->o_value.v_f = v->vec_v->o_value.v_f * obj->o_value.v_f;
+            }
+
+            if (v->vec_v->o_tag == LOX_STRING)
+            {
+                struct lox_object *tmp_obj = v->vec_v;
+                if (tmp_obj->o_value.v_str && strlen(tmp_obj->o_value.v_str))
+                {
+                    if (obj->o_value.v_f >= 1.0 && lox_is_int_number(obj->o_value.v_f))
+                    {
+                        int k = obj->o_value.v_f;
+                        tmp_obj->o_value.v_str = lox_string_repeat(tmp_obj->o_value.v_str, k);
+                    }
+                    else
+                    {
+                        lox_error("string*number must int number >= 1\n");
+                        tmp_obj->o_value.v_str = (char *)malloc(1);
+                        strcpy(tmp_obj->o_value.v_str, "");
+                    }
+                }
+                else
+                {
+                    tmp_obj->o_value.v_str = (char *)malloc(1);
+                    strcpy(tmp_obj->o_value.v_str, "");
+                }
+            }
+
+            if(v->vec_v->o_tag == LOX_ARRAY)
+            {
+                lox_array_mul_number(v->vec_v, obj);
+            }
+        }
+        v= v->next;
+    }
+    return LOX_OK;
+}
+
+int lox_array_div_number(struct lox_object *arr1, struct lox_object *obj)
+{
+    int ret = LOX_ERROR(LOX_INVALID);
+    if (!arr1 || !obj)
+    {
+        return ret;
+    }
+
+    struct lox_vector *vec = arr1->o_value.v_vec;
+    struct lox_vector_value *v = vec->vec_head.next;
+
+    if (!vec->vec_head.next)
+    {
+        return LOX_OK;
+    }
+
+    while(v)
+    {
+        if (v->vec_v)
+        {
+            if (v->vec_v->o_tag == LOX_NUMBER)
+            {
+                v->vec_v->o_value.v_f = v->vec_v->o_value.v_f / obj->o_value.v_f;
+            }
+
+            if(v->vec_v->o_tag == LOX_ARRAY)
+            {
+                lox_array_div_number(v->vec_v, obj);
+            }
+        }
+        v= v->next;
+    }
+    return LOX_OK;
 }
 
 long lox_array_get_object(struct lox_object *arr, long *indexs, int index_cnt)
@@ -193,6 +443,12 @@ int lox_arrary_equal(struct lox_object *obj1, struct lox_object *obj2)
     struct lox_vector *v1 = obj1->o_value.v_vec;
     struct lox_vector *v2 = obj2->o_value.v_vec;
 
+    if (v1 == v2)
+    {
+        ret = LOX_OK;
+        return ret;
+    }
+
     struct lox_vector_value *value1 = v1->vec_head.next;
     struct lox_vector_value *value2 = v2->vec_head.next;
     while (value1 && value2)
@@ -241,3 +497,4 @@ int lox_arrary_equal(struct lox_object *obj1, struct lox_object *obj2)
     }
     return LOX_OK;
 }
+

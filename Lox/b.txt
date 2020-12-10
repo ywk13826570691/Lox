@@ -42,11 +42,45 @@ j = 0
     @until i < 2
 @until j < 2
 
-k = 0
-foreach k in [1,10]
-    if k < 5 then
-        continue
-    end
-    print("-----------", k);
-end
+@k = 0
+f@oreach k in [1,10]
+    @if k < 5 then
+        @continue
+    @end
+    @print("-----------", k);
+@end
+
+a = 100
+c = 100
+m = a + "hello vkang" + a
+k = [1,2,3]
+g = 8 + k + 9
+g[0] = 10
+print(g[0], g[1], g[2], g[3], g[4])
+print(k[0], k[1], k[2])
+f = "456hello123vkanghellokkkk"
+print(f + f)
+
+k = f - "hello"
+print(k)
+
+ggg = [1,2,3,4]
+ggg = ggg - 4
+@print(h[0], h[1], h[2], h[3])
+print(ggg[0], ggg[1], ggg[2])
+
+vk = [10,20,30,"hello", ggg]
+jj = 2*vk
+
+print(jj[0], jj[1], jj[2], jj[3])
+print(jj[4][0], jj[4][1],jj[4][2])
+
+jj = jj / 3
+print(jj[0], jj[1], jj[2], jj[3])
+m = "vkang" + "hello" + "pppppppppp"
+print(m)
+print(1-(+1))
+
+print(-"hello")
+print(+5)
 

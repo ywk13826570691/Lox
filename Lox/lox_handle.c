@@ -123,30 +123,58 @@ long lox_handle_move(struct lox_cmd *cmd)
     return LOX_OK;
 }
 
-
-long lox_handle_add(struct lox_cmd *cmd)
+long lox_handle_operator(struct lox_cmd *cmd)
 {
     long ret = LOX_ERROR(LOX_INVALID);
     struct lox_symbol * s1 = (struct lox_symbol *)lox_find_symbol_by_label(cmd->cmd_args[0]);
     struct lox_symbol * s2 = (struct lox_symbol *)lox_find_symbol_by_label(cmd->cmd_args[1]);
     struct lox_symbol * s3 = (struct lox_symbol *)lox_find_symbol_by_label(cmd->cmd_label_index);
     struct lox_object *obj1, *obj2, *obj3;
-    lox_info("-------------lox_handle_add:%ld %ld\n",cmd->cmd_args[0], cmd->cmd_args[1]);
-    if (!s1 || !s2 || !s3)
+    lox_info("-------------lox_handle_operator:%ld %ld\n",cmd->cmd_args[0], cmd->cmd_args[1]);
+    if (!s1 || !s3 )
     {
+
         lox_error("add invalid symbold %d %d %d\n", cmd->cmd_args[0], cmd->cmd_args[1],cmd->cmd_label_index);
         exit(0);
-        return  ret;
     }
 
+    if (cmd->cmd_opcode != LOX_PLUS && cmd->cmd_opcode != LOX_MINUS && !s2)
+    {
+        lox_error("add invalid symbold2 %d %d %d\n", cmd->cmd_args[0], cmd->cmd_args[1],cmd->cmd_label_index);
+        exit(0);
+    }
     obj1 = s1->sym_obj;
-    obj2 = s2->sym_obj;
+    if (s2)
+    {
+        obj2 = s2->sym_obj;
+    }
     obj3 = s3->sym_obj;
-    ret = lox_object_add(obj1, obj2, obj3);
-
-    lox_info("------lox_handle_add---------add %f %f %f\n", obj1->o_value.v_f, obj2->o_value.v_f, obj3->o_value.v_f);
-
-    return ret;
+    switch (cmd->cmd_opcode)
+    {
+        case LOX_ADD:
+            ret = lox_object_add(obj1, obj2, obj3);
+            break;
+        case LOX_SUB:
+            ret = lox_object_sub(obj1, obj2, obj3);
+            break;
+        case LOX_MUL:
+            ret = lox_object_mul(obj1, obj2, obj3);
+            break;
+        case LOX_DIV:
+            ret = lox_object_div(obj1, obj2, obj3);
+            break;
+        case LOX_PLUS:
+            lox_object_plus(obj1, obj3);
+            break;
+        case LOX_MINUS:
+            lox_object_minus(obj1, obj3);
+            break;
+        default:
+            lox_error("invalid lox operator\n", cmd->cmd_opcode);
+            exit(0);
+            break;
+    }
+    return LOX_OK;
 }
 
 long lox_handle_logical_operation(struct lox_cmd *cmd)

@@ -42,8 +42,16 @@ extern int lox_linenumber;
 "false"					return LOX_FALSE;
 \"[^\"]*\" 			| 
 \'[^\']*\'			      {
-                       yylval.vChar = (char*)malloc(strlen(yytext));
-                       strcpy(yylval.vChar, yytext);
+                       yylval.vChar = (char*)malloc(strlen(yytext) + 1);
+                       if (strlen(yytext))
+                       {
+                       		memcpy(yylval.vChar, yytext + 1, strlen(yytext) - 2);
+                       }
+                       else
+                       {
+                       		strcpy(yylval.vChar, "");
+                       }
+                       printf("+++++++++++++++++vb+++++++++++++++++++++++++++++++++++++:%s\n", yylval.vChar);
 				       return STRING;
 				      }
 [0-9]+("."[0-9]*)?	|

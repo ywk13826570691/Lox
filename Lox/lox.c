@@ -24,7 +24,12 @@ int lox_machine_run(void)
                 break;
 
             case LOX_ADD:
-                lox_handle_add(cmd);
+            case LOX_SUB:
+            case LOX_MUL:
+            case LOX_DIV:
+            case LOX_PLUS:
+            case LOX_MINUS:
+                lox_handle_operator(cmd);
                 break;
 
             case LOX_JMP:

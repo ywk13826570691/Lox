@@ -13,7 +13,7 @@ enum lox_error_code
 };
 #define LOX_ERROR(err) (-err)
 
-//#define LOX_DEBUG
+#define LOX_DEBUG
 
 #ifdef LOX_DEBUG
 #define lox_error(...) printf("[Error]:" __VA_ARGS__)
@@ -36,6 +36,7 @@ enum lox_tag_type
     LOX_BOOL_FALSE,
     LOX_FUNCTION,
     LOX_RANGE,
+    LOX_OBJ_END,
 };
 
 struct lox_vector_value

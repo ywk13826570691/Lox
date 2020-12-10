@@ -1,8 +1,10 @@
 #include "lox_object.h"
 #include "lox_array.h"
+#include "lox_lib.h"
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <stdio.h>
 
 
 struct lox_object* lox_object_new_number(float f)
@@ -285,7 +287,7 @@ long lox_object_destroy(struct lox_object *obj1)
     struct lox_object *obj = obj1;
     if (obj)
     {
-        if(obj->o_tag == LOX_STRING)
+        if(obj->o_tag == LOX_STRING && obj->o_value.v_str)
         {
             free(obj->o_value.v_str);
         }
@@ -312,6 +314,7 @@ int lox_object_destroy_array(struct lox_object *obj)
                 if (o->o_tag == LOX_ARRAY)
                 {
                     lox_object_destroy_array(o);
+                    free(o);
                 }
                 else
                 {
@@ -377,14 +380,636 @@ int lox_object_copy(struct lox_object *dst, struct lox_object *src)
     return LOX_OK;
 }
 
-long lox_object_add(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst)
+long lox_object_number_add_number(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst)
 {
-    if (obj1->o_tag == LOX_NUMBER && obj2->o_tag == LOX_NUMBER)
+    if (dst->o_tag == LOX_ARRAY)
     {
-        dst->o_tag = LOX_NUMBER;
-        dst->o_value.v_f = obj1->o_value.v_f + obj2->o_value.v_f;
+        lox_object_destroy_array(dst);
+    }
+    else
+    {
+        lox_object_destroy(dst);
+    }
+    dst->o_tag = LOX_NUMBER;
+    dst->o_value.v_f = obj1->o_value.v_f + obj2->o_value.v_f;
+    return LOX_OK;
+}
+
+long lox_object_number_add_string(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst)
+{
+    if (dst->o_tag == LOX_ARRAY)
+    {
+        lox_object_destroy_array(dst);
+    }
+    else
+    {
+        lox_object_destroy(dst);
+    }
+
+    dst->o_tag = LOX_STRING;
+    if (obj2->o_value.v_str)
+    {
+        dst->o_value.v_str = malloc(strlen(obj2->o_value.v_str) + 100);
+        sprintf(dst->o_value.v_str, "%s%f", obj2->o_value.v_str, obj1->o_value.v_f);
+    }
+    else
+    {
+        dst->o_value.v_str = malloc(100);
+        sprintf(dst->o_value.v_str, "%f",obj1->o_value.v_f);
+    }
+
+    return LOX_OK;
+}
+
+long lox_object_number_add_array(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst)
+{
+    if (dst->o_tag == LOX_ARRAY)
+    {
+        lox_object_destroy_array(dst);
+    }
+    else
+    {
+        lox_object_destroy(dst);
+    }
+    dst->o_tag = LOX_ARRAY;
+
+    lox_array_deep_copy(dst, obj2);
+    lox_array_insert_obj(dst, obj1);
+    return LOX_OK;
+}
+
+long lox_object_string_add_string(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst)
+{
+    if (dst->o_tag == LOX_ARRAY)
+    {
+        lox_object_destroy_array(dst);
+    }
+    else
+    {
+        lox_object_destroy(dst);
+    }
+    dst->o_tag = LOX_STRING;
+    if (obj1->o_value.v_str && obj2->o_value.v_str)
+    {
+        dst->o_value.v_str = malloc(strlen(obj1->o_value.v_str) + strlen(obj2->o_value.v_str) + 2 );
+        sprintf(dst->o_value.v_str, "%s%s", obj1->o_value.v_str, obj2->o_value.v_str);
     }
     return LOX_OK;
+}
+
+long lox_object_string_add_array(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst)
+{
+    if (dst->o_tag == LOX_ARRAY)
+    {
+        lox_object_destroy_array(dst);
+    }
+    else
+    {
+        lox_object_destroy(dst);
+    }
+    dst->o_tag = LOX_ARRAY;
+    lox_array_deep_copy(dst, obj2);
+    lox_array_insert_obj(dst, obj1);
+    return LOX_OK;
+}
+
+long lox_object_array_add_array(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst)
+{
+    if (dst->o_tag == LOX_ARRAY)
+    {
+        lox_object_destroy_array(dst);
+    }
+    else
+    {
+        lox_object_destroy(dst);
+    }
+
+    dst->o_tag = LOX_ARRAY;
+    struct lox_object *obj_temp = lox_object_new_temp();
+    lox_array_deep_copy(dst, obj1);
+    lox_array_deep_copy(obj_temp, obj2);
+    lox_array_connect_array(dst, obj_temp);
+    free(obj_temp);
+    return LOX_OK;
+}
+
+long lox_object_add(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst)
+{
+    lox_info("-------------------lox_object_add");
+    long ret = LOX_ERROR(LOX_INVALID);
+    if (!obj1 || !obj2 || !dst)
+    {
+        lox_error("-----lox_object_add error nil object");
+        exit(0);
+        return ret;
+    }
+    if (obj1->o_tag == LOX_NUMBER)
+    {
+        switch (obj2->o_tag)
+        {
+            case LOX_NUMBER:
+                ret = lox_object_number_add_number(obj1, obj2, dst);
+            break;
+            case LOX_STRING:
+                ret = lox_object_number_add_string(obj1, obj2, dst);
+                break;
+            case LOX_ARRAY:
+                ret = lox_object_number_add_array(obj1, obj2, dst);
+                break;
+            default:
+                lox_error("add not support number with:%d\n", obj2->o_tag);
+                exit(0);
+                break;
+        }
+    }
+
+    if (obj1->o_tag == LOX_STRING)
+    {
+        switch (obj2->o_tag)
+        {
+            case LOX_NUMBER:
+                ret = lox_object_number_add_string(obj2, obj1, dst);
+            break;
+            case LOX_STRING:
+                ret = lox_object_string_add_string(obj1, obj2, dst);
+                break;
+            case LOX_ARRAY:
+                ret = lox_object_string_add_array(obj1, obj2, dst);
+                break;
+            default:
+                lox_error("add not support string with:%d\n", obj2->o_tag);
+                exit(0);
+                break;
+        }
+    }
+
+    if (obj1->o_tag == LOX_ARRAY)
+    {
+        switch (obj2->o_tag)
+        {
+            case LOX_NUMBER:
+                ret = lox_object_number_add_array(obj2, obj1, dst);
+            break;
+            case LOX_STRING:
+                ret = lox_object_string_add_array(obj2, obj1, dst);
+                break;
+            case LOX_ARRAY:
+                ret = lox_object_array_add_array(obj1, obj2, dst);
+                break;
+            default:
+                lox_error("add not support array with:%d\n", obj2->o_tag);
+                exit(0);
+                break;
+        }
+    }
+    if (obj1->o_tag == LOX_NIL || obj1->o_tag == LOX_BOOL_TRUE || obj1->o_tag == LOX_BOOL_FALSE
+            || obj1->o_tag == LOX_FUNCTION)
+    {
+        lox_error("lox_object_add invalid type:%d\n", obj1->o_tag);
+        exit(0);
+        return LOX_ERROR(LOX_INVALID);
+    }
+    return LOX_OK;
+}
+
+long lox_object_number_sub_number(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst)
+{
+    if (dst->o_tag == LOX_ARRAY)
+    {
+        lox_object_destroy_array(dst);
+    }
+    else
+    {
+        lox_object_destroy(dst);
+    }
+    dst->o_tag = LOX_NUMBER;
+    dst->o_value.v_f = obj1->o_value.v_f - obj2->o_value.v_f;
+    return LOX_OK;
+}
+
+long lox_object_string_sub_string(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst)
+{
+    char *ret = NULL;
+    if (dst->o_tag == LOX_ARRAY)
+    {
+        lox_object_destroy_array(dst);
+    }
+    else
+    {
+        lox_object_destroy(dst);
+    }
+    dst->o_tag = LOX_STRING;
+    if (obj1->o_value.v_str && obj2->o_value.v_str)
+    {
+        ret = lox_replace_string(obj1->o_value.v_str, obj2->o_value.v_str, "");
+        if (ret == obj1->o_value.v_str)
+        {
+            lox_object_copy(dst, obj1);
+        }
+        else
+        {
+            dst->o_value.v_str = ret;
+        }
+    }
+    return LOX_OK;
+}
+
+long lox_object_array_sub_number(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst)
+{
+    if (dst->o_tag == LOX_ARRAY)
+    {
+        lox_object_destroy_array(dst);
+    }
+    else
+    {
+        lox_object_destroy(dst);
+    }
+    dst->o_tag = LOX_ARRAY;
+    lox_array_deep_copy(dst, obj1);
+    lox_array_delete_obj(dst, obj2);
+    return LOX_OK;
+}
+
+long lox_object_array_sub_string(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst)
+{
+    if (dst->o_tag == LOX_ARRAY)
+    {
+        lox_object_destroy_array(dst);
+    }
+    else
+    {
+        lox_object_destroy(dst);
+    }
+    dst->o_tag = LOX_ARRAY;
+    lox_array_deep_copy(dst, obj1);
+    lox_array_delete_obj(dst, obj2);
+    return LOX_OK;
+}
+
+long lox_object_array_sub_array(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst)
+{
+    if (dst->o_tag == LOX_ARRAY)
+    {
+        lox_object_destroy_array(dst);
+    }
+    else
+    {
+        lox_object_destroy(dst);
+    }
+    dst->o_tag = LOX_ARRAY;
+    lox_array_deep_copy(dst, obj1);
+    lox_array_delete_obj(dst, obj2);
+    return LOX_OK;
+}
+
+long lox_object_sub(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst)
+{
+    lox_info("-------------------lox_object_sub\n");
+    int ret = LOX_ERROR(LOX_INVALID);
+    if (!obj1 || !obj2 || !dst)
+    {
+        lox_error("-----lox_object_sub error nil object");
+        exit(0);
+        return ret;
+    }
+    if (obj1->o_tag == LOX_NUMBER)
+    {
+        switch (obj2->o_tag)
+        {
+            case LOX_NUMBER:
+                ret = lox_object_number_sub_number(obj1, obj2, dst);
+            break;
+            default:
+                lox_error("sub not support number with:%d\n", obj2->o_tag);
+                exit(0);
+                break;
+        }
+    }
+
+    if (obj1->o_tag == LOX_STRING)
+    {
+        switch (obj2->o_tag)
+        {
+            case LOX_STRING:
+                ret = lox_object_string_sub_string(obj1, obj2, dst);
+                break;
+            default:
+                lox_error("sub not support string with:%d\n", obj2->o_tag);
+                exit(0);
+                break;
+        }
+    }
+
+    if (obj1->o_tag == LOX_ARRAY)
+    {
+        switch (obj2->o_tag)
+        {
+            case LOX_NUMBER:
+                ret = lox_object_array_sub_number(obj1, obj2, dst);
+            break;
+            case LOX_STRING:
+                ret = lox_object_array_sub_string(obj1, obj2, dst);
+                break;
+            case LOX_ARRAY:
+                ret = lox_object_array_sub_array(obj1, obj2, dst);
+                break;
+            default:
+                lox_error("sub not support array with:%d\n", obj2->o_tag);
+                exit(0);
+                break;
+        }
+    }
+    if (obj1->o_tag == LOX_NIL || obj1->o_tag == LOX_BOOL_TRUE || obj1->o_tag == LOX_BOOL_FALSE
+            || obj1->o_tag == LOX_FUNCTION)
+    {
+        lox_error("lox_object_sub invalid type:%d\n", obj1->o_tag);
+        exit(0);
+        return LOX_ERROR(LOX_INVALID);
+    }
+    return LOX_OK;
+}
+
+long lox_object_mul(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst)
+{
+    lox_info("-------------------lox_object_mul\n");
+    int ret = LOX_ERROR(LOX_INVALID);
+    if (!obj1 || !obj2 || !dst)
+    {
+        lox_error("-----lox_object_mul error nil object");
+        exit(0);
+        return ret;
+    }
+    if (obj1->o_tag == LOX_NUMBER)
+    {
+        switch (obj2->o_tag)
+        {
+            case LOX_NUMBER:
+                ret = lox_object_number_mul_number(obj1, obj2, dst);
+                break;
+            case LOX_STRING:
+                ret = lox_object_number_mul_string(obj1, obj2, dst);
+                break;
+            case LOX_ARRAY:
+                ret = lox_object_number_mul_array(obj1, obj2, dst);
+                break;
+            default:
+                lox_error("mul not support number with:%d\n", obj2->o_tag);
+                exit(0);
+                break;
+        }
+    }
+
+    if (obj1->o_tag == LOX_STRING)
+    {
+        switch (obj2->o_tag)
+        {
+            case LOX_NUMBER:
+                ret = lox_object_number_mul_string(obj2, obj1, dst);
+                break;
+            default:
+                lox_error("mul not support string with:%d\n", obj2->o_tag);
+                exit(0);
+                break;
+        }
+    }
+
+    if (obj1->o_tag == LOX_ARRAY)
+    {
+        switch (obj2->o_tag)
+        {
+            case LOX_NUMBER:
+                ret = lox_object_number_mul_array(obj2, obj1, dst);
+            break;
+                break;
+            default:
+                lox_error("mul not support array with:%d\n", obj2->o_tag);
+                exit(0);
+                break;
+        }
+    }
+    if (obj1->o_tag == LOX_NIL || obj1->o_tag == LOX_BOOL_TRUE || obj1->o_tag == LOX_BOOL_FALSE
+            || obj1->o_tag == LOX_FUNCTION)
+    {
+        lox_error("lox_object_mul invalid type:%d\n", obj1->o_tag);
+        exit(0);
+        return LOX_ERROR(LOX_INVALID);
+    }
+    return LOX_OK;
+}
+
+long lox_object_number_mul_number(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst)
+{
+    if (dst->o_tag == LOX_ARRAY)
+    {
+        lox_object_destroy_array(dst);
+    }
+    else
+    {
+        lox_object_destroy(dst);
+    }
+    dst->o_tag = LOX_NUMBER;
+    dst->o_value.v_f = obj1->o_value.v_f * obj2->o_value.v_f;
+    return LOX_OK;
+}
+
+long lox_object_number_mul_string(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst)
+{
+    if (dst->o_tag == LOX_ARRAY)
+    {
+        lox_object_destroy_array(dst);
+    }
+    else
+    {
+        lox_object_destroy(dst);
+    }
+    dst->o_tag = LOX_STRING;
+    if (obj2->o_value.v_str && strlen(obj2->o_value.v_str))
+    {
+        if (obj1->o_value.v_f >= 1.0 && lox_is_int_number(obj1->o_value.v_f))
+        {
+            int k = obj1->o_value.v_f;
+            dst->o_value.v_str = lox_string_repeat(obj2->o_value.v_str, k);
+        }
+        else
+        {
+            lox_error("string*number must int number >= 1\n");
+            dst->o_value.v_str = (char *)malloc(1);
+            strcpy(dst->o_value.v_str, "");
+        }
+    }
+    else
+    {
+        dst->o_value.v_str = (char *)malloc(1);
+        strcpy(dst->o_value.v_str, "");
+    }
+    return  LOX_OK;
+}
+
+long lox_object_number_mul_array(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst)
+{
+    if (dst->o_tag == LOX_ARRAY)
+    {
+        lox_object_destroy_array(dst);
+    }
+    else
+    {
+        lox_object_destroy(dst);
+    }
+    dst->o_tag = LOX_ARRAY;
+    lox_array_deep_copy(dst, obj2);
+    lox_array_mul_number(dst, obj1);
+    return  LOX_OK;
+
+}
+
+long lox_object_div(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst)
+{
+    lox_info("-------------------lox_object_div\n");
+    int ret = LOX_ERROR(LOX_INVALID);
+    if (!obj1 || !obj2 || !dst)
+    {
+        lox_error("-----lox_object_div error nil object");
+        exit(0);
+        return ret;
+    }
+    if (obj1->o_tag == LOX_NUMBER)
+    {
+        switch (obj2->o_tag)
+        {
+            case LOX_NUMBER:
+                if (obj2->o_value.v_f == 0)
+                {
+                    lox_error("div zero error\n");
+                    exit(0);
+                }
+                ret = lox_object_number_div_number(obj1, obj2, dst);
+                break;
+            default:
+                lox_error("div not support number with:%d\n", obj2->o_tag);
+                exit(0);
+                break;
+        }
+    }
+
+    if (obj1->o_tag == LOX_ARRAY)
+    {
+        switch (obj2->o_tag)
+        {
+            case LOX_NUMBER:
+                if (obj2->o_value.v_f == 0)
+                {
+                    lox_error("div zero error\n");
+                    exit(0);
+                }
+                ret = lox_object_array_div_number(obj1, obj2, dst);
+                break;
+            default:
+                lox_error("div not support array with:%d\n", obj2->o_tag);
+                exit(0);
+                break;
+        }
+    }
+
+    if (obj1->o_tag == LOX_NIL || obj1->o_tag == LOX_BOOL_TRUE || obj1->o_tag == LOX_BOOL_FALSE
+            || obj1->o_tag == LOX_FUNCTION || obj1->o_tag == LOX_STRING)
+    {
+        lox_error("lox_object_div invalid type:%d\n", obj1->o_tag);
+        exit(0);
+        return LOX_ERROR(LOX_INVALID);
+    }
+    return LOX_OK;
+}
+
+
+long lox_object_number_div_number(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst)
+{
+    if (dst->o_tag == LOX_ARRAY)
+    {
+        lox_object_destroy_array(dst);
+    }
+    else
+    {
+        lox_object_destroy(dst);
+    }
+    dst->o_tag = LOX_NUMBER;
+    dst->o_value.v_f = obj1->o_value.v_f / obj2->o_value.v_f;
+    return LOX_OK;
+}
+
+long lox_object_array_div_number(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst)
+{
+    if (dst->o_tag == LOX_ARRAY)
+    {
+        lox_object_destroy_array(dst);
+    }
+    else
+    {
+        lox_object_destroy(dst);
+    }
+    dst->o_tag = LOX_ARRAY;
+    lox_array_deep_copy(dst, obj1);
+    lox_array_div_number(dst, obj2);
+    return  LOX_OK;
+}
+
+long lox_object_plus(struct lox_object *obj1,  struct lox_object *dst)
+{
+    if(obj1->o_tag != LOX_NUMBER)
+    {
+        lox_error("+ plus must number\n");
+        exit(0);
+    }
+    if (dst->o_tag == LOX_ARRAY)
+    {
+        lox_object_destroy_array(dst);
+    }
+    else
+    {
+        lox_object_destroy(dst);
+    }
+    dst->o_tag = LOX_NUMBER;
+    lox_object_copy(dst, obj1);
+    return  LOX_OK;
+}
+
+long lox_object_minus(struct lox_object *obj1, struct lox_object *dst)
+{
+    if(obj1->o_tag != LOX_NUMBER)
+    {
+        if (obj1->o_tag != LOX_STRING)
+        {
+            lox_error("- minus must number or string:%d\n", obj1->o_tag);
+            exit(0);
+        }
+    }
+
+    if (dst->o_tag == LOX_ARRAY)
+    {
+        lox_object_destroy_array(dst);
+    }
+    else
+    {
+        lox_object_destroy(dst);
+    }
+
+    if (obj1->o_tag == LOX_NUMBER)
+    {
+        dst->o_tag = LOX_NUMBER;
+        lox_object_copy(dst, obj1);
+        dst->o_value.v_f = dst->o_value.v_f*(-1);
+    }
+
+    if(obj1->o_tag == LOX_STRING)
+    {
+        dst->o_tag = LOX_STRING;
+        if (obj1->o_value.v_str)
+        {
+            lox_object_copy(dst, obj1);
+            lox_string_tolower(dst->o_value.v_str);
+        }
+    }
+
+    return  LOX_OK;
 }
 
 long lox_object_logical_operation(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst, int opcode)
@@ -823,4 +1448,16 @@ long lox_object_or(struct lox_object *obj1, struct lox_object *obj2, struct lox_
 
     lox_object_copy(dst, &obj_new);
     return LOX_OK;
+}
+
+
+char *object_name(int type)
+{
+    static char obj_name[LOX_OBJ_END][20] =
+    {
+        "invalid", "number", "string", "table", "nil", "true", "false", "function", "range"
+    };
+    if (type < LOX_OBJ_END)
+        return obj_name[type];
+    return NULL;
 }

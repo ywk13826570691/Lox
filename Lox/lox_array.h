@@ -15,11 +15,16 @@ long lox_array_element_end(void);
 
 
 
-
+int lox_array_deep_copy(struct lox_object *dst, struct lox_object *src);
 int lox_array_insert_obj(struct lox_object *arr, struct lox_object *obj);
+int lox_array_delete_obj(struct lox_object *arr, struct lox_object *obj);
+int lox_array_connect_array(struct lox_object *arr1, struct lox_object *arr2);
+int lox_array_mul_number(struct lox_object *arr1, struct lox_object *obj);
+int lox_array_div_number(struct lox_object *arr1, struct lox_object *obj);
 long lox_array_get_object(struct lox_object *arr, long *indexs, int index_cnt);
 long lox_array_set_object(struct lox_object *arr, long *indexs, int index_cnt, struct lox_object *obj_set);
 long lox_array_index_value(struct lox_object *arr, long index);
 
 int lox_arrary_equal(struct lox_object *obj1, struct lox_object *obj2);
+
 #endif // LOX_ARRAY_H
