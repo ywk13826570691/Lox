@@ -83,3 +83,13 @@ print(type(m), len(m), len(vk))
 
 print(vk)
 
+
+jjjjjjj = "hello"
+print(jjjjjjj)
+
+if not jjjjjjj then
+	print("kkkkkkkkkkkkkkkkkkkkkkkkkk")
+else
+	print("kkkkkkkkkkkkkkkkkkkkkkkkkk2")
+end
+

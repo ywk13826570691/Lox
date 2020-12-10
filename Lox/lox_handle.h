@@ -11,6 +11,7 @@ long lox_handle_logical_operation(struct lox_cmd *cmd);
 
 long lox_handle_and(struct lox_cmd *cmd);
 long lox_handle_or(struct lox_cmd *cmd);
+long lox_handle_not(struct lox_cmd *cmd);
 
 long lox_handle_jmp_inner(struct lox_cmd *cmd);
 long lox_handle_jmp(struct lox_cmd *cmd);

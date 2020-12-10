@@ -114,6 +114,9 @@ int lox_machine_run(void)
         case LOX_CMP_IN_RANGE:
             lox_handle_cmp_inrange(cmd);
             break;
+        case LOX_NOT:
+            lox_handle_not(cmd);
+            break;
         default:
             break;
         }

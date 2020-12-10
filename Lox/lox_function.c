@@ -416,17 +416,20 @@ void lox_print_array(struct lox_object *obj)
     {
         if (v->vec_v)
         {
-            if (v->vec_v->o_tag == LOX_NUMBER)
+            switch (v->vec_v->o_tag)
             {
+             case LOX_NUMBER:
                 printf("%f ", v->vec_v->o_value.v_f);
-            }
-            if (v->vec_v->o_tag == LOX_STRING)
-            {
+                break;
+            case LOX_STRING:
                 printf("%s ", v->vec_v->o_value.v_str);
-            }
-            if (v->vec_v->o_tag == LOX_ARRAY)
-            {
+                break;
+            case LOX_ARRAY:
                 lox_print_array(v->vec_v);
+                break;
+            default:
+                printf("''");
+                break;
             }
         }
         v = v->next;
@@ -442,17 +445,20 @@ static void lox_inner_printf(struct lox_symbol * sym, long *argv, int len, long 
         struct lox_object *obj = (struct lox_object *)argv[i];
         if (obj)
         {
-            if (obj->o_tag == LOX_NUMBER)
+            switch (obj->o_tag)
             {
+                case LOX_NUMBER:
                 printf("%f ", obj->o_value.v_f);
-            }
-            if (obj->o_tag == LOX_STRING)
-            {
+                break;
+            case LOX_STRING:
                 printf("%s ", obj->o_value.v_str);
-            }
-            if(obj->o_tag == LOX_ARRAY)
-            {
-                lox_print_array(obj);
+                break;
+            case LOX_ARRAY:
+                 lox_print_array(obj);
+                break;
+            default:
+                printf("%s ", lox_object_name(obj->o_tag));
+                break;
             }
         }
     }

@@ -1450,8 +1450,39 @@ long lox_object_or(struct lox_object *obj1, struct lox_object *obj2, struct lox_
     return LOX_OK;
 }
 
+long lox_object_not(struct lox_object *obj1, struct lox_object *dst)
+{
+    struct lox_object obj_new;
+    obj_new.o_tag = LOX_BOOL_FALSE;
+    if (!dst)
+    {
+        lox_info("---------lox_object_not nil dst\n");
+        exit(0);
+    }
 
-char *object_name(int type)
+    if (!obj1)
+    {
+        obj_new.o_tag = LOX_BOOL_FALSE;
+        lox_object_copy(dst, &obj_new);
+        return LOX_OK;
+    }
+
+    if (obj1->o_tag == LOX_NIL)
+    {
+        obj_new.o_tag = LOX_BOOL_TRUE;
+    }
+
+    if (obj1->o_tag == LOX_BOOL_FALSE)
+    {
+        obj_new.o_tag = LOX_BOOL_TRUE;
+    }
+
+    lox_object_copy(dst, &obj_new);
+    return LOX_OK;
+}
+
+
+char *lox_object_name(int type)
 {
     static char obj_name[LOX_OBJ_END][20] =
     {

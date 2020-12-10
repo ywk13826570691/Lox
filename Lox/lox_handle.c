@@ -246,6 +246,28 @@ long lox_handle_or(struct lox_cmd *cmd)
     return ret;
 }
 
+long lox_handle_not(struct lox_cmd *cmd)
+{
+    long ret = LOX_ERROR(LOX_INVALID);
+    struct lox_symbol * s1 = (struct lox_symbol *)lox_find_symbol_by_label(cmd->cmd_args[0]);
+    struct lox_symbol * s2 = (struct lox_symbol *)lox_find_symbol_by_label(cmd->cmd_label_index);
+
+    if (!s1 || !s2)
+    {
+        lox_error("lox_handle_not invalid symbold %d %d\n", cmd->cmd_args[0],cmd->cmd_label_index);
+        exit(0);
+        return  ret;
+    }
+
+    struct lox_object *obj1, *obj2;
+
+    obj1 = s1->sym_obj;
+    obj2 = s2->sym_obj;
+
+    ret = lox_object_not(obj1, obj2);
+    return ret;
+}
+
 long lox_handle_jmp_inner(struct lox_cmd *cmd)
 {
     struct lox_symbol *sym = (struct lox_symbol *)cmd->cmd_args[0];

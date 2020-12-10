@@ -379,7 +379,7 @@ expr : '(' expr ')' { $$ = $2; }
                        lox_var_label_index++;
                        lox_info("---------------------function call end2:%s\n", sym->sym_name);
                      }
-     |	NOT expr %prec UMINUS
+     |	NOT expr %prec UMINUS { $$ = lox_var_label_index; lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_not($2, lox_var_label_index);lox_var_label_index++;}
      |	expr AND  expr { $$ = lox_var_label_index; lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_and($1, $3, lox_var_label_index);lox_var_label_index++;}
      |	expr OR   expr { $$ = lox_var_label_index; lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_or($1,  $3, lox_var_label_index);lox_var_label_index++;}
      |  LOX_FALSE      { $$ = lox_var_label_index; lox_opcode_push_bool_var(lox_var_label_index, 0);lox_var_label_index++;  }
