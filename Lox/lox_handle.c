@@ -16,11 +16,12 @@ FP
 LR
 argc
 
-RET---->return label -100 will not return
+RET---->return symbol -100 will not return
 
-arg1->label only label
-argx->label  only label
+arg1-> symbol
+argx-> symbol
 
+function param create
 arg1 symbol
 argx symbol
 */

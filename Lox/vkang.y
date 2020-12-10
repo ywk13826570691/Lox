@@ -346,10 +346,6 @@ varlist  : expr { $$ = $1; }
              	}
 		 ;
 
-     
-PrepJump : /* empty */
-		 ;
-
 expr : '(' expr ')' { $$ = $2; }
      |	expr EQ expr	{ $$ = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_equal($1, $3, lox_var_label_index);lox_var_label_index++;}
      |	expr '<' expr	{ $$ = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_lt($1, $3, lox_var_label_index);lox_var_label_index++;}

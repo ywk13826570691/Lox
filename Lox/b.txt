@@ -93,3 +93,16 @@ else
 	print("kkkkkkkkkkkkkkkkkkkkkkkkkk2")
 end
 
+i = 0
+j = 1
+
+while j do
+	j = j + 1
+	print(j)
+	
+	if j >= 10 then
+		break	
+	end
+
+end 
+
