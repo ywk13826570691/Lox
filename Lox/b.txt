@@ -78,9 +78,8 @@ print(jj[4][0], jj[4][1],jj[4][2])
 jj = jj / 3
 print(jj[0], jj[1], jj[2], jj[3])
 m = "vkang" + "hello" + "pppppppppp"
-print(m)
-print(1-(+1))
+print("vkang" + "hello" + "pppppppppp")
+print(type(m), len(m), len(vk))
 
-print(-"hello")
-print(+5)
+print(vk)
 

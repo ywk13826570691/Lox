@@ -61,12 +61,6 @@
 %token  <vChar> NAME
  
 
-//%type <vInt> var exprlist exprlist1
-//%type <vInt> expr  var retlist varlist1 val_list functionvalue functioncall
-//%type <vInt> expr1 
-
-//%type <pChar> parlist1
-
 %type <vLong> expr var  varlist functionvalue  functioncall retlist forexpr forrange for_range_list
 
 %left AND OR
@@ -342,26 +336,15 @@ varlist1  :	NAME {
 	      ;
 
 varlist  : expr { $$ = $1; }
-          /*| val_list ',' expr*/
-     | array {
+     	 | array {
                     extern long  lox_array_index;
                     extern long  lox_array_label[1000];
                     $$ = lox_var_label_index;
                     lox_opcode_push_array_var(lox_var_label_index, lox_array_label, lox_array_index);
                     lox_var_label_index++;
                     lox_array_parsing_end();
-                }
-		  ;
-/*
-exprlist  :
-	  |	exprlist1
-	  ;
-
-	
-exprlist1 :	expr
-      |	exprlist1 ',' expr
-	  ; 
-*/
+             	}
+		 ;
 
      
 PrepJump : /* empty */
@@ -510,7 +493,7 @@ int  main()
 
 int yywrap (void)
 {
- return 1;
+ 	return 1;
 }
 int yyerror(char *s)
 {
