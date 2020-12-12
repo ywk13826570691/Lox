@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "lox.h"
 
-int main()
+int main(int argc, char **argv)
 {
     lox_main();
     extern FILE *yyin;

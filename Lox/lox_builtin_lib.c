@@ -153,7 +153,7 @@ int lox_builtin_lib_init(void)
         builtin_func_table[i].s = sym;
         lox_register_func(sym);
 #endif
-        lox_lib_register_lib(&builtin_func_table[i]);
+        lox_lib_register(&builtin_func_table[i]);
     }
     return LOX_OK;
 }

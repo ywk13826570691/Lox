@@ -2,7 +2,7 @@
 #include "lox_register.h"
 #include "lox_object.h"
 #include "lox_array.h"
-#include "lox_lib.h"
+#include "lox_string.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -139,6 +139,21 @@ long lox_stack_push_array_var(long label, long *labels, long label_cnt)
             lox_array_insert_obj(obj, sym->sym_obj);
         }
     }
+    return  lox_stack_push(s);
+}
+
+long lox_stack_push_function_var(long label, long f)
+{
+    lox_info("-----------------------------------------------------------: push function var:%d\n", label);
+    struct lox_symbol *s = (struct lox_symbol *)malloc(sizeof (struct lox_symbol));
+    struct lox_symbol *func = (struct lox_symbol *)f;
+
+    struct lox_object *obj = lox_object_new_func();
+
+    memset(s, 0, sizeof (struct lox_symbol));
+    s->sym_obj = obj;
+    obj->o_value.v_func = func->sym_obj->o_value.v_func;
+    s->sym_label_value = label;
     return  lox_stack_push(s);
 }
 

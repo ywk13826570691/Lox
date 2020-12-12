@@ -16,6 +16,7 @@
     
     char lox_var_name[50];
     char lox_var_name2[50];
+    int yydebug=1;
 %}
 
 %union 
@@ -61,7 +62,9 @@
 %token  <vChar> NAME
  
 
-%type <vLong> expr var  varlist functionvalue  functioncall retlist forexpr forrange for_range_list
+%type <vLong> expr var  varlist functionvalue  functioncall  retlist forexpr forrange for_range_list
+
+%type <vLong> functioncall_dep_call 
 
 %left AND OR
 %left EQ NE '>' '<' LE GE
@@ -77,7 +80,7 @@ program : function_list
         ;
         
 function_list : 
-	  | function_list  stat sc
+	  | function_list stat sc
 	  | function_list function
 	  ;
 
@@ -130,7 +133,7 @@ statlist : /* empty */
 	 | statlist stat sc
 	 ;
 	 
-stat : stat1
+stat : stat1 
 	 ;
 	 		
 sc	 : /* empty */ | ';' ;
@@ -139,18 +142,15 @@ sc	 : /* empty */ | ';' ;
 stat1 : IF expr THEN {
                         int ret = lox_if_index_increase();
                         lox_if_index_push(ret);
-                        //lox_info("-------------1---------:%d\n", ret);
                         lox_opcode_cmp($2);
                         lox_opcode_jmpeq_label(lox_else_label(), 0);
                     } 
             block  {
-                        //lox_info("-------------3---------:%d\n",lox_if_get_cur_index());
                         lox_opcode_jmp_label(lox_if_end_label(), 0);
                    }
             elsepart END {
             				lox_opcode_push_label(lox_else_label());
                             lox_opcode_push_label(lox_if_end_label());
-                            //lox_info("-------------2---------:%d\n", lox_if_get_cur_index());
                             lox_if_index_pop();
                          }
 	| WHILE  
@@ -172,7 +172,7 @@ stat1 : IF expr THEN {
             lox_opcode_push_label(lox_while_end_label());
             lox_while_index_pop();
         }
-        END { lox_pop_loop_index(); lox_pop_loop_end_label();lox_pop_loop_start_label();}
+        END { lox_pop_loop_index(); lox_pop_loop_end_label();lox_pop_loop_start_label(); }
 	| REPEAT  
     {
         int ret = lox_foreach_index_increase();
@@ -212,7 +212,23 @@ stat1 : IF expr THEN {
                                             lox_pop_loop_end_label();
                                             lox_pop_loop_start_label();
     								 	}
-    | var_create '=' varlist
+        /*
+        | functioncall   {
+                           struct lox_function_calling *call_f = lox_get_cur_calling_function();
+                           lox_opcode_jmp($1, -100, (long)call_f);
+                           lox_func_clear((long)call_f);
+                           lox_pop_cur_calling_function();
+    				    }
+        */
+        
+        | functioncall_dep_call '(' function_parlistlist ')' {
+                                    struct lox_function_calling *call_f = lox_get_cur_calling_function();
+                                    lox_opcode_jmp($1, -100, (long)call_f);
+                                    lox_func_clear((long)call_f);
+                                    lox_pop_cur_calling_function();
+                                }
+
+        | var_create '=' varlist
             {
 				if (lox_get_is_array_element())
 				{
@@ -250,16 +266,9 @@ stat1 : IF expr THEN {
                     lox_opcode_move(label, $3);
 				}
 			}
-    | functioncall {
-                       struct lox_function_calling *call_f = lox_get_cur_calling_function();
-                       lox_opcode_jmp($1, -100, (long)call_f);
-                       lox_func_clear((long)call_f);
-                       lox_pop_cur_calling_function();
-    				}
+
     | var_decalre
     | ret
-	//| typeconstructor                
-	//| LOCAL localdeclist decinit
     | BREAK { 
                 if (lox_is_loop_parsing() <= 0)
                 {
@@ -277,6 +286,52 @@ stat1 : IF expr THEN {
                     lox_opcode_jmp_label(lox_get_cur_loop_start_label(), 1);
                 }
 	;
+
+functioncall_dep_call:functioncall_dep  
+                     {
+                        long ret = lox_find_local_symbol(lox_var_name2);
+				        long retf = lox_find_function(lox_var_name2);		
+				
+				        if (ret < 0 && retf < 0)
+				        {
+					        lox_error("call function Using an invalid var:%s %d\n", lox_var_name2, lox_cur_line_number());
+					        exit(0);
+				        }
+				
+				        // function object
+				        if (ret < 0 && retf > 0)
+				        {
+					        $$ = lox_var_label_index;
+					        lox_opcode_push_func_var(lox_var_label_index, retf);
+					        lox_var_label_index++;
+				        }
+				
+				        if (ret > 0)
+				        {
+					        if (lox_get_is_array_element())
+					        {
+						        extern long lox_array_ele_index;
+						        extern long lox_arrary_ele_labels[50];
+						        $$ = lox_var_label_index;
+						        lox_opcode_push_temp_var(lox_var_label_index);
+						        lox_opcode_get_array_object(ret, lox_var_label_index, lox_arrary_ele_labels, lox_array_ele_index);
+						        lox_var_label_index++;
+						        lox_array_element_end();
+					        }
+					        else
+					        {
+						        $$ = ret;
+					        }
+				        }
+                        lox_push_cur_calling_function($$);
+                        memset(lox_var_name2, 0, 50);
+                    }                 
+                   ;
+
+functioncall_dep: NAME { strcpy(lox_var_name2, $1); }
+                | functioncall_dep '[' expr ']' { lox_set_is_array_element(); lox_array_element_index_push_label($3); }
+;
+	
 forexpr:NAME {
 				int ret = lox_add_local_symbol($1, lox_var_label_index);
 				if (ret > 0)
@@ -291,16 +346,16 @@ forexpr:NAME {
 					lox_var_label_index++;
 				}
 			}
-;
+        ;
 forrange: for_range_list {$$ = $1;}
          ;
-;
+
 for_range_list:'[' expr ',' expr ']' { 
 								lox_opcode_push_range_var(lox_var_label_index, $2, $4);
 								$$ = lox_var_label_index;
 								lox_var_label_index++;
 							}
-;
+                ;
 elsepart : /* empty */
 	 | ELSE { lox_opcode_push_label(lox_else_label()); } block
      | ELSEIF expr THEN 
@@ -331,9 +386,16 @@ var_create: varlist1
 			;
 varlist1  :	NAME { 
 					strcpy(lox_var_name, $1);
+					long ret = lox_find_function(lox_var_name);
+					if (ret > 0)
+					{
+						lox_error("Can not move an value to function\n");
+						exit(0);
+					}
 				 }
           | varlist1 '[' expr ']' { lox_set_is_array_element(); lox_array_element_index_push_label($3); }
 	      ;
+
 
 varlist  : expr { $$ = $1; }
      	 | array {
@@ -366,14 +428,12 @@ expr : '(' expr ')' { $$ = $2; }
      |	NIL     { $$ = lox_var_label_index; lox_opcode_push_temp_var(lox_var_label_index);lox_var_label_index++;       }
      |	functioncall {
                        struct lox_function_calling *call_f = lox_get_cur_calling_function();
-                       struct lox_symbol *sym = (struct lox_symbol *)call_f->func;
      				   $$ = lox_var_label_index;
      				   lox_opcode_push_temp_var(lox_var_label_index);
                        lox_opcode_jmp($1, lox_var_label_index, (long)call_f);
                        lox_func_clear(call_f);
                        lox_pop_cur_calling_function();
                        lox_var_label_index++;
-                       lox_info("---------------------function call end2:%s\n", sym->sym_name);
                      }
      |	NOT expr %prec UMINUS { $$ = lox_var_label_index; lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_not($2, lox_var_label_index);lox_var_label_index++;}
      |	expr AND  expr { $$ = lox_var_label_index; lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_and($1, $3, lox_var_label_index);lox_var_label_index++;}
@@ -381,11 +441,6 @@ expr : '(' expr ')' { $$ = $2; }
      |  LOX_FALSE      { $$ = lox_var_label_index; lox_opcode_push_bool_var(lox_var_label_index, 0);lox_var_label_index++;  }
      |  LOX_TRUE       { $$ = lox_var_label_index; lox_opcode_push_bool_var(lox_var_label_index, 1);lox_var_label_index++;  }
      ;
-    /*
-dimension    :
-	     | expr
-	     ;
-         */
 
 array: '[' arraylist ']'
         ;
@@ -399,33 +454,45 @@ arraylist1: expr {   lox_array_push_label($1); }
           | arraylist1  ','  expr { lox_array_push_label($3);}
           ;
 	     
-functioncall : functionvalue  '(' function_parlistlist ')' { 
-									$$ = $1; 
-                                    struct lox_function_calling *call_f = lox_get_cur_calling_function();
-                                    struct lox_symbol *sym = (struct lox_symbol *)call_f->func;
-                                    lox_func_check_args((long)call_f);
-								}
-            ;
+functioncall : functionvalue  '(' function_parlistlist ')' { $$ = $1; }
+             ;
 
 function_parlistlist  : /* empty */
           |	function_parlistlist1
           ;
 
-function_parlistlist1 :	expr { lox_func_push_arg_label($1); }
+function_parlistlist1 :	expr { lox_func_push_arg_label($1);}
           |	function_parlistlist1 ',' expr { lox_func_push_arg_label($3); }
           ;
 
+
+/*
 functionvalue : NAME {
                         $$ = lox_find_function($1);
-                        lox_info("calling function:%s\n", $1);
-                        lox_push_cur_calling_function($$);
+                        lox_info("calling function:%s %d\n", $1, $$);
                         if ($$ < 0)
                         {
                             lox_info("Call invalid function at line:%d %s\n", lox_linenumber, $1);
                             exit(0);
                         }
+                        lox_push_cur_calling_function($$);
                     }
 	         ;
+*/
+
+
+functionvalue : var {
+                        $$ = $1;
+                        //lox_info("calling function:%s %d\n", $1, $$);
+                        //if ($$ < 0)
+                        //{
+                            //lox_info("Call invalid function at line:%d %s\n", lox_linenumber, $1);
+                            //exit(0);
+                        //}
+                        lox_push_cur_calling_function($$);
+                    }
+	         ;
+
 /*
 var	  :	NAME  { 
 				struct lox_symbol *sym = lox_get_cur_parsing_function();
@@ -443,35 +510,45 @@ var	  :	NAME  {
 
 var: varlist2
 			{
-				int ret = lox_find_local_symbol(lox_var_name2);
+				long ret = lox_find_local_symbol(lox_var_name2);
+				long retf = lox_find_function(lox_var_name2);		
 				
-				if (ret <= 0)
+				if (ret < 0 && retf < 0)
 				{
 					lox_error("Using an invalid var:%s %d\n", lox_var_name2, lox_cur_line_number());
 					exit(0);
 				}
 				
-				if (lox_get_is_array_element())
+				// function object
+				if (ret < 0 && retf > 0)
 				{
-					extern long lox_array_ele_index;
-					extern long lox_arrary_ele_labels[50];
 					$$ = lox_var_label_index;
-					lox_opcode_push_temp_var(lox_var_label_index);
-					lox_opcode_get_array_object(ret, lox_var_label_index, lox_arrary_ele_labels, lox_array_ele_index);
+					lox_opcode_push_func_var(lox_var_label_index, retf);
 					lox_var_label_index++;
-					lox_array_element_end();
-                    memset(lox_var_name2, 0, 50);
 				}
-				else
+				
+				if (ret > 0)
 				{
-					$$ = ret;
+					if (lox_get_is_array_element())
+					{
+						extern long lox_array_ele_index;
+						extern long lox_arrary_ele_labels[50];
+						$$ = lox_var_label_index;
+						lox_opcode_push_temp_var(lox_var_label_index);
+						lox_opcode_get_array_object(ret, lox_var_label_index, lox_arrary_ele_labels, lox_array_ele_index);
+						lox_var_label_index++;
+						lox_array_element_end();
+					}
+					else
+					{
+						$$ = ret;
+					}
 				}
+                memset(lox_var_name2, 0, 50);
 			}
 	;
 
-varlist2  :	NAME { 
-					strcpy(lox_var_name2, $1);
-				 }
+varlist2  :	NAME { strcpy(lox_var_name2, $1); }
           | varlist2 '[' expr ']' { lox_set_is_array_element(); lox_array_element_index_push_label($3); }
 	      ;
 
@@ -493,5 +570,6 @@ int yywrap (void)
 }
 int yyerror(char *s)
 {
-    printf("%s %d error!\n",s, yyget_lineno());
+    printf("%s %d error ! line:%d\n",s, yyget_lineno(), lox_cur_line_number());
+    exit(0);
 }

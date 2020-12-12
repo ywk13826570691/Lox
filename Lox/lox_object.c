@@ -114,6 +114,11 @@ int lox_object_copy_to_number(struct lox_object *dst, struct lox_object *src)
         dst->o_tag = LOX_BOOL_FALSE;
         dst->o_value.v_f = 0.0;
     }
+    else if (src->o_tag == LOX_FUNCTION)
+    {
+        dst->o_tag = LOX_FUNCTION;
+        dst->o_value.v_func = src->o_value.v_func;
+    }
     else
     {
         return LOX_ERROR(LOX_INVALID);
@@ -161,6 +166,11 @@ int lox_object_copy_to_string(struct lox_object *dst, struct lox_object *src)
     {
         dst->o_tag = LOX_BOOL_FALSE;
     }
+    else if (src->o_tag == LOX_FUNCTION)
+    {
+        dst->o_tag = LOX_FUNCTION;
+        dst->o_value.v_func = src->o_value.v_func;
+    }
     else
     {
         return LOX_ERROR(LOX_INVALID);
@@ -196,6 +206,11 @@ int lox_object_copy_to_nil(struct lox_object *dst, struct lox_object *src)
     else if (src->o_tag == LOX_BOOL_FALSE)
     {
         dst->o_tag = LOX_BOOL_FALSE;
+    }
+    else if (src->o_tag == LOX_FUNCTION)
+    {
+        dst->o_tag = LOX_FUNCTION;
+        dst->o_value.v_func = src->o_value.v_func;
     }
     else
     {
@@ -238,6 +253,15 @@ int lox_object_copy_to_array(struct lox_object *dst, struct lox_object *src)
     {
         dst->o_tag = LOX_BOOL_FALSE;
     }
+    else if (src->o_tag == LOX_FUNCTION)
+    {
+        dst->o_tag = LOX_FUNCTION;
+        dst->o_value.v_func = src->o_value.v_func;
+    }
+    else
+    {
+        return LOX_ERROR(LOX_INVALID);
+    }
     return LOX_OK;
 }
 
@@ -274,6 +298,63 @@ int lox_object_copy_to_bool(struct lox_object *dst, struct lox_object *src)
     else if (src->o_tag == LOX_BOOL_FALSE)
     {
         dst->o_tag = LOX_BOOL_FALSE;
+    }
+    else if (src->o_tag == LOX_FUNCTION)
+    {
+        dst->o_tag = LOX_FUNCTION;
+        dst->o_value.v_func = src->o_value.v_func;
+    }
+    else
+    {
+        return LOX_ERROR(LOX_INVALID);
+    }
+    return LOX_OK;
+}
+
+int lox_object_copy_to_function(struct lox_object *dst, struct lox_object *src)
+{
+    if (src->o_tag == LOX_NUMBER)
+    {
+        dst->o_tag = LOX_NUMBER;
+        dst->o_value.v_f = src->o_value.v_f;
+        dst->o_value.v_func = NULL;
+    }
+    else if (src->o_tag == LOX_STRING)
+    {
+        dst->o_tag = LOX_STRING;
+        if (src->o_value.v_str)
+        {
+            dst->o_value.v_str = malloc(strlen(src->o_value.v_str) + 1);
+            strcpy(dst->o_value.v_str, src->o_value.v_str);
+        }
+        dst->o_value.v_func = NULL;
+    }
+    else if (src->o_tag == LOX_NIL)
+    {
+        dst->o_tag = LOX_NIL;
+        dst->o_value.v_func = NULL;
+    }
+    else if(src->o_tag == LOX_ARRAY)
+    {
+        dst->o_tag = LOX_ARRAY;
+        dst->o_value.v_vec = src->o_value.v_vec;
+        src->o_value.v_vec->counter++;
+        dst->o_value.v_func = NULL;
+    }
+    else if (src->o_tag == LOX_BOOL_TRUE)
+    {
+        dst->o_tag = LOX_BOOL_TRUE;
+        dst->o_value.v_func = NULL;
+    }
+    else if (src->o_tag == LOX_BOOL_FALSE)
+    {
+        dst->o_tag = LOX_BOOL_FALSE;
+        dst->o_value.v_func = NULL;
+    }
+    else if (src->o_tag == LOX_FUNCTION)
+    {
+        dst->o_tag = LOX_FUNCTION;
+        dst->o_value.v_func = src->o_value.v_func;
     }
     else
     {
@@ -372,6 +453,9 @@ int lox_object_copy(struct lox_object *dst, struct lox_object *src)
     case LOX_BOOL_TRUE:
     case LOX_BOOL_FALSE:
         lox_object_copy_to_bool(dst, src);
+        break;
+    case LOX_FUNCTION:
+        lox_object_copy_to_function(dst, src);
         break;
     default:
         lox_error("lox_object_copy dst invalid type");
@@ -1109,6 +1193,11 @@ long lox_object_logical_operation_eq(struct lox_object *obj1, struct lox_object 
         case LOX_BOOL_FALSE:
             obj_new.o_tag = LOX_BOOL_TRUE;
             break;
+        case LOX_FUNCTION:
+            if (obj1->o_value.v_func == obj2->o_value.v_func)
+            {
+                obj_new.o_tag = LOX_BOOL_TRUE;
+            }
         default:
             break;
     }
@@ -1182,6 +1271,11 @@ long lox_object_logical_operation_neq(struct lox_object *obj1, struct lox_object
         case LOX_BOOL_FALSE:
             obj_new.o_tag = LOX_BOOL_FALSE;
             break;
+        case LOX_FUNCTION:
+            if (obj1->o_value.v_func != obj2->o_value.v_func)
+            {
+                obj_new.o_tag = LOX_BOOL_TRUE;
+            }
         default:
             break;
     }
@@ -1223,15 +1317,10 @@ long lox_object_logical_operation_lt(struct lox_object *obj1, struct lox_object 
             }
             break;
         case LOX_NIL:
-            obj_new.o_tag = LOX_BOOL_FALSE;
-            break;
         case LOX_ARRAY:
-            obj_new.o_tag = LOX_BOOL_FALSE;
-            break;
         case LOX_BOOL_TRUE:
-            obj_new.o_tag = LOX_BOOL_FALSE;
-            break;
         case LOX_BOOL_FALSE:
+        case LOX_FUNCTION:
             obj_new.o_tag = LOX_BOOL_FALSE;
             break;
         default:
@@ -1274,15 +1363,10 @@ long lox_object_logical_operation_gt(struct lox_object *obj1, struct lox_object 
             }
             break;
         case LOX_NIL:
-            obj_new.o_tag = LOX_BOOL_FALSE;
-            break;
         case LOX_ARRAY:
-            obj_new.o_tag = LOX_BOOL_FALSE;
-            break;
         case LOX_BOOL_TRUE:
-            obj_new.o_tag = LOX_BOOL_FALSE;
-            break;
         case LOX_BOOL_FALSE:
+        case LOX_FUNCTION:
             obj_new.o_tag = LOX_BOOL_FALSE;
             break;
         default:
@@ -1324,17 +1408,25 @@ long lox_object_logical_operation_let(struct lox_object *obj1, struct lox_object
                 }
             }
             break;
-        case LOX_NIL:
-            obj_new.o_tag = LOX_BOOL_FALSE;
-            break;
         case LOX_ARRAY:
-            obj_new.o_tag = LOX_BOOL_FALSE;
+            {
+                int ret = lox_arrary_equal(obj1, obj2);
+                if (!ret)
+                {
+                    obj_new.o_tag = LOX_BOOL_TRUE;
+                }
+            }
             break;
+        case LOX_NIL:
         case LOX_BOOL_TRUE:
-            obj_new.o_tag = LOX_BOOL_FALSE;
-            break;
         case LOX_BOOL_FALSE:
-            obj_new.o_tag = LOX_BOOL_FALSE;
+            obj_new.o_tag = LOX_BOOL_TRUE;
+            break;
+        case LOX_FUNCTION:
+            if (obj1->o_value.v_func == obj2->o_value.v_func)
+            {
+                obj_new.o_tag = LOX_BOOL_TRUE;
+            }
             break;
         default:
             break;
@@ -1375,17 +1467,26 @@ long lox_object_logical_operation_get(struct lox_object *obj1, struct lox_object
                 }
             }
             break;
-        case LOX_NIL:
-            obj_new.o_tag = LOX_BOOL_FALSE;
-            break;
+
         case LOX_ARRAY:
-            obj_new.o_tag = LOX_BOOL_FALSE;
+            {
+                int ret = lox_arrary_equal(obj1, obj2);
+                if (!ret)
+                {
+                    obj_new.o_tag = LOX_BOOL_TRUE;
+                }
+            }
             break;
+        case LOX_NIL:
         case LOX_BOOL_TRUE:
-            obj_new.o_tag = LOX_BOOL_FALSE;
-            break;
         case LOX_BOOL_FALSE:
-            obj_new.o_tag = LOX_BOOL_FALSE;
+            obj_new.o_tag = LOX_BOOL_TRUE;
+            break;
+        case LOX_FUNCTION:
+            if (obj1->o_value.v_func == obj2->o_value.v_func)
+            {
+                obj_new.o_tag = LOX_BOOL_TRUE;
+            }
             break;
         default:
             break;

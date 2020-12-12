@@ -20,6 +20,7 @@ int lox_object_copy_to_string(struct lox_object *dst, struct lox_object *src);
 int lox_object_copy_to_nil(struct lox_object *dst, struct lox_object *src);
 int lox_object_copy_to_array(struct lox_object *dst, struct lox_object *src);
 int lox_object_copy_to_bool(struct lox_object *dst, struct lox_object *src);
+int lox_object_copy_to_function(struct lox_object *dst, struct lox_object *src);
 int lox_object_destroy_array(struct lox_object *obj);
 long lox_object_destroy(struct lox_object *obj1);
 

@@ -1,108 +1,18 @@
-
-@a = nil
-@foreach a in [2,10]
-	@print("----------------------------:", a)
-	@foreach k in [1,5]
-		@print("+++++++++++", k)
-	@end
-@end
-
-@a = nil
-@b = "hello"
-@if a and b then
-
-    @print("-----------------")
-@else
-    @print("--------------2");
-@end
-
-
-i = 0
-j = 0
-@while i < 2 do
-    @i = i + 1
-    @print(i)
-    @j = 0
-    @while j < 2 do
-        @j = j + 1
-        @print("kkkk", j)
-    @end
-@end
-
-@j = 0
-@i = 0
-@repeat
-    @print("kkkkkkkkkkk", j)
-    @j = j + 1
-    @i = 0
-    @repeat
-        @print("mmmmmmmm",i)
-        @i = i + 1
-        @break
-    @until i < 2
-@until j < 2
-
-@k = 0
-f@oreach k in [1,10]
-    @if k < 5 then
-        @continue
-    @end
-    @print("-----------", k);
-@end
-
-a = 100
-c = 100
-m = a + "hello vkang" + a
-k = [1,2,3]
-g = 8 + k + 9
-g[0] = 10
-print(g[0], g[1], g[2], g[3], g[4])
-print(k[0], k[1], k[2])
-f = "456hello123vkanghellokkkk"
-print(f + f)
-
-k = f - "hello"
-print(k)
-
-ggg = [1,2,3,4]
-ggg = ggg - 4
-@print(h[0], h[1], h[2], h[3])
-print(ggg[0], ggg[1], ggg[2])
-
-vk = [10,20,30,"hello", ggg]
-jj = 2*vk
-
-print(jj[0], jj[1], jj[2], jj[3])
-print(jj[4][0], jj[4][1],jj[4][2])
-
-jj = jj / 3
-print(jj[0], jj[1], jj[2], jj[3])
-m = "vkang" + "hello" + "pppppppppp"
-print("vkang" + "hello" + "pppppppppp")
-print(type(m), len(m), len(vk))
-
-print(vk)
-
-
-jjjjjjj = "hello"
-print(jjjjjjj)
-
-if not jjjjjjj then
-	print("kkkkkkkkkkkkkkkkkkkkkkkkkk")
-else
-	print("kkkkkkkkkkkkkkkkkkkkkkkkkk2")
+function add(a, b)
+    return a + b
 end
 
-i = 0
-j = 1
+a = [1,2,3,4,print, type]
+a[4](a[5](a), "hello")
 
-while j do
-	j = j + 1
-	print(j)
-	
-	if j >= 10 then
-		break	
-	end
+print("kkkkkkkkkkkkkkkk","hello")
 
-end 
+print(add(add(1,2), add(3,4)))
 
+m = add
+c = add
+
+if c >= m then
+
+print("mmmmmmmmmmmmmmmmmm")
+end

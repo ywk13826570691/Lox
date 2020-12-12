@@ -34,13 +34,22 @@ int lox_machine_run(void)
 
             case LOX_JMP:
                 {
-                    struct lox_symbol *sym = (struct lox_symbol *)cmd->cmd_args[0];
-                    struct lox_function *func = sym->sym_obj->o_value.v_func;
-                    if (!sym || !func)
+                    struct lox_symbol * sym = lox_find_symbol_by_label(cmd->cmd_args[0]);
+                    if (!sym)
                     {
                         lox_info("calling an null function\n");
                         exit(0);
                     }
+                    struct lox_function *func = sym->sym_obj->o_value.v_func;
+                    if (!func)
+                    {
+                        lox_info("calling an null function2\n");
+                        exit(0);
+                    }
+                    struct lox_symbol * sym2 = lox_find_function_by_addr(func);
+
+                    lox_info("calling function:%s %s\n", sym->sym_name, sym2->sym_name);
+
                     if (func->is_inner_function)
                     {
                         lox_handle_jmp_inner(cmd);

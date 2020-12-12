@@ -17,6 +17,7 @@ int lox_function_init(void);
 struct lox_symbol *lox_new_function(char *name);
 int lox_register_func(struct lox_symbol *f);
 long lox_find_function(char *name);
+long lox_find_function_by_addr(long f);
 
 struct lox_symbol * lox_get_cur_parsing_function(void);
 int lox_cur_parsing_function_end(void);
@@ -39,7 +40,7 @@ int lox_func_before_call(long f);
 
 long lox_add_local_symbol(char *name, long label);
 void lox_local_symbol_destory(void);
-int lox_find_local_symbol(char *name);
+long lox_find_local_symbol(char *name);
 
 int lox_func_has_arg(char *arg_name, long f);
 int lox_func_clear(long f);

@@ -4,7 +4,7 @@
 #include "lox_register.h"
 #include "lox_stack.h"
 #include "lox_object.h"
-#include "lox_lib.h"
+#include "lox_string.h"
 #include "lox_array.h"
 #include <string.h>
 #include <stdlib.h>
@@ -87,6 +87,10 @@ long lox_handle_push_cmd(struct lox_cmd *cmd)
     else if(push_type->p_type == PUSH_RANGE)
     {
         ret = lox_stack_push_range_var(push_type->f_label_index, cmd->cmd_args[0], cmd->cmd_args[1]);
+    }
+    else if (push_type->p_type == PUSH_FUNCTION)
+    {
+        ret = lox_stack_push_function_var(push_type->f_label_index, cmd->cmd_args[0]);
     }
     else
     {
@@ -271,17 +275,13 @@ long lox_handle_not(struct lox_cmd *cmd)
 
 long lox_handle_jmp_inner(struct lox_cmd *cmd)
 {
-    struct lox_symbol *sym = (struct lox_symbol *)cmd->cmd_args[0];
+    struct lox_symbol *sym = lox_find_symbol_by_label(cmd->cmd_args[0]);;
     struct lox_function *func = sym->sym_obj->o_value.v_func;
+    struct lox_symbol * sym2 = lox_find_function_by_addr(func);
 
-    if (!sym || !func)
-    {
-        lox_error("jump to an nill function\n");
-        exit(0);
-    }
     long argc = cmd->cmd_args[1];
 
-    lox_info("callinng inner function:%s %d\n", sym->sym_name, argc);
+    lox_info("callinng inner function:%s %d\n", sym2->sym_name, argc);
     int i = 0;
     long len = argc;
     long *argv = (long *)malloc(len * sizeof (long));
@@ -316,7 +316,7 @@ lox_info("------------vvvv---1-__4444444444444444444:%d %f\n", obj2->o_tag, obj2
         lox_info("will not return %d %s\n", cmd->cmd_label_index, sym->sym_name);
 #endif
 
-    lox_run_lib_func((long)sym, argv, len, (long)ret);
+    lox_run_lib_func((long)sym2, argv, len, (long)ret);
     for(i = 0; i < len; i++)
     {
         free(argv[i]);
@@ -330,7 +330,7 @@ long lox_handle_jmp(struct lox_cmd *cmd)
     //lox_stack_print();
 
     lox_info("---------jmp sp------------------:%ld \n", SP);
-    struct lox_symbol *sym = (struct lox_symbol *)cmd->cmd_args[0];
+    struct lox_symbol *sym = lox_find_symbol_by_label(cmd->cmd_args[0]);
     struct lox_function *func;
     long *stack = lox_get_stack();
 
@@ -648,6 +648,7 @@ long lox_handle_cmp(struct lox_cmd *cmd)
                 SPR = 0;
                 break;
             case LOX_BOOL_TRUE:
+            case LOX_FUNCTION:
                 SPR = 1;
                 break;
             default:

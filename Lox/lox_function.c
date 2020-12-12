@@ -29,7 +29,7 @@ int lox_function_init(void)
     lox_function_table = (long *)malloc(LOX_FUNCTION_TABLE_STEP * sizeof (long));
     lox_function_total += LOX_FUNCTION_TABLE_STEP;
     main_function = lox_new_function("main");
-    lox_set_cur_calling_function((long)main_function);
+    lox_push_cur_calling_function((long)main_function);
     lox_lib_init();
     return LOX_OK;
 }
@@ -53,6 +53,23 @@ long lox_find_function(char *name)
     {
         struct lox_symbol *sym = (struct lox_symbol *)lox_function_table[i];
         if (strcmp(sym->sym_name, name) == 0)
+        {
+            ret = (long)sym;
+            break;
+        }
+    }
+
+    return ret;
+}
+
+long lox_find_function_by_addr(long f)
+{
+    int i = 0;
+    long ret = LOX_ERROR(LOX_INVALID);
+    for (i = 0; i < lox_function_index; i++)
+    {
+        struct lox_symbol *sym = (struct lox_symbol *)lox_function_table[i];
+        if ((long)sym->sym_obj->o_value.v_func == f)
         {
             ret = (long)sym;
             break;
@@ -126,10 +143,10 @@ struct lox_function_calling *lox_get_cur_calling_function()
 
 int lox_push_cur_calling_function(long f)
 {
-    struct lox_symbol *sym = (struct lox_symbol*)f;
+    //struct lox_symbol *sym = (struct lox_symbol*)f;
     struct lox_function_calling *call_f = &cur_calling_function_table[cur_calling_function_index + 1 ];
     call_f->func = f;
-    strcpy(call_f->name, sym->sym_name);
+    //strcpy(call_f->name, sym->sym_name);
     cur_calling_function_index++;
     lox_set_cur_calling_function((long)call_f);
     return LOX_OK;
@@ -186,8 +203,8 @@ int lox_func_push_arg_label(long label)
     struct lox_function_calling *cur_calling_func = lox_get_cur_calling_function();
     cur_calling_func->args[cur_calling_func->argc] = label;
     cur_calling_func->argc++;
-    struct lox_symbol *sym = (struct lox_symbol *)cur_calling_func->func;
-    lox_info("----func push arg:%s %d\n", sym->sym_name, cur_calling_func->argc);
+    //struct lox_symbol *sym = (struct lox_symbol *)cur_calling_func->func;
+    //lox_info("----func push arg:%s %d\n", sym->sym_name, cur_calling_func->argc);
 
     return LOX_OK;
 }
@@ -254,8 +271,8 @@ int lox_func_has_arg(char *arg_name, long f)
 int lox_func_clear(long f)
 {
     struct lox_function_calling *calf = (struct lox_function_calling *)f;
-    struct lox_symbol *sym = (struct lox_symbol *)calf->func;
-    lox_info("-------lox_func_clear:%s\n", sym->sym_name);
+    //struct lox_symbol *sym = (struct lox_symbol *)calf->func;
+    lox_info("-------lox_func_clear:\n");
     calf->argc = 0;
     calf->func = 0;
     memset(calf->args, 0, 100*sizeof (long));
@@ -300,7 +317,7 @@ long lox_add_local_symbol(char *name, long label)
     return LOX_ERROR(LOX_NO_EXIST);
 }
 
-int lox_find_local_symbol(char *name)
+long lox_find_local_symbol(char *name)
 {
     int i = 0;
     for(i = 0; i < 1000; i++)

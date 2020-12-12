@@ -96,6 +96,7 @@ enum lox_push_type
     PUSH_ARRARY,
     PUSH_BOOL,
     PUSH_RANGE,
+    PUSH_FUNCTION,
 };
 
 struct lox_cmd_push
@@ -141,8 +142,11 @@ int lox_opcode_push_temp_ptr_var(int label_temp);
 int lox_opcode_push_bool_var(long label, int v);
 int lox_opcode_push_range_var(long label, long label_min, long label_len);
 int lox_opcode_push_array_var(long label, long *labels, long label_cnt);
+int lox_opcode_push_func_var(long func_label, long f);
 int lox_opcode_get_array_object(long array_label, long temp_label, long *label_indexs, long index_cnt);
 int lox_opcode_set_array_object(long array_label, long temp_label, long *label_indexs, long index_cnt);
+
+
 
 
 //int lox_opcode_get_var(char *var_name, int label);

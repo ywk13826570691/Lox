@@ -6,7 +6,7 @@ all: yacc lex
 	gcc -g $(lox_src)  -lm -o $(target)
 
 yacc:
-	yacc -d -v vkang.y -Wconflicts-sr
+	yacc -d -v vkang.y --debug
 lex:
 	lex vkang.l
 

@@ -1,4 +1,5 @@
 #include "lox_lib.h"
+#include "lox_object.h"
 
 static struct lox_lib **lox_lib_table;
 static long lox_lib_index = 0;
@@ -16,7 +17,7 @@ int lox_lib_init(void)
     return LOX_OK;
 }
 
-int lox_lib_register_lib(struct lox_lib *lib)
+int lox_lib_register(struct lox_lib *lib)
 {
     if (lox_lib_index == lox_lib_cnt)
     {
@@ -30,12 +31,15 @@ int lox_lib_register_lib(struct lox_lib *lib)
     memset(sym, 0, sizeof (struct lox_symbol));
 
     struct lox_object *obj = lox_object_new_func();
+    lox_info("11111111111111111111111111111111111111111111111111111112:%p\n", obj);
     sym->sym_obj = obj;
 
     struct lox_function *func;
 
     func = (struct lox_function*)malloc(sizeof (struct lox_function));
+    lox_info("11111111111111111111111111111111111111111111111111111113:%p %p %p\n", sym->sym_obj, func, obj);
     sym->sym_obj->o_value.v_func = func;
+    lox_info("11111111111111111111111111111111111111111111111111111114\n");
 
     func->is_inner_function = 1;
     func->func_def_args_cnt = lib->func_argc;
@@ -62,4 +66,19 @@ long lox_run_lib_func(long f, long *argv, int len, long ret)
         }
     }
     return LOX_OK;
+}
+
+int lox_is_lib_func(char *name)
+{
+    int ret = 0;
+    for (unsigned int i = 0 ; i < lox_lib_index; i++)
+    {
+        struct lox_symbol *s_func = lox_lib_table[i]->s;
+        if (strcmp(s_func->sym_name, name) == 0)
+        {
+            ret = 1;
+            break;
+        }
+    }
+    return ret;
 }

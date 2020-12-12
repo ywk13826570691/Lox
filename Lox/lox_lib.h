@@ -15,7 +15,9 @@ struct lox_lib
 };
 
 int lox_lib_init(void);
-int lox_lib_register_lib( struct lox_lib *lib);
+int lox_lib_register( struct lox_lib *lib);
 long lox_run_lib_func(long f, long *argv, int len, long ret);
+
+int lox_is_lib_func(char *name);
 
 #endif // LOX_LIB_H
