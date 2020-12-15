@@ -5,7 +5,7 @@
 #include "lox_register.h"
 #include "lox_handle.h"
 int lox_linenumber = 0;
-int lox_machine_run(void)
+int lox_vm_machine_run(void)
 {
     struct lox_cmd *cmd = (struct lox_cmd *)PC;
     int cmd_add = 0;
@@ -143,7 +143,7 @@ int lox_machine_run(void)
     return LOX_OK;
 }
 
-int lox_main(void)
+int lox_vm_init(void)
 {
     lox_register_init();
     lox_stack_init();
@@ -151,10 +151,10 @@ int lox_main(void)
     return LOX_OK;
 }
 
-int lox_run(void)
+int lox_vm_run(void)
 {
     lox_setup_stack();
-    lox_machine_run();
+    lox_vm_machine_run();
     return LOX_OK;
 }
 

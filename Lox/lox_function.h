@@ -36,7 +36,6 @@ int lox_func_push_cmd(struct lox_cmd *cmd);
 int lox_func_add_arg_name(char *name);
 int lox_func_push_arg_label(long label);
 int lox_func_check_args(long f);
-int lox_func_before_call(long f);
 
 long lox_add_local_symbol(char *name, long label);
 void lox_local_symbol_destory(void);

@@ -36,10 +36,8 @@ int lox_stack_increase(void)
         lox_stack_len += LOX_STACK_STEP;
         lox_stack = realloc(lox_stack, sizeof (long) * lox_stack_len);
     }
-
     ret = SP;
     SP = SP+1;
-
     return ret;
 }
 

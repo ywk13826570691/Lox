@@ -274,28 +274,6 @@ int lox_opcode_set_array_object(long array_label, long temp_label, long *label_i
     return lox_func_push_cmd(&cmd);
 }
 
-/*
-int lox_opcode_get_var(char *var_name, int label)
-{
-    int ret = LOX_ERROR(LOX_INVALID);
-    struct lox_symbol *sym = lox_get_cur_parsing_function();
-
-    if (!sym)
-    {
-        lox_error("cur parse funcion is nil %s %d\n", __func__, __LINE__);
-        return  ret;
-    }
-
-    struct lox_cmd cmd;
-
-    cmd.cmd_opcode = LOX_GET_VAR;
-    cmd.cmd_var_name = var_name;
-    cmd.cmd_label_index = label;
-
-    return lox_func_push_cmd(&cmd);
-}
-*/
-
 int lox_opcode_add(long r1, long r2, long label)
 {
     int ret = LOX_ERROR(LOX_INVALID);
@@ -735,7 +713,6 @@ int lox_opcode_function_param_end(void)
     lox_info("-------------------end function---%s\n", sym->sym_name);
     return lox_func_push_cmd(&cmd);
 }
-
 
 int lox_opcode_push_label(char *label)
 {

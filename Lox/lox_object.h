@@ -9,7 +9,6 @@ struct lox_object* lox_object_new_temp(void);
 struct lox_object* lox_object_new_bool(int v);
 struct lox_object* lox_object_new_array(void);
 struct lox_object* lox_object_new_range(int min, int len);
-
 struct lox_object* lox_object_new_func(void);
 
 int lox_object_increase(struct lox_object *obj);
@@ -61,8 +60,6 @@ long lox_object_logical_operation_get(struct lox_object *obj1, struct lox_object
 long lox_object_and(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst);
 long lox_object_or(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst);
 long lox_object_not(struct lox_object *obj1, struct lox_object *dst);
-
-
 
 char *lox_object_name(int type);
 

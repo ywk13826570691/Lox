@@ -3,8 +3,6 @@
 
 int lox_loop_index = 0;
 
-
-
 int lox_is_loop_parsing(void)
 {
     return lox_loop_index;
@@ -19,8 +17,6 @@ int lox_pop_loop_index(void)
 {
    return  lox_loop_index--;
 }
-
-
 
 static int lox_loop_end_label_index = -1;
 static char *lox_loop_end_label[1000];
@@ -42,7 +38,6 @@ char * lox_get_cur_loop_end_label(void)
 {
     return  lox_loop_end_label[lox_loop_end_label_index];
 }
-
 
 static int lox_loop_start_label_index = -1;
 static char *lox_loop_start_label[1000];

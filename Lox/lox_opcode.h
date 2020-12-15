@@ -126,8 +126,6 @@ struct lox_cmd
 
     //for get var
     char *cmd_var_name;
-
-
     long  cmd_label_index;
 };
 

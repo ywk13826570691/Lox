@@ -10,6 +10,7 @@
     #include "lox_while.h"
     #include "lox_repeat.h"
     #include "lox_loop.h"
+    #include "lox_keywords.h"
     extern int lox_linenumber;
     extern unsigned int lox_var_label_index;
     extern int lox_function_parsing;
@@ -230,6 +231,11 @@ stat1 : IF expr THEN {
 
         | var_create '=' varlist
             {
+            	if (lox_is_keyword(lox_var_name))
+            	{
+            		lox_error("var is keyword\n");
+            		exit(0);
+            	}
 				if (lox_get_is_array_element())
 				{
 					int ret = lox_find_local_symbol(lox_var_name);

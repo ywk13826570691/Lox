@@ -30,7 +30,7 @@ long lox_arrary_ele_labels[50] = { 0 };
 long lox_array_parsing_end(void)
 {
     lox_array_index = 0;
-    memset((void *)lox_array_label, 0, 1000*sizeof (long));
+    memset((void *)lox_array_label, 0, 1000 * sizeof (long));
     return LOX_OK;
 }
 
@@ -245,15 +245,17 @@ int lox_array_connect_array(struct lox_object *arr1, struct lox_object *arr2)
         return LOX_OK;
     }
 
+    struct lox_vector_value *v1 = vec->vec_head.next;
     if (vec && vec2)
     {
-        while (vec)
+        while (v1)
         {
-            if (vec->vec_head.next == NULL)
+            if (v1->next == NULL)
             {
-                vec->vec_head.next = vec->vec_head.next;
+                v1->next = vec2->vec_head.next;
                 break;
             }
+            v1 = v1->next;
         }
     }
     return ret;
