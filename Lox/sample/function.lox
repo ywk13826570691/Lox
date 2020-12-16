@@ -1,0 +1,12 @@
+function lox_test(a, b)
+
+	if a > 0 then
+		return a + b
+	else
+		return a - b
+	end
+
+end
+
+print(lox_test(100, 1000))
+print(lox_test(-100, 1000))

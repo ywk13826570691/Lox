@@ -17,7 +17,7 @@
     
     char lox_var_name[50];
     char lox_var_name2[50];
-    int yydebug=1;
+    //int yydebug=1;
 %}
 
 %union 
@@ -425,6 +425,7 @@ expr : '(' expr ')' { $$ = $2; }
      |	expr '-' expr { $$ = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_sub($1, $3, lox_var_label_index); lox_var_label_index++;}
      |	expr '*' expr { $$ = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_mul($1, $3, lox_var_label_index); lox_var_label_index++;}
      |	expr '/' expr { $$ = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_div($1, $3, lox_var_label_index); lox_var_label_index++;}
+     |	expr '%' expr { $$ = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_mod($1, $3, lox_var_label_index); lox_var_label_index++;}
      //|	expr CONC expr
      |	'+' expr %prec UMINUS { $$ = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_plus($2, lox_var_label_index); lox_var_label_index++;}
      |	'-' expr %prec UMINUS { $$ = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_minus($2, lox_var_label_index); lox_var_label_index++;}

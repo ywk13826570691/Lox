@@ -1036,6 +1036,51 @@ long lox_object_array_div_number(struct lox_object *obj1, struct lox_object *obj
     return  LOX_OK;
 }
 
+long lox_object_mod(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst)
+{
+    lox_info("-------------------lox_object_mod\n");
+    int ret = LOX_ERROR(LOX_INVALID);
+    if (!obj1 || !obj2 || !dst)
+    {
+        lox_error("-----lox_object_div error nil object");
+        exit(0);
+        return ret;
+    }
+
+    if (obj1->o_tag != LOX_NUMBER || obj2->o_tag != LOX_NUMBER)
+    {
+        lox_error("-----lox_object_mod must number\n");
+        exit(0);
+        return ret;
+    }
+
+    if (obj2->o_value.v_f == 0.0)
+    {
+        lox_error("-----lox_object_mod zero\n");
+        exit(0);
+        return ret;
+    }
+
+    if (!lox_is_int_number(obj1->o_value.v_f) || !lox_is_int_number(obj2->o_value.v_f))
+    {
+        lox_error("-----lox_object_mod must int number\n");
+        exit(0);
+        return ret;
+    }
+
+    if (dst->o_tag == LOX_ARRAY)
+    {
+        lox_object_destroy_array(dst);
+    }
+    else
+    {
+        lox_object_destroy(dst);
+    }
+
+    dst->o_tag = LOX_NUMBER;
+    dst->o_value.v_f = (int)obj1->o_value.v_f % (int)obj2->o_value.v_f;
+}
+
 long lox_object_plus(struct lox_object *obj1,  struct lox_object *dst)
 {
     if(obj1->o_tag != LOX_NUMBER)

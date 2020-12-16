@@ -47,6 +47,8 @@ long lox_object_div(struct lox_object *obj1, struct lox_object *obj2, struct lox
 long lox_object_number_div_number(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst);
 long lox_object_array_div_number(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst);
 
+long lox_object_mod(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst);
+
 long lox_object_plus(struct lox_object *obj1,  struct lox_object *dst);
 long lox_object_minus(struct lox_object *obj1, struct lox_object *dst);
 

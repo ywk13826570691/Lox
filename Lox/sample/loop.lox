@@ -1,0 +1,37 @@
+foreach i in [1,100]
+	@print(i)
+end
+print("--------------------test1---------------------")
+i = 0
+foreach i in [1,100]
+	if i < 50 then
+		print(i)
+	else
+		break
+	end
+end
+
+print("--------------------test2---------------------")
+i = 0
+foreach i in [1,100]
+	if i < 50 then
+		continue
+	else
+		print(i)
+	end
+end
+
+print("--------------------test3---------------------")
+i = 0
+while i < 10 do
+	
+	print(i)
+	i = i + 1
+end
+
+print("--------------------test4---------------------")
+i = 0
+repeat
+	print(i)
+	i = i + 1
+until i < 10

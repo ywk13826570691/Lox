@@ -168,6 +168,9 @@ long lox_handle_operator(struct lox_cmd *cmd)
         case LOX_DIV:
             ret = lox_object_div(obj1, obj2, obj3);
             break;
+        case LOX_MOD:
+            ret = lox_object_mod(obj1, obj2, obj3);
+            break;
         case LOX_PLUS:
             lox_object_plus(obj1, obj3);
             break;

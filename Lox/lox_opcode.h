@@ -154,6 +154,7 @@ int lox_opcode_add(long r1, long r2, long label);
 int lox_opcode_sub(long r1, long r2, long label);
 int lox_opcode_mul(long r1, long r2, long label);
 int lox_opcode_div(long r1, long r2, long label);
+int lox_opcode_mod(long r1, long r2, long label);
 int lox_opcode_plus(long r1, long label);
 int lox_opcode_minus(long r1, long label);
 int lox_opcode_not(long r1, long label);

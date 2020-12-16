@@ -27,6 +27,7 @@ int lox_vm_machine_run(void)
             case LOX_SUB:
             case LOX_MUL:
             case LOX_DIV:
+            case LOX_MOD:
             case LOX_PLUS:
             case LOX_MINUS:
                 lox_handle_operator(cmd);
