@@ -1,8 +1,8 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "lox_while.h"
 #include "lox_if.h"
-#include <stdio.h>
-#include<stdlib.h>
-#include<string.h>
 
 static int lox_while_index = 0;
 

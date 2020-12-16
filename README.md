@@ -10,13 +10,15 @@ Lox变量是不需要提前声明，可以直接使用
 Ex:
 a = 100
 b = "Hello"
+***********变量名字不能超过50个字符*************
+
 2,Lox变量类型
 2.1 number：
 	a = 100
 2.2 string:
 	str = "hello lox"
 2.3 function
-	func = print, print时函数
+	func = print ==> print是函数
 2.4 nil
 	m = nil
 2.5 bool
@@ -30,7 +32,6 @@ b = "Hello"
 	table嵌套定义
 	f = [1,2,3]
 	vec = [1,2,3, f]
-2.7 变量名字不能超过50个字符
 
 3,Lox运算符号
 3.1 “+”
@@ -51,15 +52,18 @@ b = "Hello"
 	f = a - 1 ==> f = [2,3,4,"hello"]
 	f = a - "hello" ==> [1,2,3,4]
 	
-3.1 “*”
+3.3 “*”
 	a = 10 * 100 ==> a = 1000
 	a = 2*"hello" ==> a = "hellohello"
 	a = [1,2,3, "lox"]
 	c = a*2 ==> c = [2,4,6, "loxlox"]
-3.2 “/”
+3.4 “/”
 	a = 100 / 10  ==> a = 10.0
 	a = [2,4,6,7]
 	f = a / 2 ==> f = [1,2,3,3.5]
+	
+3.5 “%”
+	a = 10 % 3  ==> a = 1
 	
 4, Lox逻辑运算
 4.1 and
@@ -141,8 +145,8 @@ end
 		@continue
 	end
 	
-8, How to install Lox
- 8.1 Install yacc/lex
+8,怎么编译Lox
+ 8.1 安装yacc/lex
  8.2 make
  8.3 ./lox就是lox解析器
  

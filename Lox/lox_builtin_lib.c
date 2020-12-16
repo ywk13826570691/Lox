@@ -1,7 +1,8 @@
-#include "lox_builtin_lib.h"
-#include "lox_object.h"
 #include <stdlib.h>
 #include <string.h>
+#include "lox_builtin_lib.h"
+#include "lox_object.h"
+
 
 
 void lox_print_array(struct lox_object *obj)
@@ -58,17 +59,17 @@ static void lox_inner_printf(struct lox_symbol * sym, long *argv, int len, long 
             switch (obj->o_tag)
             {
                 case LOX_NUMBER:
-                printf("%f ", obj->o_value.v_f);
-                break;
-            case LOX_STRING:
-                printf("%s ", obj->o_value.v_str);
-                break;
-            case LOX_ARRAY:
-                 lox_print_array(obj);
-                break;
-            default:
-                printf("%s ", lox_object_name(obj->o_tag));
-                break;
+                    printf("%f ", obj->o_value.v_f);
+                    break;
+                case LOX_STRING:
+                    printf("%s ", obj->o_value.v_str);
+                    break;
+                case LOX_ARRAY:
+                    lox_print_array(obj);
+                    break;
+                default:
+                    printf("%s ", lox_object_name(obj->o_tag));
+                    break;
             }
         }
     }

@@ -1,11 +1,10 @@
-#include "lox_object.h"
-#include "lox_array.h"
-#include "lox_string.h"
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 #include <stdio.h>
-
+#include "lox_object.h"
+#include "lox_array.h"
+#include "lox_string.h"
 
 struct lox_object* lox_object_new_number(float f)
 {

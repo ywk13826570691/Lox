@@ -7,7 +7,7 @@ int main(int argc, char **argv)
     lox_vm_init();
 #ifndef LOX_SCAN_STRING
     extern FILE *yyin;
-    yyin = fopen("b.txt","r");
+    yyin = fopen(argv[1],"r");
 #else
     yy_scan_string("print(100000)");
 #endif

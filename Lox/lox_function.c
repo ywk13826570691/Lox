@@ -1,3 +1,5 @@
+#include <stdlib.h>
+#include <string.h>
 #include "lox_function.h"
 #include "lox.h"
 #include "lox_def.h"
@@ -6,8 +8,7 @@
 #include "lox_config.h"
 #include "lox_object.h"
 #include "lox_lib.h"
-#include <stdlib.h>
-#include <string.h>
+
 
 struct lox_symbol *cur_parsing_function = NULL;
 struct lox_function_calling *cur_calling_function = NULL;
@@ -143,10 +144,8 @@ struct lox_function_calling *lox_get_cur_calling_function()
 
 int lox_push_cur_calling_function(long f)
 {
-    //struct lox_symbol *sym = (struct lox_symbol*)f;
     struct lox_function_calling *call_f = &cur_calling_function_table[cur_calling_function_index + 1 ];
     call_f->func = f;
-    //strcpy(call_f->name, sym->sym_name);
     cur_calling_function_index++;
     lox_set_cur_calling_function((long)call_f);
     return LOX_OK;
@@ -273,7 +272,6 @@ struct lox_local_symbol
 };
 
 struct lox_local_symbol local_lable_table[1000] = { 0 };
-
 
 long lox_add_local_symbol(char *name, long label)
 {

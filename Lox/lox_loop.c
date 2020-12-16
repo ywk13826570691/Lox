@@ -1,5 +1,5 @@
-#include "lox_loop.h"
 #include <stdlib.h>
+#include "lox_loop.h"
 
 int lox_loop_index = 0;
 

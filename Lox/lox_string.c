@@ -1,6 +1,6 @@
+#include <string.h>
 #include "lox_string.h"
 
-#include <string.h>
 int lox_is_int_number(float f)
 {
     float f1 = f;

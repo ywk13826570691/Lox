@@ -1,3 +1,5 @@
+#include <string.h>
+#include <stdlib.h>
 #include "lox_handle.h"
 #include "lox_def.h"
 #include "lox_function.h"
@@ -6,22 +8,19 @@
 #include "lox_object.h"
 #include "lox_string.h"
 #include "lox_array.h"
-#include <string.h>
-#include <stdlib.h>
 
 
 /*
-SP
-FP
-LR
-argc
+0:SP
+1:FP
+2:LR
+3:argc
+4:RET---->return symbol -100 will not return
+5:arg1-> symbol
+.....
+6:argx-> symbol
 
-RET---->return symbol -100 will not return
-
-arg1-> symbol
-argx-> symbol
-
-function param create
+function param created
 arg1 symbol
 argx symbol
 */
@@ -39,10 +38,7 @@ int lox_setup_stack(void)
     stack[2] = 0;
     stack[3] = 0;
     stack[4] = -100;
-    //extern int lox_sp_index;
-    //lox_sp_index = 5;
     SP = 5;
-
     return LOX_OK;
 }
 
@@ -53,53 +49,39 @@ long lox_handle_push_cmd(struct lox_cmd *cmd)
 
     lox_info("+++++++++++++handle push cmd+++++++++++++:%d %d %ld\n", push_type->f_label_index, push_type->p_type, SP);
 
-
-    if (push_type->p_type == PUSH_NUMBER_VAR)
+    switch (push_type->p_type)
     {
-        ret = lox_stack_push_number_var(push_type->f_f, push_type->f_label_index);
+        case PUSH_NUMBER_VAR:
+            ret = lox_stack_push_number_var(push_type->f_f, push_type->f_label_index);
+            break;
+        case PUSH_STRING_VAR:
+            ret = lox_stack_push_string_var(push_type->f_str, push_type->f_label_index);
+            break;
+        case PUSH_VAR:
+            ret = lox_stack_push_var(push_type->f_var_name, push_type->f_label_index);
+            break;
+        case PUSH_TEMP_VAR:
+            ret = lox_stack_push_temp_var(push_type->f_label_index);
+            break;
+        case PUSH_TEMP_PTR_VAR:
+            ret = lox_stack_push_temp_ptr_var(push_type->f_label_index);
+            break;
+        case PUSH_ARRARY:
+            ret = lox_stack_push_array_var(push_type->f_label_index, &cmd->cmd_args[1], cmd->cmd_args[0]);
+            break;
+        case PUSH_BOOL:
+            ret = lox_stack_push_bool_var(push_type->f_label_index, cmd->cmd_args[0]);
+            break;
+        case PUSH_RANGE:
+            ret = lox_stack_push_range_var(push_type->f_label_index, cmd->cmd_args[0], cmd->cmd_args[1]);
+            break;
+        case PUSH_FUNCTION:
+            ret = lox_stack_push_function_var(push_type->f_label_index, cmd->cmd_args[0]);
+            break;
+        default:
+            lox_error("invalid push cmd:%d\n", push_type->p_type);
+            exit(0);
     }
-    else if (push_type->p_type == PUSH_STRING_VAR)
-    {
-        ret = lox_stack_push_string_var(push_type->f_str, push_type->f_label_index);
-    }
-    else if (push_type->p_type == PUSH_VAR)
-    {
-        lox_info("handle push var----------------:%s %d\n", push_type->f_var_name, push_type->f_label_index);
-        ret = lox_stack_push_var(push_type->f_var_name, push_type->f_label_index);
-    }
-    else if (push_type->p_type == PUSH_TEMP_VAR)
-    {
-        ret = lox_stack_push_temp_var(push_type->f_label_index);
-    }
-    else if (push_type->p_type == PUSH_TEMP_PTR_VAR)
-    {
-        ret = lox_stack_push_temp_ptr_var(push_type->f_label_index);
-    }
-    else if (push_type->p_type == PUSH_ARRARY)
-    {
-        lox_info("---------------------handle push array:%d\n", cmd->cmd_args[0]);
-        ret = lox_stack_push_array_var(push_type->f_label_index, &cmd->cmd_args[1], cmd->cmd_args[0]);
-    }
-    else if (push_type->p_type == PUSH_BOOL)
-    {
-        ret =  lox_stack_push_bool_var(push_type->f_label_index, cmd->cmd_args[0]);
-    }
-    else if(push_type->p_type == PUSH_RANGE)
-    {
-        ret = lox_stack_push_range_var(push_type->f_label_index, cmd->cmd_args[0], cmd->cmd_args[1]);
-    }
-    else if (push_type->p_type == PUSH_FUNCTION)
-    {
-        ret = lox_stack_push_function_var(push_type->f_label_index, cmd->cmd_args[0]);
-    }
-    else
-    {
-        lox_error("finding an invalid push cmd:%d\n", push_type->p_type);
-        exit(0);
-    }
-
-    lox_info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++:%d\n", SP);
-
     return ret;
 }
 
@@ -108,10 +90,6 @@ long lox_handle_move(struct lox_cmd *cmd)
     long ret = LOX_ERROR(LOX_INVALID);
     struct lox_symbol *sym1 = (struct lox_symbol *)lox_find_symbol_by_label((unsigned long)cmd->cmd_args[0]);
     struct lox_symbol *sym2 = (struct lox_symbol *)lox_find_symbol_by_label((unsigned long)cmd->cmd_args[1]);
-
-    lox_info("--------lox_handle_move-------------%ld %ld\n", cmd->cmd_args[0], cmd->cmd_args[1]);
-
-    lox_info("--------lox_handle_move-------------%f %f\n", sym2->sym_obj->o_value.v_f, sym2->sym_obj->o_value.v_f);
 
     if (!sym1 || !sym2)
     {
@@ -294,7 +272,6 @@ long lox_handle_jmp_inner(struct lox_cmd *cmd)
         struct lox_symbol *s = lox_find_symbol_by_label(cmd->cmd_args[2+i]);
         struct lox_object *obj2 = s->sym_obj;
         struct lox_object *obj3 = lox_object_new_temp();
-lox_info("------------vvvv---1-__4444444444444444444:%d %f\n", obj2->o_tag, obj2->o_value.v_f);
         if (!obj2)
         {
             lox_error("func invalid param nil\n");
@@ -557,7 +534,6 @@ long lox_handle_set_array_value(struct lox_cmd *cmd)
         if (sym_set)
         {
             lox_array_set_object(sym->sym_obj, index_array, index_cnt, sym_set->sym_obj);
-
         }
     }
 

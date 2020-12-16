@@ -5,6 +5,7 @@
 #include "lox_register.h"
 #include "lox_handle.h"
 int lox_linenumber = 0;
+
 int lox_vm_machine_run(void)
 {
     struct lox_cmd *cmd = (struct lox_cmd *)PC;
@@ -38,13 +39,13 @@ int lox_vm_machine_run(void)
                     struct lox_symbol * sym = lox_find_symbol_by_label(cmd->cmd_args[0]);
                     if (!sym)
                     {
-                        lox_info("calling an null function\n");
+                        lox_error("calling an null function\n");
                         exit(0);
                     }
                     struct lox_function *func = sym->sym_obj->o_value.v_func;
                     if (!func)
                     {
-                        lox_info("calling an null function2\n");
+                        lox_error("calling an null function2\n");
                         exit(0);
                     }
                     struct lox_symbol * sym2 = lox_find_function_by_addr(func);
@@ -158,7 +159,6 @@ int lox_vm_run(void)
     lox_vm_machine_run();
     return LOX_OK;
 }
-
 
 int lox_cur_line_number(void)
 {

@@ -1,10 +1,10 @@
+#include <stdlib.h>
+#include <string.h>
 #include "lox_stack.h"
 #include "lox_register.h"
 #include "lox_object.h"
 #include "lox_array.h"
 #include "lox_string.h"
-#include <stdlib.h>
-#include <string.h>
 
 int lox_sp_index = 0;
 static int lox_stack_len = 0;

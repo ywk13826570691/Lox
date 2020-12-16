@@ -1,5 +1,6 @@
-#include "lox_keywords.h"
 #include <string.h>
+#include "lox_keywords.h"
+
 #define KEYWORDS_CNT 30
 
 static char lox_keywords[KEYWORDS_CNT][100] =

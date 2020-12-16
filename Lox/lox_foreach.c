@@ -1,12 +1,10 @@
-#include "lox_foreach.h"
-
-#include "lox_if.h"
 #include <stdio.h>
-#include<stdlib.h>
-#include<string.h>
+#include <stdlib.h>
+#include <string.h>
+#include "lox_foreach.h"
+#include "lox_if.h"
 
 static int lox_foreach_index = 0;
-
 static long lox_foreach_stack_index = -1;
 static long lox_foreach_stack[1000] = { 0 };
 

@@ -1,7 +1,7 @@
-#include "lox_repeat.h"
 #include <stdio.h>
-#include<stdlib.h>
-#include<string.h>
+#include <stdlib.h>
+#include <string.h>
+#include "lox_repeat.h"
 
 static int lox_repeat_index = 0;
 
