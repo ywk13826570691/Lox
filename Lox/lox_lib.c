@@ -31,15 +31,12 @@ int lox_lib_register(struct lox_lib *lib)
     memset(sym, 0, sizeof (struct lox_symbol));
 
     struct lox_object *obj = lox_object_new_func();
-    lox_info("11111111111111111111111111111111111111111111111111111112:%p\n", obj);
     sym->sym_obj = obj;
 
     struct lox_function *func;
 
     func = (struct lox_function*)malloc(sizeof (struct lox_function));
-    lox_info("11111111111111111111111111111111111111111111111111111113:%p %p %p\n", sym->sym_obj, func, obj);
     sym->sym_obj->o_value.v_func = func;
-    lox_info("11111111111111111111111111111111111111111111111111111114\n");
 
     func->is_inner_function = 1;
     func->func_def_args_cnt = lib->func_argc;
