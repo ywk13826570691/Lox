@@ -18,6 +18,184 @@
     char lox_var_name[50];
     char lox_var_name2[50];
     //int yydebug=1;
+    
+
+static long lox_eq(long r1, long r2)
+{
+	long ret = lox_var_label_index;
+	lox_opcode_push_temp_var(ret);
+	lox_opcode_equal(r1, r2, ret);
+	lox_var_label_index++;
+	return ret;
+}
+
+static long lox_neq(long r1, long r2)
+{
+	long ret = lox_var_label_index;
+	lox_opcode_push_temp_var(ret);
+	lox_opcode_nequal(r1, r2, ret);
+	lox_var_label_index++;
+	return ret;
+}
+
+static long lox_lt(long r1, long r2)
+{
+	long ret = lox_var_label_index;
+	lox_opcode_push_temp_var(ret);
+	lox_opcode_lt(r1, r2, ret);
+	lox_var_label_index++;
+	return ret;
+}
+
+static long lox_gt(long r1, long r2)
+{
+	long ret = lox_var_label_index;
+	lox_opcode_push_temp_var(ret);
+	lox_opcode_gt(r1, r2, ret);
+	lox_var_label_index++;
+	return ret;
+}
+
+static long lox_ge(long r1, long r2)
+{
+	long ret = lox_var_label_index;
+	lox_opcode_push_temp_var(ret);
+	lox_opcode_ge(r1, r2, ret);
+	lox_var_label_index++;
+	return ret;
+}
+
+static long lox_le(long r1, long r2)
+{
+	long ret = lox_var_label_index;
+	lox_opcode_push_temp_var(ret);
+	lox_opcode_le(r1, r2, ret);
+	return ret;
+}
+
+
+static long lox_add(long r1, long r2)
+{
+	long ret = lox_var_label_index;
+	lox_opcode_push_temp_var(ret);
+	lox_opcode_add(r1, r2, ret);
+	lox_var_label_index++;
+	return ret;
+}
+
+static long lox_sub(long r1, long r2)
+{
+	long ret = lox_var_label_index;
+	lox_opcode_push_temp_var(ret);
+	lox_opcode_sub(r1, r2, ret);
+	lox_var_label_index++;
+	return ret;
+}
+
+static long lox_mul(long r1, long r2)
+{
+	long ret = lox_var_label_index;
+	lox_opcode_push_temp_var(ret);
+	lox_opcode_mul(r1, r2, ret);
+	lox_var_label_index++;
+	return ret;
+}
+
+static long lox_div(long r1, long r2)
+{
+	long ret = lox_var_label_index;
+	lox_opcode_push_temp_var(ret);
+	lox_opcode_div(r1, r2, ret);
+	lox_var_label_index++;
+	return ret;
+}
+
+static long lox_mod(long r1, long r2)
+{
+	long ret = lox_var_label_index;
+	lox_opcode_push_temp_var(ret);
+	lox_opcode_mod(r1, r2, ret);
+	lox_var_label_index++;
+	return ret;
+}
+
+static long lox_plus(long r1)
+{
+	long ret = lox_var_label_index;
+	lox_opcode_push_temp_var(ret);
+	lox_opcode_plus(r1, ret);
+	lox_var_label_index++;
+	return ret;
+}
+
+static long lox_minus(long r1)
+{
+	long ret = lox_var_label_index;
+	lox_opcode_push_temp_var(ret);
+	lox_opcode_minus(r1, ret);
+	lox_var_label_index++;
+	return ret;
+}
+
+static long lox_number(float r1)
+{
+	long ret = lox_var_label_index;
+	lox_opcode_push_number_var(r1, ret);
+	lox_var_label_index++;
+	return ret;
+}
+
+static long lox_string(char *str)
+{
+	long ret = lox_var_label_index;
+	lox_opcode_push_string_var(str, ret);
+	lox_var_label_index++;
+	return ret;
+}
+
+static long lox_nil()
+{
+	long ret = lox_var_label_index;
+	lox_opcode_push_temp_var(ret);
+	lox_var_label_index++;
+	return ret;
+}
+
+static long lox_not(long r1)
+{
+	long ret = lox_var_label_index;
+	lox_opcode_push_temp_var(ret);
+	lox_opcode_not(r1, ret);
+	lox_var_label_index++;
+	return ret;
+}
+
+static long lox_and(long r1, long r2)
+{
+	long ret = lox_var_label_index;
+	lox_opcode_push_temp_var(ret);
+	lox_opcode_and(r1, r2, ret);
+	lox_var_label_index++;
+	return ret;
+}
+
+static long lox_or(long r1, long r2)
+{
+	long ret = lox_var_label_index;
+	lox_opcode_push_temp_var(ret);
+	lox_opcode_or(r1, r2, ret);
+	lox_var_label_index++;
+	return ret;
+}
+
+static long lox_bool(int v)
+{
+	long ret = lox_var_label_index;
+	lox_opcode_push_bool_var(ret, v);
+	lox_var_label_index++;
+	return ret;
+}
+
 %}
 
 %union 
@@ -414,25 +592,24 @@ varlist  : expr { $$ = $1; }
              	}
 		 ;
 
-expr : '(' expr ')' { $$ = $2; }
-     |	expr EQ expr	{ $$ = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_equal($1, $3, lox_var_label_index);lox_var_label_index++;}
-     |	expr '<' expr	{ $$ = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_lt($1, $3, lox_var_label_index);lox_var_label_index++;}
-     |	expr '>' expr	{ $$ = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_gt($1, $3, lox_var_label_index);lox_var_label_index++;}
-     |	expr NE  expr	{ $$ = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_nequal($1, $3, lox_var_label_index);lox_var_label_index++;}
-     |	expr LE  expr	{ $$ = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_let($1, $3, lox_var_label_index);lox_var_label_index++;}
-     |	expr GE  expr	{ $$ = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_get($1, $3, lox_var_label_index);lox_var_label_index++;}
-     |	expr '+' expr { $$ = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_add($1, $3, lox_var_label_index);lox_var_label_index++;}
-     |	expr '-' expr { $$ = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_sub($1, $3, lox_var_label_index); lox_var_label_index++;}
-     |	expr '*' expr { $$ = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_mul($1, $3, lox_var_label_index); lox_var_label_index++;}
-     |	expr '/' expr { $$ = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_div($1, $3, lox_var_label_index); lox_var_label_index++;}
-     |	expr '%' expr { $$ = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_mod($1, $3, lox_var_label_index); lox_var_label_index++;}
-     //|	expr CONC expr
-     |	'+' expr %prec UMINUS { $$ = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_plus($2, lox_var_label_index); lox_var_label_index++;}
-     |	'-' expr %prec UMINUS { $$ = lox_var_label_index;lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_minus($2, lox_var_label_index); lox_var_label_index++;}
-     |	var     { $$ = $1; }
-     |	NUMBER  { $$ = lox_var_label_index; lox_opcode_push_number_var($1, lox_var_label_index);lox_var_label_index++; }
-     |	STRING  { $$ = lox_var_label_index; lox_opcode_push_string_var($1, lox_var_label_index);lox_var_label_index++; }
-     |	NIL     { $$ = lox_var_label_index; lox_opcode_push_temp_var(lox_var_label_index);lox_var_label_index++;       }
+expr : '(' expr ')' 			{ $$ = $2; }
+     |	expr EQ expr			{ $$ = lox_eq($1, $3); 	}
+     |	expr '<' expr			{ $$ = lox_lt($1, $3); 	}
+     |	expr '>' expr			{ $$ = lox_gt($1, $3); 	}
+     |	expr NE  expr			{ $$ = lox_neq($1, $3);	}
+     |	expr LE  expr			{ $$ = lox_le($1, $3); 	}
+     |	expr GE  expr			{ $$ = lox_ge($1, $3); 	}
+     |	expr '+' expr 			{ $$ = lox_add($1, $3);	}
+     |	expr '-' expr 			{ $$ = lox_sub($1, $3);	}
+     |	expr '*' expr 			{ $$ = lox_mul($1, $3);	}
+     |	expr '/' expr 			{ $$ = lox_div($1, $3);	}
+     |	expr '%' expr 			{ $$ = lox_mod($1, $3);	}
+     |	'+' expr %prec UMINUS 	{ $$ = lox_plus($2);    }
+     |	'-' expr %prec UMINUS 	{ $$ = lox_minus($2);	}
+     |	var     				{ $$ = $1; 				}
+     |	NUMBER  				{ $$ = lox_number($1); 	}
+     |	STRING  				{ $$ = lox_string($1); 	}
+     |	NIL     				{ $$ = lox_nil();       }
      |	functioncall {
                        struct lox_function_calling *call_f = lox_get_cur_calling_function();
      				   $$ = lox_var_label_index;
@@ -442,11 +619,11 @@ expr : '(' expr ')' { $$ = $2; }
                        lox_pop_cur_calling_function();
                        lox_var_label_index++;
                      }
-     |	NOT expr %prec UMINUS { $$ = lox_var_label_index; lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_not($2, lox_var_label_index);lox_var_label_index++;}
-     |	expr AND  expr { $$ = lox_var_label_index; lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_and($1, $3, lox_var_label_index);lox_var_label_index++;}
-     |	expr OR   expr { $$ = lox_var_label_index; lox_opcode_push_temp_var(lox_var_label_index);lox_opcode_or($1,  $3, lox_var_label_index);lox_var_label_index++;}
-     |  LOX_FALSE      { $$ = lox_var_label_index; lox_opcode_push_bool_var(lox_var_label_index, 0);lox_var_label_index++;  }
-     |  LOX_TRUE       { $$ = lox_var_label_index; lox_opcode_push_bool_var(lox_var_label_index, 1);lox_var_label_index++;  }
+     |	NOT expr %prec UMINUS 	{ $$ = lox_not($2);		}
+     |	expr AND  expr 			{ $$ = lox_and($1, $3);	}
+     |	expr OR   expr 			{ $$ = lox_or($1, $3);}
+     |  LOX_FALSE      			{ $$ = lox_bool(0);  	}
+     |  LOX_TRUE       			{ $$ = lox_bool(1); 	}
      ;
 
 array: '[' arraylist ']'

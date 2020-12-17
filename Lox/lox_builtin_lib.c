@@ -3,8 +3,6 @@
 #include "lox_builtin_lib.h"
 #include "lox_object.h"
 
-
-
 void lox_print_array(struct lox_object *obj)
 {
     if (!obj->o_value.v_vec)

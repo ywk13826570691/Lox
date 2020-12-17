@@ -535,7 +535,7 @@ int lox_opcode_gt(long r1, long r2, long label)
     return lox_func_push_cmd(&cmd);
 }
 
-int lox_opcode_let(long r1, long r2, long label)
+int lox_opcode_le(long r1, long r2, long label)
 {
     int ret = LOX_ERROR(LOX_INVALID);
     struct lox_symbol *sym = lox_get_cur_parsing_function();
@@ -557,7 +557,7 @@ int lox_opcode_let(long r1, long r2, long label)
     return lox_func_push_cmd(&cmd);
 }
 
-int lox_opcode_get(long r1, long r2, long label)
+int lox_opcode_ge(long r1, long r2, long label)
 {
     int ret = LOX_ERROR(LOX_INVALID);
     struct lox_symbol *sym = lox_get_cur_parsing_function();

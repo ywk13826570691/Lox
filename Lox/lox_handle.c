@@ -277,16 +277,8 @@ long lox_handle_jmp_inner(struct lox_cmd *cmd)
             lox_error("func invalid param nil\n");
             exit(0);
         }
-
         lox_object_copy(obj3, obj2);
-
-        if (obj2->o_tag == LOX_NUMBER)
-            lox_info("----------------2__4444444444444444444:%f %d\n", obj3->o_value.v_f, obj3->o_tag);
-        if (obj2->o_tag == LOX_STRING)
-                    lox_info("----------------3__4444444444444444444:%s %d %s\n", obj3->o_value.v_str, obj3->o_tag, obj3->o_value.v_str);
-
         argv[i] = (long)obj3;
-
     }
 
     struct lox_symbol *ret = lox_find_symbol_by_label(cmd->cmd_label_index);

@@ -163,8 +163,8 @@ int lox_opcode_equal(long r1, long r2, long label);
 int lox_opcode_nequal(long r1, long r2, long label);
 int lox_opcode_lt(long r1, long r2, long label);
 int lox_opcode_gt(long r1, long r2, long label);
-int lox_opcode_let(long r1, long r2, long label);
-int lox_opcode_get(long r1, long r2, long label);
+int lox_opcode_le(long r1, long r2, long label);
+int lox_opcode_ge(long r1, long r2, long label);
 
 int lox_opcode_and(long r1, long r2, long label);
 int lox_opcode_or(long r1, long r2, long label);
