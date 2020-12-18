@@ -9,6 +9,7 @@ SOURCES += \
     lox_foreach.c \
         lox_function.c \
     lox_lib.c \
+    lox_math_lib.c \
         lox_opcode.c \
         lox_register.c \
         lox_stack.c \
@@ -33,6 +34,7 @@ HEADERS += \
     lox_foreach.h \
     lox_function.h \
     lox_lib.h \
+    lox_math_lib.h \
     lox_opcode.h \
     lox_register.h \
     lox_stack.h \

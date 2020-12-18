@@ -1,5 +1,6 @@
 #include "lox_lib.h"
 #include "lox_object.h"
+#include "lox_math_lib.h"
 
 static struct lox_lib **lox_lib_table;
 static long lox_lib_index = 0;
@@ -14,6 +15,7 @@ int lox_lib_init(void)
     lox_lib_index = 0;
 
     lox_builtin_lib_init();
+    lox_math_lib_int();
     return LOX_OK;
 }
 
