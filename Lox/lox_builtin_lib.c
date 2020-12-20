@@ -72,7 +72,7 @@ static void lox_inner_printf(struct lox_symbol * sym, long *argv, int len, long 
         }
     }
     printf("\n");
-    lox_info("calling print\n");
+    lox_debug("calling print\n");
 }
 
 static void lox_inner_type(struct lox_symbol * sym, long *argv, int len, long ret)
@@ -91,6 +91,7 @@ static void lox_inner_type(struct lox_symbol * sym, long *argv, int len, long re
         lox_object_copy(re->sym_obj, result);
         free(result);
     }
+    lox_debug("calling type\n");
 }
 
 static void lox_inner_len(struct lox_symbol * sym, long *argv, int len, long ret)
@@ -117,6 +118,8 @@ static void lox_inner_len(struct lox_symbol * sym, long *argv, int len, long ret
         lox_object_copy(re->sym_obj, result);
         free(result);
     }
+
+    lox_debug("calling len\n");
 }
 
 static struct lox_lib builtin_func_table[] =

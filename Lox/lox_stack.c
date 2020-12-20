@@ -214,7 +214,6 @@ long lox_stack_push_range_var(long label, long label_min, long label_len)
 
     s->sym_label_value = label;
     s->sym_obj = obj;
-    lox_info("11111111111111111111111111111111111111111111111111111111111111111111111111111%d %d %p\n", label, obj->o_value.v_range.index, obj);
     return  lox_stack_push(s);
 }
 
@@ -246,7 +245,6 @@ long lox_find_symbol_by_name(char *s_name)
 
 long lox_find_symbol_by_label(unsigned long label)
 {
-
     long i = 0;
     long *stack = lox_get_stack();
     long argc = stack[FP + 3];
@@ -323,6 +321,4 @@ void lox_stack_clear_and_return(void)
     SP = sp;
     PC = lr;
     FP = fp;
-
-    lox_info("============================================================================%ld\n", SP);
 }

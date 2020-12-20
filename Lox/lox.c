@@ -13,7 +13,7 @@ int lox_vm_machine_run(void)
     while (cmd && cmd->cmd_opcode != LOX_NOP)
     {
         cmd_add = 1;
-        lox_info("---------vm handle cmd------:%d %p %d\n",cmd->cmd_opcode, PC, SP);
+        lox_debug("vm handle cmd:%d %p %d\n",cmd->cmd_opcode, PC, SP);
         switch (cmd->cmd_opcode)
         {
             case LOX_PUSH:
@@ -39,18 +39,18 @@ int lox_vm_machine_run(void)
                     struct lox_symbol * sym = lox_find_symbol_by_label(cmd->cmd_args[0]);
                     if (!sym)
                     {
-                        lox_error("calling an null function\n");
+                        lox_error("calling an nil function\n");
                         exit(0);
                     }
                     struct lox_function *func = sym->sym_obj->o_value.v_func;
                     if (!func)
                     {
-                        lox_error("calling an null function2\n");
+                        lox_error("calling an nil function2\n");
                         exit(0);
                     }
                     struct lox_symbol * sym2 = lox_find_function_by_addr(func);
 
-                    lox_info("calling function:%s %s\n", sym->sym_name, sym2->sym_name);
+                    lox_debug("calling function:%s %s\n", sym->sym_name, sym2->sym_name);
 
                     if (func->is_inner_function)
                     {

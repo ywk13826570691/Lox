@@ -364,7 +364,7 @@ long lox_array_get_object(struct lox_object *arr, long *indexs, int index_cnt)
     {
         if (!obj || obj->o_tag != LOX_ARRAY)
         {
-            lox_error("array object is not a array\n");
+            lox_error("array get object is not a array\n");
             exit(0);
         }
         obj = (struct lox_object *)lox_array_index_value(obj, indexs[index]);
@@ -386,7 +386,7 @@ long lox_array_set_object(struct lox_object *arr, long *indexs, int index_cnt, s
     {
         if (!obj || obj->o_tag != LOX_ARRAY)
         {
-            lox_error("array object is not a array\n");
+            lox_error("array set object is not a array\n");
             exit(0);
         }
         obj = (struct lox_object *)lox_array_index_value(obj, indexs[index]);

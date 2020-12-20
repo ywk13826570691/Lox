@@ -34,8 +34,6 @@ int lox_while_index_pop(void)
     return lox_while_stack_index;
 }
 
-
-
 inline char *lox_while_label(void)
 {
     char *while_label = (char*)malloc(50);

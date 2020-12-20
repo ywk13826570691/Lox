@@ -432,7 +432,7 @@ int lox_object_copy(struct lox_object *dst, struct lox_object *src)
 {
     if (!dst || !src)
     {
-        lox_info("lox_object_copy null value!!!\n");
+        lox_debug("lox_object_copy nui value!!!\n");
         return LOX_ERROR(LOX_INVALID);
     }
 
@@ -578,11 +578,11 @@ long lox_object_array_add_array(struct lox_object *obj1, struct lox_object *obj2
 
 long lox_object_add(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst)
 {
-    lox_info("-------------------lox_object_add");
+    lox_debug("lox_object_add.\n");
     long ret = LOX_ERROR(LOX_INVALID);
     if (!obj1 || !obj2 || !dst)
     {
-        lox_error("-----lox_object_add error nil object");
+        lox_error("lox_object_add error nil object.\n");
         exit(0);
         return ret;
     }
@@ -747,11 +747,11 @@ long lox_object_array_sub_array(struct lox_object *obj1, struct lox_object *obj2
 
 long lox_object_sub(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst)
 {
-    lox_info("-------------------lox_object_sub\n");
+    lox_debug("lox_object_sub.\n");
     int ret = LOX_ERROR(LOX_INVALID);
     if (!obj1 || !obj2 || !dst)
     {
-        lox_error("-----lox_object_sub error nil object");
+        lox_error("lox_object_sub error nil object.");
         exit(0);
         return ret;
     }
@@ -814,11 +814,11 @@ long lox_object_sub(struct lox_object *obj1, struct lox_object *obj2, struct lox
 
 long lox_object_mul(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst)
 {
-    lox_info("-------------------lox_object_mul\n");
+    lox_debug("lox_object_mul\n");
     int ret = LOX_ERROR(LOX_INVALID);
     if (!obj1 || !obj2 || !dst)
     {
-        lox_error("-----lox_object_mul error nil object");
+        lox_error("lox_object_mul error nil object");
         exit(0);
         return ret;
     }
@@ -947,11 +947,11 @@ long lox_object_number_mul_array(struct lox_object *obj1, struct lox_object *obj
 
 long lox_object_div(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst)
 {
-    lox_info("-------------------lox_object_div\n");
+    lox_debug("lox_object_div\n");
     int ret = LOX_ERROR(LOX_INVALID);
     if (!obj1 || !obj2 || !dst)
     {
-        lox_error("-----lox_object_div error nil object");
+        lox_error("lox_object_div error nil object");
         exit(0);
         return ret;
     }
@@ -1037,32 +1037,32 @@ long lox_object_array_div_number(struct lox_object *obj1, struct lox_object *obj
 
 long lox_object_mod(struct lox_object *obj1, struct lox_object *obj2, struct lox_object *dst)
 {
-    lox_info("-------------------lox_object_mod\n");
+    lox_debug("lox_object_mod\n");
     int ret = LOX_ERROR(LOX_INVALID);
     if (!obj1 || !obj2 || !dst)
     {
-        lox_error("-----lox_object_div error nil object");
+        lox_error("lox_object_div error nil object.\n");
         exit(0);
         return ret;
     }
 
     if (obj1->o_tag != LOX_NUMBER || obj2->o_tag != LOX_NUMBER)
     {
-        lox_error("-----lox_object_mod must number\n");
+        lox_error("lox_object_mod must number.\n");
         exit(0);
         return ret;
     }
 
     if (obj2->o_value.v_f == 0.0)
     {
-        lox_error("-----lox_object_mod zero\n");
+        lox_error("lox_object_mod zero.\n");
         exit(0);
         return ret;
     }
 
     if (!lox_is_int_number(obj1->o_value.v_f) || !lox_is_int_number(obj2->o_value.v_f))
     {
-        lox_error("-----lox_object_mod must int number\n");
+        lox_error("lox_object_mod must int number.\n");
         exit(0);
         return ret;
     }
@@ -1144,7 +1144,7 @@ long lox_object_logical_operation(struct lox_object *obj1, struct lox_object *ob
 {
     if (!obj1 || !obj2 || !dst)
     {
-        lox_error("---------logical opearation nil obj\n");
+        lox_error("logical opearation nil obj\n");
         exit(0);
     }
     struct lox_object obj_new;
@@ -1183,7 +1183,7 @@ long lox_object_logical_operation_eq(struct lox_object *obj1, struct lox_object 
     obj_new.o_tag = LOX_BOOL_FALSE;
     if (obj1->o_tag != obj2->o_tag)
     {
-        lox_info("---------logical opearation eq type not equal:%d %d\n", obj1->o_tag, obj2->o_tag);
+        lox_debug("logical opearation_eq type not equal:%d %d\n", obj1->o_tag, obj2->o_tag);
         lox_object_copy(dst, &obj_new);
         return  LOX_OK;
     }
@@ -1255,7 +1255,7 @@ long lox_object_logical_operation_neq(struct lox_object *obj1, struct lox_object
     obj_new.o_tag = LOX_BOOL_FALSE;
     if (obj1->o_tag != obj2->o_tag)
     {
-        lox_info("---------logical opearation neq type not equal:%d %d\n", obj1->o_tag, obj2->o_tag);
+        lox_debug("logical opearation neq type not equal:%d %d\n", obj1->o_tag, obj2->o_tag);
         obj_new.o_tag = LOX_BOOL_TRUE;
         lox_object_copy(dst, &obj_new);
         return  LOX_OK;
@@ -1333,12 +1333,12 @@ long lox_object_logical_operation_lt(struct lox_object *obj1, struct lox_object 
     obj_new.o_tag = LOX_BOOL_FALSE;
     if ((obj1->o_tag != obj2->o_tag))
     {
-        lox_info("---------logical opearation lt type not equal:%d %d\n", obj1->o_tag, obj2->o_tag);
+        lox_debug("logical opearation lt type not equal:%d %d\n", obj1->o_tag, obj2->o_tag);
         lox_object_copy(dst, &obj_new);
         return  LOX_OK;
     }
 
-    lox_info("lox_object_logical_operation_lt-----------[-------------------:%d %f %f\n\n", obj1->o_tag, obj1->o_value.v_f, obj2->o_value.v_f);
+    lox_debug("lox_object_logical_operation_lt:%d %f %f\n\n", obj1->o_tag, obj1->o_value.v_f, obj2->o_value.v_f);
     switch (obj1->o_tag)
     {
         case LOX_NUMBER:
@@ -1380,7 +1380,7 @@ long lox_object_logical_operation_gt(struct lox_object *obj1, struct lox_object 
     obj_new.o_tag = LOX_BOOL_FALSE;
     if ((obj1->o_tag != obj2->o_tag))
     {
-        lox_info("---------logical opearation gt type not equal:%d %d\n", obj1->o_tag, obj2->o_tag);
+        lox_debug("logical opearation gt type not equal:%d %d\n", obj1->o_tag, obj2->o_tag);
         lox_object_copy(dst, &obj_new);
         return  LOX_OK;
     }
@@ -1426,7 +1426,7 @@ long lox_object_logical_operation_let(struct lox_object *obj1, struct lox_object
     obj_new.o_tag = LOX_BOOL_FALSE;
     if ((obj1->o_tag != obj2->o_tag))
     {
-        lox_info("---------logical opearation let type not equal:%d %d\n", obj1->o_tag, obj2->o_tag);
+        lox_debug("logical opearation let type not equal:%d %d\n", obj1->o_tag, obj2->o_tag);
         lox_object_copy(dst, &obj_new);
         return  LOX_OK;
     }
@@ -1485,7 +1485,7 @@ long lox_object_logical_operation_get(struct lox_object *obj1, struct lox_object
     obj_new.o_tag = LOX_BOOL_FALSE;
     if ((obj1->o_tag != obj2->o_tag))
     {
-        lox_info("---------logical opearation get type not equal:%d %d\n", obj1->o_tag, obj2->o_tag);
+        lox_debug("logical opearation get type not equal:%d %d\n", obj1->o_tag, obj2->o_tag);
         lox_object_copy(dst, &obj_new);
         return  LOX_OK;
     }
@@ -1545,7 +1545,7 @@ long lox_object_and(struct lox_object *obj1, struct lox_object *obj2, struct lox
     obj_new.o_tag = LOX_BOOL_FALSE;
     if (!dst)
     {
-        lox_info("---------lox_object_and nil dst\n");
+        lox_debug("lox_object_and nil dst.\n");
         exit(0);
     }
     if (!obj1 || !obj2)
@@ -1571,7 +1571,7 @@ long lox_object_or(struct lox_object *obj1, struct lox_object *obj2, struct lox_
     obj_new.o_tag = LOX_BOOL_TRUE;
     if (!dst)
     {
-        lox_info("---------lox_object_or nil dst\n");
+        lox_debug("lox_object_or nil dst.\n");
         exit(0);
     }
     if (!obj1 || !obj2)
@@ -1601,7 +1601,7 @@ long lox_object_not(struct lox_object *obj1, struct lox_object *dst)
     obj_new.o_tag = LOX_BOOL_FALSE;
     if (!dst)
     {
-        lox_info("---------lox_object_not nil dst\n");
+        lox_debug("lox_object_not nil dst\n");
         exit(0);
     }
 
